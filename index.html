@@ -23,6 +23,12 @@
             --danger: #f44336;
             --border: #2a2a4a;
             --radius: 8px;
+            --sl1: #e53935;
+            --sl2: #fb8c00;
+            --sl3: #43a047;
+            --sl4: #ffd600;
+            --int1: #78909c;
+            --int2: #7c4dff;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -32,7 +38,7 @@
             line-height: 1.5;
         }
         .hidden { display: none !important; }
-        
+
         /* Login */
         .login-container {
             display: flex;
@@ -55,7 +61,7 @@
             color: var(--accent);
         }
         .login-box p { color: var(--text-dim); margin-bottom: 24px; font-size: 0.9rem; }
-        
+
         /* Form elements */
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 4px; }
@@ -72,7 +78,7 @@
         }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); }
         textarea { resize: vertical; min-height: 80px; }
-        
+
         .btn {
             padding: 12px 24px;
             border: none;
@@ -95,7 +101,7 @@
         .btn-success:hover { background: #388e3c; }
         .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
         .btn-block { width: 100%; justify-content: center; }
-        
+
         /* App Layout */
         .app-header {
             background: var(--surface);
@@ -117,9 +123,9 @@
             padding: 6px 12px;
             border-radius: 20px;
         }
-        
+
         .app-content { padding: 24px; max-width: 1200px; margin: 0 auto; }
-        
+
         /* Tabs */
         .tabs {
             display: flex;
@@ -141,40 +147,114 @@
         }
         .tab:hover { border-color: var(--accent); }
         .tab.active { background: var(--accent); border-color: var(--accent); color: white; }
-        
+
         /* Skill Cards */
         .skill-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 16px;
+            padding: 16px 20px;
             margin-bottom: 12px;
+        }
+        .skill-card .skill-name {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        .skill-card .skill-ratings {
             display: flex;
+            gap: 32px;
             align-items: center;
-            justify-content: space-between;
-            gap: 16px;
             flex-wrap: wrap;
         }
-        .skill-card .skill-name { flex: 1; min-width: 200px; font-size: 0.95rem; }
-        .skill-card .skill-ratings { display: flex; gap: 16px; align-items: center; }
-        .skill-card .skill-ratings label { font-size: 0.8rem; color: var(--text-dim); }
-        .skill-card select { width: 70px; padding: 8px; }
-        
+        .rating-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .rating-group .rating-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            min-width: 75px;
+        }
+        .pill-group {
+            display: flex;
+            gap: 4px;
+        }
+        .pill {
+            width: 40px;
+            height: 34px;
+            border-radius: 6px;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+        .pill:hover {
+            border-color: var(--text-dim);
+            transform: translateY(-1px);
+        }
+        .pill.selected {
+            color: white;
+            border-color: transparent;
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .pill.sl-1.selected { background: var(--sl1); }
+        .pill.sl-2.selected { background: var(--sl2); }
+        .pill.sl-3.selected { background: var(--sl3); }
+        .pill.sl-4.selected { background: var(--sl4); color: #1a1a2e; }
+        .pill.int-1.selected { background: var(--int1); }
+        .pill.int-2.selected { background: var(--int2); }
+
+        /* Pill tooltips */
+        .pill-group[data-type="sl"] .pill:nth-child(1)::after { content: ''; }
+        .pill-group[data-type="sl"] .pill:nth-child(2)::after { content: ''; }
+        .pill-group[data-type="sl"] .pill:nth-child(3)::after { content: ''; }
+        .pill-group[data-type="sl"] .pill:nth-child(4)::after { content: ''; }
+
         /* Rating Key */
         .rating-key {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 16px;
+            padding: 16px 20px;
             margin-bottom: 24px;
         }
-        .rating-key h4 { margin-bottom: 8px; font-size: 0.9rem; color: var(--accent); }
+        .rating-key h4 { margin-bottom: 10px; font-size: 0.9rem; color: var(--accent); }
         .rating-key .keys { display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-dim); }
-        
+        .key-pills {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .key-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+        .key-pill.kp-1 { background: var(--sl1); }
+        .key-pill.kp-2 { background: var(--sl2); }
+        .key-pill.kp-3 { background: var(--sl3); }
+        .key-pill.kp-4 { background: var(--sl4); color: #1a1a2e; }
+
         /* Admin */
         .admin-section { margin-bottom: 32px; }
         .admin-section h3 { margin-bottom: 16px; font-size: 1.1rem; }
-        
+
         .skill-admin-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -202,7 +282,7 @@
             transition: all 0.2s;
         }
         .skill-admin-card .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
-        
+
         /* Results */
         .result-card {
             background: var(--surface);
@@ -212,25 +292,7 @@
             margin-bottom: 16px;
         }
         .result-card h4 { margin-bottom: 12px; color: var(--accent); }
-        .result-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 8px;
-        }
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            background: var(--bg);
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-        .result-item .score { font-weight: 600; }
-        .score-low { color: var(--danger); }
-        .score-mid { color: var(--warning); }
-        .score-high { color: var(--success); }
-        
+
         /* Gap Summary */
         .gap-badge {
             display: inline-block;
@@ -242,7 +304,7 @@
         }
         .gap-critical { background: rgba(244,67,54,0.2); color: var(--danger); }
         .gap-warning { background: rgba(255,152,0,0.2); color: var(--warning); }
-        
+
         /* Settings */
         .settings-row {
             display: flex;
@@ -253,7 +315,7 @@
         }
         .settings-row label { font-size: 0.9rem; min-width: 150px; }
         .settings-row input, .settings-row select { max-width: 200px; }
-        
+
         /* Modal */
         .modal-overlay {
             position: fixed;
@@ -276,7 +338,7 @@
         }
         .modal h3 { margin-bottom: 16px; }
         .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
-        
+
         /* Toast */
         .toast {
             position: fixed;
@@ -293,13 +355,12 @@
         }
         .toast.error { background: var(--danger); }
         @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
+
         /* Responsive */
         @media (max-width: 768px) {
             .app-header { padding: 12px 16px; }
             .app-content { padding: 16px; }
-            .skill-card { flex-direction: column; align-items: flex-start; }
-            .skill-card .skill-ratings { width: 100%; justify-content: flex-start; }
+            .skill-card .skill-ratings { gap: 16px; }
             .header-right { gap: 8px; }
             .user-badge { display: none; }
         }
@@ -335,18 +396,23 @@
             <button class="btn btn-sm btn-secondary" onclick="handleLogout()">Logout</button>
         </div>
     </header>
-    
+
     <div class="app-content">
         <!-- ASSESSMENT VIEW -->
         <div id="assessmentView">
             <div class="rating-key">
                 <h4>Rating Key</h4>
-                <div class="keys">
-                    <span><strong>Skill Level:</strong> 1=Basic, 2=Intermediate, 3=Advanced, 4=Trainer</span>
-                    <span><strong>Interest:</strong> 1=No interest/Not relevant, 2=Interested</span>
+                <div class="key-pills">
+                    <span class="key-pill kp-1">1 Basic</span>
+                    <span class="key-pill kp-2">2 Intermediate</span>
+                    <span class="key-pill kp-3">3 Advanced</span>
+                    <span class="key-pill kp-4">4 Trainer</span>
+                </div>
+                <div class="keys" style="margin-top:10px;">
+                    <span><strong>Interest:</strong> 1 = No interest / Not relevant &nbsp;|&nbsp; 2 = Interested</span>
                 </div>
             </div>
-            
+
             <div class="tabs" id="productTabs"></div>
             <div id="skillsList"></div>
             <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
@@ -354,7 +420,7 @@
                 <button class="btn btn-primary" onclick="submitAssessment()">Submit Assessment</button>
             </div>
         </div>
-        
+
         <!-- ADMIN VIEW -->
         <div id="adminView" class="hidden">
             <div class="tabs" style="margin-bottom:16px;">
@@ -362,7 +428,7 @@
                 <div class="tab" onclick="switchAdminTab('results')">View Results</div>
                 <div class="tab" onclick="switchAdminTab('settings')">Settings</div>
             </div>
-            
+
             <!-- Questions Management -->
             <div id="adminQuestions">
                 <div class="admin-section">
@@ -377,7 +443,7 @@
                     <div id="adminSkillsList"></div>
                 </div>
             </div>
-            
+
             <!-- Results -->
             <div id="adminResults" class="hidden">
                 <div class="admin-section">
@@ -389,7 +455,7 @@
                     <div id="resultsContainer"></div>
                 </div>
             </div>
-            
+
             <!-- Settings -->
             <div id="adminSettings" class="hidden">
                 <div class="admin-section">
@@ -427,18 +493,18 @@
 // FIREBASE CONFIG - Replace with your project details
 // =====================================================
 const firebaseConfig = {
-  apiKey: "AIzaSyA5xE8YJkAVzOgCXiD3wEiHE-ybFvEE1qM",
-  authDomain: "competency-matrix-2d086.firebaseapp.com",
-  projectId: "competency-matrix-2d086",
-  storageBucket: "competency-matrix-2d086.firebasestorage.app",
-  messagingSenderId: "156072705192",
-  appId: "1:156072705192:web:499355f2bddcc3049a169d"
+    apiKey: "AIzaSyA5xE8YJkAVzOgCXiD3wEiHE-ybFvEE1qM",
+    authDomain: "competency-matrix-2d086.firebaseapp.com",
+    projectId: "competency-matrix-2d086",
+    storageBucket: "competency-matrix-2d086.firebasestorage.app",
+    messagingSenderId: "156072705192",
+    appId: "1:156072705192:web:499355f2bddcc3049a169d"
 };
 
-// EmailJS Config
+// EmailJS Config - Replace with your details
 const EMAILJS_PUBLIC_KEY = "ptOv5d4JHIriHLzD_";
-const EMAILJS_SERVICE_ID = "service_lokf8zw";
-const EMAILJS_TEMPLATE_ID = "template_gy3dfd3";
+const EMAILJS_SERVICE_ID = "service_13gunnx";
+const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID_HERE";
 
 // =====================================================
 // INIT
@@ -451,8 +517,8 @@ let currentUser = null;
 let isAdmin = false;
 let currentProduct = null;
 let adminCurrentProduct = null;
-let questionsData = {}; // { productName: [{ id, text }] }
-let userResponses = {}; // { productName: { skillId: { sl, int } } }
+let questionsData = {};
+let userResponses = {};
 let settings = { threshold: 3, notifEmail: '' };
 
 // =====================================================
@@ -493,7 +559,6 @@ async function loadUserRole() {
     if (doc.exists) {
         isAdmin = doc.data().role === 'admin';
     } else {
-        // First time user, create profile
         await db.collection('users').doc(currentUser.uid).set({
             email: currentUser.email,
             name: currentUser.email.split('@')[0],
@@ -588,27 +653,35 @@ function renderSkills() {
         <div class="skill-card">
             <div class="skill-name">${skill.text}</div>
             <div class="skill-ratings">
-                <div>
-                    <label>Skill Level</label>
-                    <select onchange="updateResponse('${currentProduct}','${skill.id}','sl',this.value)">
-                        <option value="">-</option>
-                        <option value="1" ${r.sl==1?'selected':''}>1</option>
-                        <option value="2" ${r.sl==2?'selected':''}>2</option>
-                        <option value="3" ${r.sl==3?'selected':''}>3</option>
-                        <option value="4" ${r.sl==4?'selected':''}>4</option>
-                    </select>
+                <div class="rating-group">
+                    <span class="rating-label">Skill Level</span>
+                    <div class="pill-group" data-type="sl">
+                        <div class="pill sl-1 ${r.sl==1?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',1)">1</div>
+                        <div class="pill sl-2 ${r.sl==2?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',2)">2</div>
+                        <div class="pill sl-3 ${r.sl==3?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',3)">3</div>
+                        <div class="pill sl-4 ${r.sl==4?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',4)">4</div>
+                    </div>
                 </div>
-                <div>
-                    <label>Interest</label>
-                    <select onchange="updateResponse('${currentProduct}','${skill.id}','int',this.value)">
-                        <option value="">-</option>
-                        <option value="1" ${r.int==1?'selected':''}>1</option>
-                        <option value="2" ${r.int==2?'selected':''}>2</option>
-                    </select>
+                <div class="rating-group">
+                    <span class="rating-label">Interest</span>
+                    <div class="pill-group" data-type="int">
+                        <div class="pill int-1 ${r.int==1?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','int',1)">1</div>
+                        <div class="pill int-2 ${r.int==2?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','int',2)">2</div>
+                    </div>
                 </div>
             </div>
         </div>`;
     }).join('');
+}
+
+function selectPill(el, product, skillId, field, value) {
+    // Remove selected from siblings
+    const group = el.parentElement;
+    group.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+    // Add selected to clicked
+    el.classList.add('selected');
+    // Update data
+    updateResponse(product, skillId, field, value);
 }
 
 function updateResponse(product, skillId, field, value) {
@@ -639,7 +712,6 @@ async function saveProgress() {
 }
 
 async function submitAssessment() {
-    // Check completeness
     let incomplete = [];
     for (const [product, skills] of Object.entries(questionsData)) {
         for (const skill of skills) {
@@ -652,7 +724,7 @@ async function submitAssessment() {
     if (incomplete.length > 0) {
         if (!confirm(`You have ${incomplete.length} unanswered skill(s). Submit anyway?`)) return;
     }
-    
+
     await db.collection('responses').doc(currentUser.uid).set({
         responses: userResponses,
         email: currentUser.email,
@@ -661,19 +733,18 @@ async function submitAssessment() {
         submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
         submitted: true
     }, { merge: true });
-    
-    // Send email notification
+
     await sendNotificationEmail();
     showToast('Assessment submitted successfully!');
 }
 
 async function sendNotificationEmail() {
-    if (!settings.notifEmail || !EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY === 'ptOv5d4JHIriHLzD_') return;
-    
+    if (!settings.notifEmail) return;
+
     const threshold = settings.threshold || 3;
     const userName = currentUser.email.split('@')[0];
     let gaps = [];
-    
+
     for (const [product, skills] of Object.entries(questionsData)) {
         for (const skill of skills) {
             const r = (userResponses[product] || {})[skill.id];
@@ -682,11 +753,11 @@ async function sendNotificationEmail() {
             }
         }
     }
-    
-    const gapText = gaps.length > 0 
+
+    const gapText = gaps.length > 0
         ? `IMPROVEMENT AREAS (below level ${threshold}):\n${gaps.join('\n')}`
         : 'No gaps identified - all skills at or above threshold!';
-    
+
     try {
         emailjs.init(EMAILJS_PUBLIC_KEY);
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -858,17 +929,17 @@ async function loadAllResults() {
 function renderResults() {
     const threshold = parseInt(document.getElementById('thresholdInput')?.value) || settings.threshold || 3;
     const container = document.getElementById('resultsContainer');
-    
+
     if (!allResults.length) {
         container.innerHTML = '<p style="color:var(--text-dim)">No submissions yet.</p>';
         return;
     }
-    
+
     container.innerHTML = allResults.map(result => {
         const name = result.name || result.email || 'Unknown';
         const submitted = result.submitted ? '&#10003; Submitted' : '&#9998; In progress';
         let gaps = [];
-        
+
         for (const [product, skills] of Object.entries(questionsData)) {
             for (const skill of skills) {
                 const r = (result.responses?.[product] || {})[skill.id];
@@ -877,11 +948,11 @@ function renderResults() {
                 }
             }
         }
-        
-        const gapHtml = gaps.length > 0 
+
+        const gapHtml = gaps.length > 0
             ? gaps.map(g => `<span class="gap-badge ${g.level === 1 ? 'gap-critical' : 'gap-warning'}">${g.product}: ${g.skill} (${g.level})</span>`).join(' ')
             : '<span style="color:var(--success);font-size:0.85rem;">All skills at or above threshold</span>';
-        
+
         return `
         <div class="result-card">
             <h4>${name} <span style="font-size:0.8rem;font-weight:normal;color:var(--text-dim);">${submitted}</span></h4>
@@ -929,7 +1000,6 @@ async function loadTeamList() {
 async function grantAdmin() {
     const email = document.getElementById('adminEmailInput').value.trim();
     if (!email) return;
-    // Find user by email
     const snap = await db.collection('users').where('email', '==', email).get();
     if (snap.empty) { alert('User not found. They need to sign in first.'); return; }
     snap.forEach(async doc => {
@@ -951,7 +1021,6 @@ function showToast(msg, isError = false) {
     setTimeout(() => t.remove(), 3000);
 }
 
-// Delete product (accessible via console or extend UI)
 async function deleteProduct(name) {
     if (!confirm(`Delete product "${name}" and all its skills?`)) return;
     delete questionsData[name];
