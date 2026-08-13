@@ -435,6 +435,10 @@ const firebaseConfig = {
   appId: "1:156072705192:web:499355f2bddcc3049a169d"
 };
 
+// EmailJS Config
+const EMAILJS_PUBLIC_KEY = "ptOv5d4JHIriHLzD_";
+const EMAILJS_SERVICE_ID = "service_13gunnx";
+const EMAILJS_TEMPLATE_ID = "template_gy3dfd3";
 
 // =====================================================
 // INIT
@@ -664,7 +668,7 @@ async function submitAssessment() {
 }
 
 async function sendNotificationEmail() {
-    if (!settings.notifEmail || !EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY === 'YOUR_EMAILJS_PUBLIC_KEY') return;
+    if (!settings.notifEmail || !EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY === 'ptOv5d4JHIriHLzD_') return;
     
     const threshold = settings.threshold || 3;
     const userName = currentUser.email.split('@')[0];
