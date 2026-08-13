@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Config Team Competency Matrix</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #1a1a2e;
+            --surface: #16213e;
+            --surface2: #0f3460;
+            --accent: #e94560;
+            --accent2: #533483;
+            --text: #eaeaea;
+            --text-dim: #a0a0b0;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --border: #2a2a4a;
+            --radius: 8px;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        .hidden { display: none !important; }
+        
+        /* Login */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-box {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .login-box h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+        .login-box p { color: var(--text-dim); margin-bottom: 24px; font-size: 0.9rem; }
+        
+        /* Form elements */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 4px; }
+        input[type="email"], input[type="password"], input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+        textarea { resize: vertical; min-height: 80px; }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #d63851; transform: translateY(-1px); }
+        .btn-secondary { background: var(--surface2); color: var(--text); }
+        .btn-secondary:hover { background: #1a4a7a; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #d32f2f; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #388e3c; }
+        .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+        .btn-block { width: 100%; justify-content: center; }
+        
+        /* App Layout */
+        .app-header {
+            background: var(--surface);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .app-header h2 { font-size: 1.1rem; color: var(--accent); }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-badge {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            background: var(--bg);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+        
+        .app-content { padding: 24px; max-width: 1200px; margin: 0 auto; }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab:hover { border-color: var(--accent); }
+        .tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+        
+        /* Skill Cards */
+        .skill-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .skill-card .skill-name { flex: 1; min-width: 200px; font-size: 0.95rem; }
+        .skill-card .skill-ratings { display: flex; gap: 16px; align-items: center; }
+        .skill-card .skill-ratings label { font-size: 0.8rem; color: var(--text-dim); }
+        .skill-card select { width: 70px; padding: 8px; }
+        
+        /* Rating Key */
+        .rating-key {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .rating-key h4 { margin-bottom: 8px; font-size: 0.9rem; color: var(--accent); }
+        .rating-key .keys { display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-dim); }
+        
+        /* Admin */
+        .admin-section { margin-bottom: 32px; }
+        .admin-section h3 { margin-bottom: 16px; font-size: 1.1rem; }
+        
+        .skill-admin-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .skill-admin-card .skill-text { flex: 1; font-size: 0.9rem; }
+        .skill-admin-card .skill-actions { display: flex; gap: 6px; }
+        .skill-admin-card .btn-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-dim);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .skill-admin-card .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+        
+        /* Results */
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .result-card h4 { margin-bottom: 12px; color: var(--accent); }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 8px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--bg);
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        .result-item .score { font-weight: 600; }
+        .score-low { color: var(--danger); }
+        .score-mid { color: var(--warning); }
+        .score-high { color: var(--success); }
+        
+        /* Gap Summary */
+        .gap-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 2px;
+        }
+        .gap-critical { background: rgba(244,67,54,0.2); color: var(--danger); }
+        .gap-warning { background: rgba(255,152,0,0.2); color: var(--warning); }
+        
+        /* Settings */
+        .settings-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .settings-row label { font-size: 0.9rem; min-width: 150px; }
+        .settings-row input, .settings-row select { max-width: 200px; }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 32px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal h3 { margin-bottom: 16px; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.error { background: var(--danger); }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-header { padding: 12px 16px; }
+            .app-content { padding: 16px; }
+            .skill-card { flex-direction: column; align-items: flex-start; }
+            .skill-card .skill-ratings { width: 100%; justify-content: flex-start; }
+            .header-right { gap: 8px; }
+            .user-badge { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN VIEW -->
+<div id="loginView" class="login-container">
+    <div class="login-box">
+        <h1>Competency Matrix</h1>
+        <p>Config Team Self-Assessment</p>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="your.name@company.com">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter password">
+        </div>
+        <button class="btn btn-primary btn-block" onclick="handleLogin()">Sign In</button>
+        <p id="loginError" style="color:var(--danger);margin-top:12px;font-size:0.85rem;"></p>
+    </div>
+</div>
+
+<!-- APP VIEW -->
+<div id="appView" class="hidden">
+    <header class="app-header">
+        <h2>Competency Matrix</h2>
+        <div class="header-right">
+            <span class="user-badge" id="userBadge"></span>
+            <button class="btn btn-sm btn-secondary" id="adminToggle" onclick="toggleAdmin()">Admin</button>
+            <button class="btn btn-sm btn-secondary" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+    
+    <div class="app-content">
+        <!-- ASSESSMENT VIEW -->
+        <div id="assessmentView">
+            <div class="rating-key">
+                <h4>Rating Key</h4>
+                <div class="keys">
+                    <span><strong>Skill Level:</strong> 1=Basic, 2=Intermediate, 3=Advanced, 4=Trainer</span>
+                    <span><strong>Interest:</strong> 1=No interest/Not relevant, 2=Interested</span>
+                </div>
+            </div>
+            
+            <div class="tabs" id="productTabs"></div>
+            <div id="skillsList"></div>
+            <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
+                <button class="btn btn-secondary" onclick="saveProgress()">Save Progress</button>
+                <button class="btn btn-primary" onclick="submitAssessment()">Submit Assessment</button>
+            </div>
+        </div>
+        
+        <!-- ADMIN VIEW -->
+        <div id="adminView" class="hidden">
+            <div class="tabs" style="margin-bottom:16px;">
+                <div class="tab active" onclick="switchAdminTab('questions')">Manage Questions</div>
+                <div class="tab" onclick="switchAdminTab('results')">View Results</div>
+                <div class="tab" onclick="switchAdminTab('settings')">Settings</div>
+            </div>
+            
+            <!-- Questions Management -->
+            <div id="adminQuestions">
+                <div class="admin-section">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+                        <h3>Manage Skills</h3>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button class="btn btn-sm btn-secondary" onclick="showAddProductModal()">+ Product</button>
+                            <button class="btn btn-sm btn-primary" onclick="showAddSkillModal()">+ Skill</button>
+                        </div>
+                    </div>
+                    <div class="tabs" id="adminProductTabs"></div>
+                    <div id="adminSkillsList"></div>
+                </div>
+            </div>
+            
+            <!-- Results -->
+            <div id="adminResults" class="hidden">
+                <div class="admin-section">
+                    <h3>Team Results & Gap Analysis</h3>
+                    <div class="settings-row">
+                        <label>Minimum Skill Threshold:</label>
+                        <input type="number" id="thresholdInput" min="1" max="4" value="3" style="max-width:80px;" onchange="renderResults()">
+                    </div>
+                    <div id="resultsContainer"></div>
+                </div>
+            </div>
+            
+            <!-- Settings -->
+            <div id="adminSettings" class="hidden">
+                <div class="admin-section">
+                    <h3>Settings</h3>
+                    <div class="form-group">
+                        <label>Notification Email (receives gap reports)</label>
+                        <input type="email" id="notifEmail" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Skill Level Threshold (flags scores below this)</label>
+                        <input type="number" id="settingsThreshold" min="1" max="4" value="3">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+                    <hr style="margin:32px 0;border-color:var(--border);">
+                    <h3>Manage Team Members</h3>
+                    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">Add users in Firebase Console > Authentication. Grant admin role below.</p>
+                    <div id="teamList"></div>
+                    <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+                        <input type="email" id="adminEmailInput" placeholder="user@email.com" style="max-width:250px;">
+                        <button class="btn btn-sm btn-secondary" onclick="grantAdmin()">Grant Admin</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-overlay hidden" onclick="event.target===this&&closeModal()">
+    <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// =====================================================
+// FIREBASE CONFIG - Replace with your project details
+// =====================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyA5xE8YJkAVzOgCXiD3wEiHE-ybFvEE1qM",
+  authDomain: "competency-matrix-2d086.firebaseapp.com",
+  projectId: "competency-matrix-2d086",
+  storageBucket: "competency-matrix-2d086.firebasestorage.app",
+  messagingSenderId: "156072705192",
+  appId: "1:156072705192:web:499355f2bddcc3049a169d"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// =====================================================
+// INIT
+// =====================================================
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let currentUser = null;
+let isAdmin = false;
+let currentProduct = null;
+let adminCurrentProduct = null;
+let questionsData = {}; // { productName: [{ id, text }] }
+let userResponses = {}; // { productName: { skillId: { sl, int } } }
+let settings = { threshold: 3, notifEmail: '' };
+
+// =====================================================
+// AUTH
+// =====================================================
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        currentUser = user;
+        await loadUserRole();
+        await loadQuestions();
+        await loadUserResponses();
+        await loadSettings();
+        showApp();
+    } else {
+        currentUser = null;
+        isAdmin = false;
+        document.getElementById('loginView').classList.remove('hidden');
+        document.getElementById('appView').classList.add('hidden');
+    }
+});
+
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPassword').value;
+    try {
+        await auth.signInWithEmailAndPassword(email, pass);
+    } catch (e) {
+        document.getElementById('loginError').textContent = e.message;
+    }
+}
+
+function handleLogout() {
+    auth.signOut();
+}
+
+async function loadUserRole() {
+    const doc = await db.collection('users').doc(currentUser.uid).get();
+    if (doc.exists) {
+        isAdmin = doc.data().role === 'admin';
+    } else {
+        // First time user, create profile
+        await db.collection('users').doc(currentUser.uid).set({
+            email: currentUser.email,
+            name: currentUser.email.split('@')[0],
+            role: 'member',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        isAdmin = false;
+    }
+}
+
+// =====================================================
+// APP DISPLAY
+// =====================================================
+function showApp() {
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('appView').classList.remove('hidden');
+    document.getElementById('userBadge').textContent = currentUser.email.split('@')[0];
+    document.getElementById('adminToggle').classList.toggle('hidden', !isAdmin);
+    renderProductTabs();
+}
+
+function toggleAdmin() {
+    const assessView = document.getElementById('assessmentView');
+    const adminView = document.getElementById('adminView');
+    if (adminView.classList.contains('hidden')) {
+        assessView.classList.add('hidden');
+        adminView.classList.remove('hidden');
+        renderAdminProductTabs();
+        loadAllResults();
+    } else {
+        adminView.classList.add('hidden');
+        assessView.classList.remove('hidden');
+    }
+}
+
+function switchAdminTab(tab) {
+    document.querySelectorAll('#adminView > .tabs .tab').forEach((t, i) => {
+        t.classList.toggle('active', t.textContent.toLowerCase().includes(tab.substring(0, 4)));
+    });
+    document.getElementById('adminQuestions').classList.toggle('hidden', tab !== 'questions');
+    document.getElementById('adminResults').classList.toggle('hidden', tab !== 'results');
+    document.getElementById('adminSettings').classList.toggle('hidden', tab !== 'settings');
+    if (tab === 'results') loadAllResults();
+    if (tab === 'settings') loadSettingsUI();
+}
+
+// =====================================================
+// QUESTIONS (SKILLS) MANAGEMENT
+// =====================================================
+async function loadQuestions() {
+    const snap = await db.collection('config').doc('questions').get();
+    if (snap.exists) {
+        questionsData = snap.data().products || {};
+    } else {
+        questionsData = {};
+    }
+}
+
+async function saveQuestions() {
+    await db.collection('config').doc('questions').set({ products: questionsData });
+}
+
+function renderProductTabs() {
+    const products = Object.keys(questionsData);
+    if (!products.length) {
+        document.getElementById('productTabs').innerHTML = '<p style="color:var(--text-dim)">No products configured yet. Ask your admin to add some.</p>';
+        document.getElementById('skillsList').innerHTML = '';
+        return;
+    }
+    if (!currentProduct || !products.includes(currentProduct)) currentProduct = products[0];
+    document.getElementById('productTabs').innerHTML = products.map(p =>
+        `<div class="tab ${p === currentProduct ? 'active' : ''}" onclick="selectProduct('${p}')">${p}</div>`
+    ).join('');
+    renderSkills();
+}
+
+function selectProduct(p) {
+    currentProduct = p;
+    renderProductTabs();
+}
+
+function renderSkills() {
+    const skills = questionsData[currentProduct] || [];
+    if (!skills.length) {
+        document.getElementById('skillsList').innerHTML = '<p style="color:var(--text-dim)">No skills in this product yet.</p>';
+        return;
+    }
+    const responses = (userResponses[currentProduct] || {});
+    document.getElementById('skillsList').innerHTML = skills.map(skill => {
+        const r = responses[skill.id] || { sl: '', int: '' };
+        return `
+        <div class="skill-card">
+            <div class="skill-name">${skill.text}</div>
+            <div class="skill-ratings">
+                <div>
+                    <label>Skill Level</label>
+                    <select onchange="updateResponse('${currentProduct}','${skill.id}','sl',this.value)">
+                        <option value="">-</option>
+                        <option value="1" ${r.sl==1?'selected':''}>1</option>
+                        <option value="2" ${r.sl==2?'selected':''}>2</option>
+                        <option value="3" ${r.sl==3?'selected':''}>3</option>
+                        <option value="4" ${r.sl==4?'selected':''}>4</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Interest</label>
+                    <select onchange="updateResponse('${currentProduct}','${skill.id}','int',this.value)">
+                        <option value="">-</option>
+                        <option value="1" ${r.int==1?'selected':''}>1</option>
+                        <option value="2" ${r.int==2?'selected':''}>2</option>
+                    </select>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function updateResponse(product, skillId, field, value) {
+    if (!userResponses[product]) userResponses[product] = {};
+    if (!userResponses[product][skillId]) userResponses[product][skillId] = {};
+    userResponses[product][skillId][field] = value ? parseInt(value) : '';
+}
+
+// =====================================================
+// SAVE & SUBMIT
+// =====================================================
+async function loadUserResponses() {
+    const doc = await db.collection('responses').doc(currentUser.uid).get();
+    if (doc.exists) {
+        userResponses = doc.data().responses || {};
+    }
+}
+
+async function saveProgress() {
+    await db.collection('responses').doc(currentUser.uid).set({
+        responses: userResponses,
+        email: currentUser.email,
+        name: currentUser.email.split('@')[0],
+        lastSaved: firebase.firestore.FieldValue.serverTimestamp(),
+        submitted: false
+    }, { merge: true });
+    showToast('Progress saved!');
+}
+
+async function submitAssessment() {
+    // Check completeness
+    let incomplete = [];
+    for (const [product, skills] of Object.entries(questionsData)) {
+        for (const skill of skills) {
+            const r = (userResponses[product] || {})[skill.id];
+            if (!r || !r.sl || !r.int) {
+                incomplete.push(`${product}: ${skill.text}`);
+            }
+        }
+    }
+    if (incomplete.length > 0) {
+        if (!confirm(`You have ${incomplete.length} unanswered skill(s). Submit anyway?`)) return;
+    }
+    
+    await db.collection('responses').doc(currentUser.uid).set({
+        responses: userResponses,
+        email: currentUser.email,
+        name: currentUser.email.split('@')[0],
+        lastSaved: firebase.firestore.FieldValue.serverTimestamp(),
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        submitted: true
+    }, { merge: true });
+    
+    // Send email notification
+    await sendNotificationEmail();
+    showToast('Assessment submitted successfully!');
+}
+
+async function sendNotificationEmail() {
+    if (!settings.notifEmail || !EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY === 'YOUR_EMAILJS_PUBLIC_KEY') return;
+    
+    const threshold = settings.threshold || 3;
+    const userName = currentUser.email.split('@')[0];
+    let gaps = [];
+    
+    for (const [product, skills] of Object.entries(questionsData)) {
+        for (const skill of skills) {
+            const r = (userResponses[product] || {})[skill.id];
+            if (r && r.sl && r.sl < threshold) {
+                gaps.push(`[${product}] ${skill.text}: Level ${r.sl}/${threshold}`);
+            }
+        }
+    }
+    
+    const gapText = gaps.length > 0 
+        ? `IMPROVEMENT AREAS (below level ${threshold}):\n${gaps.join('\n')}`
+        : 'No gaps identified - all skills at or above threshold!';
+    
+    try {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            to_email: settings.notifEmail,
+            from_name: 'Competency Matrix',
+            subject: `Assessment Submitted: ${userName}`,
+            message: `${userName} has submitted their competency assessment.\n\n${gapText}`
+        });
+    } catch (e) {
+        console.error('Email failed:', e);
+    }
+}
+
+// =====================================================
+// ADMIN - QUESTIONS
+// =====================================================
+function renderAdminProductTabs() {
+    const products = Object.keys(questionsData);
+    if (!adminCurrentProduct && products.length) adminCurrentProduct = products[0];
+    document.getElementById('adminProductTabs').innerHTML = products.map(p =>
+        `<div class="tab ${p === adminCurrentProduct ? 'active' : ''}" onclick="selectAdminProduct('${p}')">${p}</div>`
+    ).join('');
+    renderAdminSkills();
+}
+
+function selectAdminProduct(p) {
+    adminCurrentProduct = p;
+    renderAdminProductTabs();
+}
+
+function renderAdminSkills() {
+    const skills = questionsData[adminCurrentProduct] || [];
+    if (!skills.length) {
+        document.getElementById('adminSkillsList').innerHTML = '<p style="color:var(--text-dim)">No skills yet. Click "+ Skill" to add one.</p>';
+        return;
+    }
+    document.getElementById('adminSkillsList').innerHTML = skills.map((skill, i) => `
+        <div class="skill-admin-card">
+            <span class="skill-text">${skill.text}</span>
+            <div class="skill-actions">
+                <button class="btn-icon" onclick="moveSkill(${i},-1)" ${i===0?'disabled':''} title="Move up">&uarr;</button>
+                <button class="btn-icon" onclick="moveSkill(${i},1)" ${i===skills.length-1?'disabled':''} title="Move down">&darr;</button>
+                <button class="btn-icon" onclick="editSkill(${i})" title="Edit">&#9998;</button>
+                <button class="btn-icon" onclick="deleteSkill(${i})" title="Delete">&times;</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showAddProductModal() {
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modalContent').innerHTML = `
+        <h3>Add Product</h3>
+        <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" id="newProductName" placeholder="e.g. Financial Cloud">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="addProduct()">Add</button>
+        </div>
+    `;
+}
+
+async function addProduct() {
+    const name = document.getElementById('newProductName').value.trim();
+    if (!name) return;
+    if (questionsData[name]) { alert('Product already exists'); return; }
+    questionsData[name] = [];
+    await saveQuestions();
+    adminCurrentProduct = name;
+    renderAdminProductTabs();
+    renderProductTabs();
+    closeModal();
+    showToast('Product added!');
+}
+
+function showAddSkillModal() {
+    if (!adminCurrentProduct) { alert('Select a product first'); return; }
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modalContent').innerHTML = `
+        <h3>Add Skill to ${adminCurrentProduct}</h3>
+        <div class="form-group">
+            <label>Skill Description</label>
+            <input type="text" id="newSkillText" placeholder="e.g. Basic Page Navigation">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="addSkill()">Add</button>
+        </div>
+    `;
+}
+
+async function addSkill() {
+    const text = document.getElementById('newSkillText').value.trim();
+    if (!text) return;
+    const id = 'skill_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+    questionsData[adminCurrentProduct].push({ id, text });
+    await saveQuestions();
+    renderAdminSkills();
+    renderProductTabs();
+    closeModal();
+    showToast('Skill added!');
+}
+
+function editSkill(index) {
+    const skill = questionsData[adminCurrentProduct][index];
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modalContent').innerHTML = `
+        <h3>Edit Skill</h3>
+        <div class="form-group">
+            <label>Skill Description</label>
+            <input type="text" id="editSkillText" value="${skill.text}">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveEditSkill(${index})">Save</button>
+        </div>
+    `;
+}
+
+async function saveEditSkill(index) {
+    const text = document.getElementById('editSkillText').value.trim();
+    if (!text) return;
+    questionsData[adminCurrentProduct][index].text = text;
+    await saveQuestions();
+    renderAdminSkills();
+    renderProductTabs();
+    closeModal();
+    showToast('Skill updated!');
+}
+
+async function deleteSkill(index) {
+    if (!confirm('Delete this skill? Existing responses for it will be orphaned.')) return;
+    questionsData[adminCurrentProduct].splice(index, 1);
+    await saveQuestions();
+    renderAdminSkills();
+    renderProductTabs();
+    showToast('Skill deleted');
+}
+
+async function moveSkill(index, direction) {
+    const skills = questionsData[adminCurrentProduct];
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= skills.length) return;
+    [skills[index], skills[newIndex]] = [skills[newIndex], skills[index]];
+    await saveQuestions();
+    renderAdminSkills();
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+}
+
+// =====================================================
+// ADMIN - RESULTS
+// =====================================================
+let allResults = [];
+
+async function loadAllResults() {
+    const snap = await db.collection('responses').get();
+    allResults = [];
+    snap.forEach(doc => {
+        allResults.push({ uid: doc.id, ...doc.data() });
+    });
+    renderResults();
+}
+
+function renderResults() {
+    const threshold = parseInt(document.getElementById('thresholdInput')?.value) || settings.threshold || 3;
+    const container = document.getElementById('resultsContainer');
+    
+    if (!allResults.length) {
+        container.innerHTML = '<p style="color:var(--text-dim)">No submissions yet.</p>';
+        return;
+    }
+    
+    container.innerHTML = allResults.map(result => {
+        const name = result.name || result.email || 'Unknown';
+        const submitted = result.submitted ? '&#10003; Submitted' : '&#9998; In progress';
+        let gaps = [];
+        
+        for (const [product, skills] of Object.entries(questionsData)) {
+            for (const skill of skills) {
+                const r = (result.responses?.[product] || {})[skill.id];
+                if (r && r.sl && r.sl < threshold) {
+                    gaps.push({ product, skill: skill.text, level: r.sl });
+                }
+            }
+        }
+        
+        const gapHtml = gaps.length > 0 
+            ? gaps.map(g => `<span class="gap-badge ${g.level === 1 ? 'gap-critical' : 'gap-warning'}">${g.product}: ${g.skill} (${g.level})</span>`).join(' ')
+            : '<span style="color:var(--success);font-size:0.85rem;">All skills at or above threshold</span>';
+        
+        return `
+        <div class="result-card">
+            <h4>${name} <span style="font-size:0.8rem;font-weight:normal;color:var(--text-dim);">${submitted}</span></h4>
+            <div style="margin-top:8px;">${gapHtml}</div>
+        </div>`;
+    }).join('');
+}
+
+// =====================================================
+// ADMIN - SETTINGS
+// =====================================================
+async function loadSettings() {
+    const doc = await db.collection('config').doc('settings').get();
+    if (doc.exists) {
+        settings = doc.data();
+    }
+}
+
+function loadSettingsUI() {
+    document.getElementById('notifEmail').value = settings.notifEmail || '';
+    document.getElementById('settingsThreshold').value = settings.threshold || 3;
+    loadTeamList();
+}
+
+async function saveSettings() {
+    settings.notifEmail = document.getElementById('notifEmail').value.trim();
+    settings.threshold = parseInt(document.getElementById('settingsThreshold').value) || 3;
+    await db.collection('config').doc('settings').set(settings);
+    showToast('Settings saved!');
+}
+
+async function loadTeamList() {
+    const snap = await db.collection('users').get();
+    const container = document.getElementById('teamList');
+    let html = '';
+    snap.forEach(doc => {
+        const u = doc.data();
+        html += `<div class="skill-admin-card">
+            <span class="skill-text">${u.email} <span style="color:var(--text-dim);font-size:0.8rem;">(${u.role})</span></span>
+        </div>`;
+    });
+    container.innerHTML = html || '<p style="color:var(--text-dim)">No users yet.</p>';
+}
+
+async function grantAdmin() {
+    const email = document.getElementById('adminEmailInput').value.trim();
+    if (!email) return;
+    // Find user by email
+    const snap = await db.collection('users').where('email', '==', email).get();
+    if (snap.empty) { alert('User not found. They need to sign in first.'); return; }
+    snap.forEach(async doc => {
+        await db.collection('users').doc(doc.id).update({ role: 'admin' });
+    });
+    document.getElementById('adminEmailInput').value = '';
+    loadTeamList();
+    showToast('Admin granted!');
+}
+
+// =====================================================
+// UTILS
+// =====================================================
+function showToast(msg, isError = false) {
+    const t = document.createElement('div');
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+// Delete product (accessible via console or extend UI)
+async function deleteProduct(name) {
+    if (!confirm(`Delete product "${name}" and all its skills?`)) return;
+    delete questionsData[name];
+    await saveQuestions();
+    adminCurrentProduct = Object.keys(questionsData)[0] || null;
+    renderAdminProductTabs();
+    renderProductTabs();
+}
+</script>
+</body>
+</html>
