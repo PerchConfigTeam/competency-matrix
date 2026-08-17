@@ -39,7 +39,6 @@
         }
         .hidden { display: none !important; }
 
-        /* Login */
         .login-container {
             display: flex;
             align-items: center;
@@ -58,7 +57,6 @@
         .login-box h1 { font-size: 1.5rem; margin-bottom: 8px; color: var(--accent); }
         .login-box p { color: var(--text-dim); margin-bottom: 24px; font-size: 0.9rem; }
 
-        /* Form elements */
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 4px; }
         input[type="email"], input[type="password"], input[type="text"], input[type="number"], select, textarea {
@@ -97,7 +95,6 @@
         .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
         .btn-block { width: 100%; justify-content: center; }
 
-        /* App Layout */
         .app-header {
             background: var(--surface);
             padding: 16px 24px;
@@ -121,7 +118,6 @@
 
         .app-content { padding: 24px; max-width: 1200px; margin: 0 auto; }
 
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 4px;
@@ -144,9 +140,7 @@
         .tab.active { background: var(--accent); border-color: var(--accent); color: white; }
 
         /* Skill Group (parent skill) */
-        .skill-group {
-            margin-bottom: 20px;
-        }
+        .skill-group { margin-bottom: 20px; }
         .skill-group-header {
             background: var(--surface2);
             border: 1px solid var(--border);
@@ -166,20 +160,15 @@
             font-size: 0.8rem;
             transition: transform 0.2s;
         }
-        .skill-group-header.collapsed .toggle-icon {
-            transform: rotate(-90deg);
-        }
+        .skill-group-header.collapsed .toggle-icon { transform: rotate(-90deg); }
         .skill-group-children {
             border: 1px solid var(--border);
             border-top: none;
             border-radius: 0 0 var(--radius) var(--radius);
             overflow: hidden;
         }
-        .skill-group-children.collapsed {
-            display: none;
-        }
+        .skill-group-children.collapsed { display: none; }
 
-        /* Skill Cards */
         .skill-card {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -197,8 +186,6 @@
             align-items: center;
             flex-wrap: wrap;
         }
-
-        /* Standalone skill (no parent) */
         .skill-card.standalone {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -206,9 +193,7 @@
             padding: 16px 20px;
             margin-bottom: 12px;
         }
-        .skill-card.standalone .skill-name {
-            font-weight: 500;
-        }
+        .skill-card.standalone .skill-name { font-weight: 500; }
 
         .rating-group {
             display: flex;
@@ -220,10 +205,7 @@
             color: var(--text-dim);
             min-width: 75px;
         }
-        .pill-group {
-            display: flex;
-            gap: 4px;
-        }
+        .pill-group { display: flex; gap: 4px; }
         .pill {
             width: 40px;
             height: 34px;
@@ -240,10 +222,7 @@
             transition: all 0.15s ease;
             user-select: none;
         }
-        .pill:hover {
-            border-color: var(--text-dim);
-            transform: translateY(-1px);
-        }
+        .pill:hover { border-color: var(--text-dim); transform: translateY(-1px); }
         .pill.selected {
             color: white;
             border-color: transparent;
@@ -257,7 +236,6 @@
         .pill.int-1.selected { background: var(--int1); }
         .pill.int-2.selected { background: var(--int2); }
 
-        /* Rating Key */
         .rating-key {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -267,13 +245,7 @@
         }
         .rating-key h4 { margin-bottom: 10px; font-size: 0.9rem; color: var(--accent); }
         .rating-key .keys { display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-dim); }
-        .key-pills {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
+        .key-pills { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
         .key-pill {
             display: inline-flex;
             align-items: center;
@@ -293,6 +265,16 @@
         .admin-section { margin-bottom: 32px; }
         .admin-section h3 { margin-bottom: 16px; font-size: 1.1rem; }
 
+        .drag-hint {
+            background: var(--bg);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
         .skill-admin-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -302,7 +284,10 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            cursor: grab;
+            transition: all 0.2s;
         }
+        .skill-admin-card:active { cursor: grabbing; }
         .skill-admin-card.is-parent {
             background: var(--surface2);
             border-color: var(--accent);
@@ -312,6 +297,23 @@
             margin-left: 32px;
             border-left: 3px solid var(--accent);
         }
+        .skill-admin-card.drag-over {
+            border-color: var(--success) !important;
+            box-shadow: 0 0 12px rgba(76,175,80,0.4);
+            transform: scale(1.01);
+        }
+        .skill-admin-card.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+        .skill-admin-card .drag-handle {
+            cursor: grab;
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            padding: 0 4px;
+            user-select: none;
+        }
+        .skill-admin-card .drag-handle:active { cursor: grabbing; }
         .skill-admin-card .skill-text { flex: 1; font-size: 0.9rem; }
         .skill-admin-card .skill-badge {
             font-size: 0.7rem;
@@ -338,7 +340,31 @@
         }
         .skill-admin-card .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
 
-        /* Results */
+        /* Drop zone indicator between items */
+        .drop-zone {
+            height: 4px;
+            margin: 2px 0;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+        .drop-zone.active {
+            height: 8px;
+            background: var(--success);
+            margin: 6px 0;
+        }
+
+        /* Promote/demote buttons */
+        .btn-promote {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            background: var(--warning);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
         .result-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -359,7 +385,6 @@
         .gap-critical { background: rgba(244,67,54,0.2); color: var(--danger); }
         .gap-warning { background: rgba(255,152,0,0.2); color: var(--warning); }
 
-        /* Settings */
         .settings-row {
             display: flex;
             align-items: center;
@@ -370,7 +395,6 @@
         .settings-row label { font-size: 0.9rem; min-width: 150px; }
         .settings-row input, .settings-row select { max-width: 200px; }
 
-        /* Modal */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -393,7 +417,6 @@
         .modal h3 { margin-bottom: 16px; }
         .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -423,7 +446,6 @@
 </head>
 <body>
 
-<!-- LOGIN VIEW -->
 <div id="loginView" class="login-container">
     <div class="login-box">
         <h1>Competency Matrix</h1>
@@ -441,7 +463,6 @@
     </div>
 </div>
 
-<!-- APP VIEW -->
 <div id="appView" class="hidden">
     <header class="app-header">
         <h2>Competency Matrix</h2>
@@ -453,7 +474,6 @@
     </header>
 
     <div class="app-content">
-        <!-- ASSESSMENT VIEW -->
         <div id="assessmentView">
             <div class="rating-key">
                 <h4>Rating Key</h4>
@@ -467,7 +487,6 @@
                     <span><strong>Interest:</strong> 1 = No interest / Not relevant &nbsp;|&nbsp; 2 = Interested</span>
                 </div>
             </div>
-
             <div class="tabs" id="productTabs"></div>
             <div id="skillsList"></div>
             <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
@@ -476,7 +495,6 @@
             </div>
         </div>
 
-        <!-- ADMIN VIEW -->
         <div id="adminView" class="hidden">
             <div class="tabs" style="margin-bottom:16px;">
                 <div class="tab active" onclick="switchAdminTab('questions')">Manage Questions</div>
@@ -490,10 +508,10 @@
                         <h3>Manage Skills</h3>
                         <div style="display:flex;gap:8px;flex-wrap:wrap;">
                             <button class="btn btn-sm btn-secondary" onclick="showAddProductModal()">+ Product</button>
-                            <button class="btn btn-sm btn-primary" onclick="showAddSkillModal()">+ Parent Skill</button>
-                            <button class="btn btn-sm btn-success" onclick="showAddSubSkillModal()">+ Sub-Skill</button>
+                            <button class="btn btn-sm btn-primary" onclick="showAddSkillModal()">+ Skill</button>
                         </div>
                     </div>
+                    <div class="drag-hint">&#9776; Drag skills to reorder. Drop a skill onto a parent to make it a sub-skill. Use the &#8592; button to promote a sub-skill back to top level.</div>
                     <div class="tabs" id="adminProductTabs"></div>
                     <div id="adminSkillsList"></div>
                 </div>
@@ -536,14 +554,13 @@
     </div>
 </div>
 
-<!-- MODAL -->
 <div id="modal" class="modal-overlay hidden" onclick="event.target===this&&closeModal()">
     <div class="modal" id="modalContent"></div>
 </div>
 
 <script>
 // =====================================================
-// FIREBASE CONFIG
+// CONFIG
 // =====================================================
 const firebaseConfig = {
     apiKey: "AIzaSyA5xE8YJkAVzOgCXiD3wEiHE-ybFvEE1qM",
@@ -554,7 +571,6 @@ const firebaseConfig = {
     appId: "1:156072705192:web:499355f2bddcc3049a169d"
 };
 
-// EmailJS Config
 const EMAILJS_PUBLIC_KEY = "ptOv5d4JHIriHLzD_";
 const EMAILJS_SERVICE_ID = "service_13gunnx";
 const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID_HERE";
@@ -571,9 +587,11 @@ let isAdmin = false;
 let currentProduct = null;
 let adminCurrentProduct = null;
 let questionsData = {};
-// Structure: { productName: [ { id, text, children: [ { id, text } ] } ] }
 let userResponses = {};
 let settings = { threshold: 3, notifEmail: '' };
+
+// Drag state
+let dragData = null; // { type: 'parent'|'child', parentIdx, childIdx, skillObj }
 
 // =====================================================
 // AUTH
@@ -597,11 +615,8 @@ auth.onAuthStateChanged(async (user) => {
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim();
     const pass = document.getElementById('loginPassword').value;
-    try {
-        await auth.signInWithEmailAndPassword(email, pass);
-    } catch (e) {
-        document.getElementById('loginError').textContent = e.message;
-    }
+    try { await auth.signInWithEmailAndPassword(email, pass); }
+    catch (e) { document.getElementById('loginError').textContent = e.message; }
 }
 
 function handleLogout() { auth.signOut(); }
@@ -664,7 +679,6 @@ async function loadQuestions() {
     const snap = await db.collection('config').doc('questions').get();
     if (snap.exists) {
         questionsData = snap.data().products || {};
-        // Migrate flat structure to hierarchical if needed
         for (const product of Object.keys(questionsData)) {
             questionsData[product] = questionsData[product].map(skill => {
                 if (!skill.children) skill.children = [];
@@ -697,10 +711,7 @@ function renderProductTabs() {
     renderSkills();
 }
 
-function selectProduct(p) {
-    currentProduct = p;
-    renderProductTabs();
-}
+function selectProduct(p) { currentProduct = p; renderProductTabs(); }
 
 function renderSkills() {
     const skills = questionsData[currentProduct] || [];
@@ -710,26 +721,17 @@ function renderSkills() {
     }
     const responses = (userResponses[currentProduct] || {});
     let html = '';
-
     for (const skill of skills) {
         if (skill.children && skill.children.length > 0) {
-            // Parent skill with sub-skills
             html += `<div class="skill-group">`;
-            html += `<div class="skill-group-header" onclick="toggleGroup(this)">
-                <span>${skill.text}</span>
-                <span class="toggle-icon">&#9660;</span>
-            </div>`;
+            html += `<div class="skill-group-header" onclick="toggleGroup(this)"><span>${skill.text}</span><span class="toggle-icon">&#9660;</span></div>`;
             html += `<div class="skill-group-children">`;
-            for (const child of skill.children) {
-                html += renderSkillCard(child, responses, false);
-            }
+            for (const child of skill.children) { html += renderSkillCard(child, responses, false); }
             html += `</div></div>`;
         } else {
-            // Standalone skill (parent with no children, still rateable)
             html += renderSkillCard(skill, responses, true);
         }
     }
-
     document.getElementById('skillsList').innerHTML = html;
 }
 
@@ -741,7 +743,7 @@ function renderSkillCard(skill, responses, standalone) {
         <div class="skill-ratings">
             <div class="rating-group">
                 <span class="rating-label">Skill Level</span>
-                <div class="pill-group" data-type="sl">
+                <div class="pill-group">
                     <div class="pill sl-1 ${r.sl==1?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',1)">1</div>
                     <div class="pill sl-2 ${r.sl==2?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',2)">2</div>
                     <div class="pill sl-3 ${r.sl==3?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',3)">3</div>
@@ -750,7 +752,7 @@ function renderSkillCard(skill, responses, standalone) {
             </div>
             <div class="rating-group">
                 <span class="rating-label">Interest</span>
-                <div class="pill-group" data-type="int">
+                <div class="pill-group">
                     <div class="pill int-1 ${r.int==1?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','int',1)">1</div>
                     <div class="pill int-2 ${r.int==2?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','int',2)">2</div>
                 </div>
@@ -761,13 +763,11 @@ function renderSkillCard(skill, responses, standalone) {
 
 function toggleGroup(header) {
     header.classList.toggle('collapsed');
-    const children = header.nextElementSibling;
-    children.classList.toggle('collapsed');
+    header.nextElementSibling.classList.toggle('collapsed');
 }
 
 function selectPill(el, product, skillId, field, value) {
-    const group = el.parentElement;
-    group.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+    el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
     el.classList.add('selected');
     updateResponse(product, skillId, field, value);
 }
@@ -783,9 +783,7 @@ function updateResponse(product, skillId, field, value) {
 // =====================================================
 async function loadUserResponses() {
     const doc = await db.collection('responses').doc(currentUser.uid).get();
-    if (doc.exists) {
-        userResponses = doc.data().responses || {};
-    }
+    if (doc.exists) userResponses = doc.data().responses || {};
 }
 
 async function saveProgress() {
@@ -817,7 +815,6 @@ async function submitAssessment() {
     if (incomplete.length > 0) {
         if (!confirm(`You have ${incomplete.length} unanswered skill(s). Submit anyway?`)) return;
     }
-
     await db.collection('responses').doc(currentUser.uid).set({
         responses: userResponses,
         email: currentUser.email,
@@ -826,40 +823,31 @@ async function submitAssessment() {
         submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
         submitted: true
     }, { merge: true });
-
     await sendNotificationEmail();
     showToast('Assessment submitted successfully!');
 }
 
 async function sendNotificationEmail() {
     if (!settings.notifEmail) return;
-
     const threshold = settings.threshold || 3;
     const userName = currentUser.email.split('@')[0];
     let gaps = [];
-
     for (const [product, skills] of Object.entries(questionsData)) {
         for (const skill of skills) {
             if (skill.children && skill.children.length > 0) {
                 for (const child of skill.children) {
                     const r = (userResponses[product] || {})[child.id];
-                    if (r && r.sl && r.sl < threshold) {
-                        gaps.push(`[${product}] ${skill.text} > ${child.text}: Level ${r.sl}/${threshold}`);
-                    }
+                    if (r && r.sl && r.sl < threshold) gaps.push(`[${product}] ${skill.text} > ${child.text}: Level ${r.sl}/${threshold}`);
                 }
             } else {
                 const r = (userResponses[product] || {})[skill.id];
-                if (r && r.sl && r.sl < threshold) {
-                    gaps.push(`[${product}] ${skill.text}: Level ${r.sl}/${threshold}`);
-                }
+                if (r && r.sl && r.sl < threshold) gaps.push(`[${product}] ${skill.text}: Level ${r.sl}/${threshold}`);
             }
         }
     }
-
     const gapText = gaps.length > 0
         ? `IMPROVEMENT AREAS (below level ${threshold}):\n${gaps.join('\n')}`
         : 'No gaps identified - all skills at or above threshold!';
-
     try {
         emailjs.init(EMAILJS_PUBLIC_KEY);
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -868,13 +856,137 @@ async function sendNotificationEmail() {
             subject: `Assessment Submitted: ${userName}`,
             message: `${userName} has submitted their competency assessment.\n\n${gapText}`
         });
-    } catch (e) {
-        console.error('Email failed:', e);
-    }
+    } catch (e) { console.error('Email failed:', e); }
 }
 
 // =====================================================
-// ADMIN - QUESTIONS
+// ADMIN - DRAG AND DROP
+// =====================================================
+function handleDragStart(e, type, parentIdx, childIdx) {
+    const skills = questionsData[adminCurrentProduct];
+    let skillObj;
+    if (type === 'parent') {
+        skillObj = { ...skills[parentIdx], children: [...(skills[parentIdx].children || [])] };
+    } else {
+        skillObj = { ...skills[parentIdx].children[childIdx] };
+    }
+    dragData = { type, parentIdx, childIdx, skillObj };
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', ''); // Required for Firefox
+}
+
+function handleDragEnd(e) {
+    e.currentTarget.classList.remove('dragging');
+    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    document.querySelectorAll('.drop-zone.active').forEach(el => el.classList.remove('active'));
+    dragData = null;
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDragEnter(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+
+async function handleDropOnParent(e, targetParentIdx) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    if (!dragData) return;
+
+    const skills = questionsData[adminCurrentProduct];
+
+    // Don't drop on yourself
+    if (dragData.type === 'parent' && dragData.parentIdx === targetParentIdx) return;
+
+    // Remove from original position
+    let movedSkill;
+    if (dragData.type === 'parent') {
+        // If parent has children, we just move the parent itself (without children) as a sub-skill
+        movedSkill = { id: dragData.skillObj.id, text: dragData.skillObj.text };
+        // If it had children, they become top-level
+        const removedParent = skills.splice(dragData.parentIdx, 1)[0];
+        if (removedParent.children && removedParent.children.length > 0) {
+            // Insert children as top-level skills at the old position
+            const insertIdx = dragData.parentIdx > targetParentIdx ? dragData.parentIdx : dragData.parentIdx;
+            for (let i = removedParent.children.length - 1; i >= 0; i--) {
+                skills.splice(insertIdx > skills.length ? skills.length : insertIdx, 0, { ...removedParent.children[i], children: [] });
+            }
+        }
+    } else {
+        // Remove child from its parent
+        movedSkill = skills[dragData.parentIdx].children.splice(dragData.childIdx, 1)[0];
+    }
+
+    // Recalculate target index (may have shifted after removal)
+    // Add as child of target parent
+    const actualTarget = skills[targetParentIdx >= skills.length ? skills.length - 1 : targetParentIdx];
+    if (!actualTarget) return;
+    if (!actualTarget.children) actualTarget.children = [];
+    actualTarget.children.push({ id: movedSkill.id, text: movedSkill.text });
+
+    await saveQuestions();
+    renderAdminSkills();
+    renderProductTabs();
+    showToast('Skill moved!');
+}
+
+async function handleDropOnZone(e, targetIdx) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('active');
+    if (!dragData) return;
+
+    const skills = questionsData[adminCurrentProduct];
+
+    // Remove from original position
+    let movedSkill;
+    if (dragData.type === 'parent') {
+        movedSkill = skills.splice(dragData.parentIdx, 1)[0];
+    } else {
+        const child = skills[dragData.parentIdx].children.splice(dragData.childIdx, 1)[0];
+        movedSkill = { ...child, children: [] };
+    }
+
+    // Insert at new position
+    const insertIdx = targetIdx > skills.length ? skills.length : targetIdx;
+    skills.splice(insertIdx, 0, movedSkill);
+
+    await saveQuestions();
+    renderAdminSkills();
+    renderProductTabs();
+    showToast('Skill reordered!');
+}
+
+function handleZoneDragEnter(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('active');
+}
+
+function handleZoneDragLeave(e) {
+    e.currentTarget.classList.remove('active');
+}
+
+async function promoteToParent(parentIdx, childIdx) {
+    const skills = questionsData[adminCurrentProduct];
+    const child = skills[parentIdx].children.splice(childIdx, 1)[0];
+    // Insert as top-level after the current parent
+    skills.splice(parentIdx + 1, 0, { ...child, children: [] });
+    await saveQuestions();
+    renderAdminSkills();
+    renderProductTabs();
+    showToast('Promoted to top level!');
+}
+
+// =====================================================
+// ADMIN - RENDER
 // =====================================================
 function renderAdminProductTabs() {
     const products = Object.keys(questionsData);
@@ -885,61 +997,77 @@ function renderAdminProductTabs() {
     renderAdminSkills();
 }
 
-function selectAdminProduct(p) {
-    adminCurrentProduct = p;
-    renderAdminProductTabs();
-}
+function selectAdminProduct(p) { adminCurrentProduct = p; renderAdminProductTabs(); }
 
 function renderAdminSkills() {
     const skills = questionsData[adminCurrentProduct] || [];
     if (!skills.length) {
-        document.getElementById('adminSkillsList').innerHTML = '<p style="color:var(--text-dim)">No skills yet. Click "+ Parent Skill" to add one.</p>';
+        document.getElementById('adminSkillsList').innerHTML = '<p style="color:var(--text-dim)">No skills yet. Click "+ Skill" to add one.</p>';
         return;
     }
     let html = '';
+
+    // Drop zone at top
+    html += `<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event, 0)"></div>`;
+
     skills.forEach((skill, i) => {
         const childCount = skill.children ? skill.children.length : 0;
         html += `
-        <div class="skill-admin-card is-parent">
+        <div class="skill-admin-card is-parent" draggable="true"
+            ondragstart="handleDragStart(event,'parent',${i},null)"
+            ondragend="handleDragEnd(event)"
+            ondragover="handleDragOver(event)"
+            ondragenter="handleDragEnter(event)"
+            ondragleave="handleDragLeave(event)"
+            ondrop="handleDropOnParent(event,${i})">
+            <span class="drag-handle">&#9776;</span>
             <span class="skill-text">${skill.text} ${childCount > 0 ? `<span class="skill-badge">${childCount} sub-skills</span>` : ''}</span>
             <div class="skill-actions">
-                <button class="btn-icon" onclick="moveSkill(${i},-1)" ${i===0?'disabled':''} title="Move up">&uarr;</button>
-                <button class="btn-icon" onclick="moveSkill(${i},1)" ${i===skills.length-1?'disabled':''} title="Move down">&darr;</button>
                 <button class="btn-icon" onclick="editSkill(${i})" title="Edit">&#9998;</button>
                 <button class="btn-icon" onclick="deleteSkill(${i})" title="Delete">&times;</button>
             </div>
         </div>`;
+
         if (skill.children) {
             skill.children.forEach((child, ci) => {
                 html += `
-                <div class="skill-admin-card is-child">
+                <div class="skill-admin-card is-child" draggable="true"
+                    ondragstart="handleDragStart(event,'child',${i},${ci})"
+                    ondragend="handleDragEnd(event)"
+                    ondragover="handleDragOver(event)"
+                    ondragenter="handleDragEnter(event)"
+                    ondragleave="handleDragLeave(event)"
+                    ondrop="handleDropOnParent(event,${i})">
+                    <span class="drag-handle">&#9776;</span>
                     <span class="skill-text">${child.text}</span>
                     <div class="skill-actions">
-                        <button class="btn-icon" onclick="moveSubSkill(${i},${ci},-1)" ${ci===0?'disabled':''} title="Move up">&uarr;</button>
-                        <button class="btn-icon" onclick="moveSubSkill(${i},${ci},1)" ${ci===skill.children.length-1?'disabled':''} title="Move down">&darr;</button>
+                        <button class="btn-promote" onclick="promoteToParent(${i},${ci})" title="Promote to top level">&#8592; Top</button>
                         <button class="btn-icon" onclick="editSubSkill(${i},${ci})" title="Edit">&#9998;</button>
                         <button class="btn-icon" onclick="deleteSubSkill(${i},${ci})" title="Delete">&times;</button>
                     </div>
                 </div>`;
             });
         }
+
+        // Drop zone after each parent
+        html += `<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event, ${i + 1})"></div>`;
     });
+
     document.getElementById('adminSkillsList').innerHTML = html;
 }
 
+// =====================================================
+// ADMIN - CRUD
+// =====================================================
 function showAddProductModal() {
     document.getElementById('modal').classList.remove('hidden');
     document.getElementById('modalContent').innerHTML = `
         <h3>Add Product</h3>
-        <div class="form-group">
-            <label>Product Name</label>
-            <input type="text" id="newProductName" placeholder="e.g. Financial Cloud">
-        </div>
+        <div class="form-group"><label>Product Name</label><input type="text" id="newProductName" placeholder="e.g. Financial Cloud"></div>
         <div class="modal-actions">
             <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
             <button class="btn btn-primary" onclick="addProduct()">Add</button>
-        </div>
-    `;
+        </div>`;
 }
 
 async function addProduct() {
@@ -959,17 +1087,13 @@ function showAddSkillModal() {
     if (!adminCurrentProduct) { alert('Select a product first'); return; }
     document.getElementById('modal').classList.remove('hidden');
     document.getElementById('modalContent').innerHTML = `
-        <h3>Add Parent Skill to ${adminCurrentProduct}</h3>
-        <div class="form-group">
-            <label>Skill / Category Name</label>
-            <input type="text" id="newSkillText" placeholder="e.g. Workflow">
-        </div>
-        <p style="color:var(--text-dim);font-size:0.8rem;margin-top:8px;">Parent skills act as a category header. Add sub-skills under them for the actual rating items. If you don't add sub-skills, the parent itself will be rateable.</p>
+        <h3>Add Skill to ${adminCurrentProduct}</h3>
+        <div class="form-group"><label>Skill Name</label><input type="text" id="newSkillText" placeholder="e.g. Workflow"></div>
+        <p style="color:var(--text-dim);font-size:0.8rem;margin-top:8px;">Added as a top-level skill. Drag other skills onto it to make them sub-skills.</p>
         <div class="modal-actions">
             <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
             <button class="btn btn-primary" onclick="addSkill()">Add</button>
-        </div>
-    `;
+        </div>`;
 }
 
 async function addSkill() {
@@ -981,62 +1105,19 @@ async function addSkill() {
     renderAdminSkills();
     renderProductTabs();
     closeModal();
-    showToast('Parent skill added!');
-}
-
-function showAddSubSkillModal() {
-    if (!adminCurrentProduct) { alert('Select a product first'); return; }
-    const skills = questionsData[adminCurrentProduct] || [];
-    if (!skills.length) { alert('Add a parent skill first'); return; }
-    const options = skills.map((s, i) => `<option value="${i}">${s.text}</option>`).join('');
-    document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('modalContent').innerHTML = `
-        <h3>Add Sub-Skill</h3>
-        <div class="form-group">
-            <label>Parent Skill</label>
-            <select id="subSkillParent">${options}</select>
-        </div>
-        <div class="form-group">
-            <label>Sub-Skill Description</label>
-            <input type="text" id="newSubSkillText" placeholder="e.g. Status and Reason">
-        </div>
-        <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-success" onclick="addSubSkill()">Add</button>
-        </div>
-    `;
-}
-
-async function addSubSkill() {
-    const parentIdx = parseInt(document.getElementById('subSkillParent').value);
-    const text = document.getElementById('newSubSkillText').value.trim();
-    if (!text) return;
-    const id = 'sub_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-    if (!questionsData[adminCurrentProduct][parentIdx].children) {
-        questionsData[adminCurrentProduct][parentIdx].children = [];
-    }
-    questionsData[adminCurrentProduct][parentIdx].children.push({ id, text });
-    await saveQuestions();
-    renderAdminSkills();
-    renderProductTabs();
-    closeModal();
-    showToast('Sub-skill added!');
+    showToast('Skill added!');
 }
 
 function editSkill(index) {
     const skill = questionsData[adminCurrentProduct][index];
     document.getElementById('modal').classList.remove('hidden');
     document.getElementById('modalContent').innerHTML = `
-        <h3>Edit Parent Skill</h3>
-        <div class="form-group">
-            <label>Skill / Category Name</label>
-            <input type="text" id="editSkillText" value="${skill.text}">
-        </div>
+        <h3>Edit Skill</h3>
+        <div class="form-group"><label>Skill Name</label><input type="text" id="editSkillText" value="${skill.text}"></div>
         <div class="modal-actions">
             <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
             <button class="btn btn-primary" onclick="saveEditSkill(${index})">Save</button>
-        </div>
-    `;
+        </div>`;
 }
 
 async function saveEditSkill(index) {
@@ -1055,15 +1136,11 @@ function editSubSkill(parentIdx, childIdx) {
     document.getElementById('modal').classList.remove('hidden');
     document.getElementById('modalContent').innerHTML = `
         <h3>Edit Sub-Skill</h3>
-        <div class="form-group">
-            <label>Sub-Skill Description</label>
-            <input type="text" id="editSubSkillText" value="${child.text}">
-        </div>
+        <div class="form-group"><label>Sub-Skill Name</label><input type="text" id="editSubSkillText" value="${child.text}"></div>
         <div class="modal-actions">
             <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
             <button class="btn btn-primary" onclick="saveEditSubSkill(${parentIdx},${childIdx})">Save</button>
-        </div>
-    `;
+        </div>`;
 }
 
 async function saveEditSubSkill(parentIdx, childIdx) {
@@ -1080,9 +1157,7 @@ async function saveEditSubSkill(parentIdx, childIdx) {
 async function deleteSkill(index) {
     const skill = questionsData[adminCurrentProduct][index];
     const childCount = skill.children ? skill.children.length : 0;
-    const msg = childCount > 0
-        ? `Delete "${skill.text}" and its ${childCount} sub-skill(s)?`
-        : `Delete "${skill.text}"?`;
+    const msg = childCount > 0 ? `Delete "${skill.text}" and its ${childCount} sub-skill(s)?` : `Delete "${skill.text}"?`;
     if (!confirm(msg)) return;
     questionsData[adminCurrentProduct].splice(index, 1);
     await saveQuestions();
@@ -1100,27 +1175,7 @@ async function deleteSubSkill(parentIdx, childIdx) {
     showToast('Sub-skill deleted');
 }
 
-async function moveSkill(index, direction) {
-    const skills = questionsData[adminCurrentProduct];
-    const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= skills.length) return;
-    [skills[index], skills[newIndex]] = [skills[newIndex], skills[index]];
-    await saveQuestions();
-    renderAdminSkills();
-}
-
-async function moveSubSkill(parentIdx, childIdx, direction) {
-    const children = questionsData[adminCurrentProduct][parentIdx].children;
-    const newIdx = childIdx + direction;
-    if (newIdx < 0 || newIdx >= children.length) return;
-    [children[childIdx], children[newIdx]] = [children[newIdx], children[childIdx]];
-    await saveQuestions();
-    renderAdminSkills();
-}
-
-function closeModal() {
-    document.getElementById('modal').classList.add('hidden');
-}
+function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
 // =====================================================
 // ADMIN - RESULTS
@@ -1130,14 +1185,11 @@ let allResults = [];
 async function loadAllResults() {
     const snap = await db.collection('responses').get();
     allResults = [];
-    snap.forEach(doc => {
-        allResults.push({ uid: doc.id, ...doc.data() });
-    });
+    snap.forEach(doc => { allResults.push({ uid: doc.id, ...doc.data() }); });
     renderResults();
 }
 
 function getAllRateableSkills() {
-    // Returns flat list of { product, parentText, skillId, skillText }
     const all = [];
     for (const [product, skills] of Object.entries(questionsData)) {
         for (const skill of skills) {
@@ -1157,17 +1209,14 @@ function renderResults() {
     const threshold = parseInt(document.getElementById('thresholdInput')?.value) || settings.threshold || 3;
     const container = document.getElementById('resultsContainer');
     const rateableSkills = getAllRateableSkills();
-
     if (!allResults.length) {
         container.innerHTML = '<p style="color:var(--text-dim)">No submissions yet.</p>';
         return;
     }
-
     container.innerHTML = allResults.map(result => {
         const name = result.name || result.email || 'Unknown';
         const submitted = result.submitted ? '&#10003; Submitted' : '&#9998; In progress';
         let gaps = [];
-
         for (const rs of rateableSkills) {
             const r = (result.responses?.[rs.product] || {})[rs.skillId];
             if (r && r.sl && r.sl < threshold) {
@@ -1175,16 +1224,10 @@ function renderResults() {
                 gaps.push({ product: rs.product, skill: label, level: r.sl });
             }
         }
-
         const gapHtml = gaps.length > 0
             ? gaps.map(g => `<span class="gap-badge ${g.level === 1 ? 'gap-critical' : 'gap-warning'}">${g.product}: ${g.skill} (${g.level})</span>`).join(' ')
             : '<span style="color:var(--success);font-size:0.85rem;">All skills at or above threshold</span>';
-
-        return `
-        <div class="result-card">
-            <h4>${name} <span style="font-size:0.8rem;font-weight:normal;color:var(--text-dim);">${submitted}</span></h4>
-            <div style="margin-top:8px;">${gapHtml}</div>
-        </div>`;
+        return `<div class="result-card"><h4>${name} <span style="font-size:0.8rem;font-weight:normal;color:var(--text-dim);">${submitted}</span></h4><div style="margin-top:8px;">${gapHtml}</div></div>`;
     }).join('');
 }
 
@@ -1193,9 +1236,7 @@ function renderResults() {
 // =====================================================
 async function loadSettings() {
     const doc = await db.collection('config').doc('settings').get();
-    if (doc.exists) {
-        settings = doc.data();
-    }
+    if (doc.exists) settings = doc.data();
 }
 
 function loadSettingsUI() {
@@ -1217,9 +1258,7 @@ async function loadTeamList() {
     let html = '';
     snap.forEach(doc => {
         const u = doc.data();
-        html += `<div class="skill-admin-card">
-            <span class="skill-text">${u.email} <span style="color:var(--text-dim);font-size:0.8rem;">(${u.role})</span></span>
-        </div>`;
+        html += `<div class="skill-admin-card"><span class="skill-text">${u.email} <span style="color:var(--text-dim);font-size:0.8rem;">(${u.role})</span></span></div>`;
     });
     container.innerHTML = html || '<p style="color:var(--text-dim)">No users yet.</p>';
 }
@@ -1229,9 +1268,7 @@ async function grantAdmin() {
     if (!email) return;
     const snap = await db.collection('users').where('email', '==', email).get();
     if (snap.empty) { alert('User not found. They need to sign in first.'); return; }
-    snap.forEach(async doc => {
-        await db.collection('users').doc(doc.id).update({ role: 'admin' });
-    });
+    snap.forEach(async doc => { await db.collection('users').doc(doc.id).update({ role: 'admin' }); });
     document.getElementById('adminEmailInput').value = '';
     loadTeamList();
     showToast('Admin granted!');
