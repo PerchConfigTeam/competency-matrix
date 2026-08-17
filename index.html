@@ -196,8 +196,9 @@
         <h2>Competency Matrix</h2>
         <div class="header-right">
             <span class="user-badge" id="userBadge"></span>
-            <button class="btn btn-sm btn-secondary" id="adminToggle" onclick="toggleAdmin()">Admin</button>
-            <button class="btn btn-sm btn-secondary" onclick="handleLogout()">Logout</button>
+          <button class="btn btn-sm btn-secondary" onclick="showAddProductModal()">+ Product</button>
+<button class="btn btn-sm btn-secondary" onclick="showProductOptions()">Manage Products</button>
+<button class="btn btn-sm btn-primary" onclick="showAddSkillModal()">+ Skill</button>
         </div>
     </header>
     <div class="app-content">
@@ -555,7 +556,7 @@ function editSubSkill(pi,ci){const child=questionsData[adminCurrentProduct][pi].
 async function saveEditSubSkill(pi,ci){const text=document.getElementById('editSubSkillText').value.trim();if(!text)return;questionsData[adminCurrentProduct][pi].children[ci].text=text;questionsData[adminCurrentProduct][pi].children[ci].description=document.getElementById('editSubSkillDesc').value.trim();await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Updated!');}
 async function deleteSkill(index){const s=questionsData[adminCurrentProduct][index];const cc=s.children?s.children.length:0;if(!confirm(cc>0?`Delete "${s.text}" and ${cc} sub-skill(s)?`:`Delete "${s.text}"?`))return;questionsData[adminCurrentProduct].splice(index,1);await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Deleted');}
 async function deleteSubSkill(pi,ci){if(!confirm('Delete this sub-skill?'))return;questionsData[adminCurrentProduct][pi].children.splice(ci,1);await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Deleted');}
-function closeModal(){document.getElementById('modal').classList.add('hidden');}
+function closeModal(){document.getElementById('modal').classList.add('hidden');}  function showProductOptions(){     const products=Object.keys(questionsData);     const options=products.map(p=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg);border-radius:var(--radius);margin-bottom:6px;"><span>${p}</span><div style="display:flex;gap:6px;"><button class="btn-icon" onclick="renameProduct('${p}')" title="Rename">&#9998;</button><button class="btn-icon" onclick="removeProduct('${p}')" title="Delete" style="color:var(--danger);">&times;</button></div></div>`).join('');     document.getElementById('modal').classList.remove('hidden');     document.getElementById('modalContent').innerHTML=`<h3>Manage Products</h3>${options}<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>`; } function renameProduct(oldName){     const newName=prompt('Rename product:',oldName);     if(!newName||newName===oldName)return;if(questionsData[newName]){alert('Name already exists');return;}     questionsData[newName]=questionsData[oldName];delete questionsData[oldName];     if(adminCurrentProduct===oldName)adminCurrentProduct=newName;if(currentProduct===oldName)currentProduct=newName;     saveQuestions();renderAdminProductTabs();renderProductTabs();closeModal();showToast('Renamed!'); } function removeProduct(name){     if(!confirm(`Delete "${name}" and ALL its skills?`))return;     delete questionsData[name];adminCurrentProduct=Object.keys(questionsData)[0]||null;currentProduct=null;     saveQuestions();renderAdminProductTabs();renderProductTabs();closeModal();showToast('Product deleted'); }
 
 // RESULTS
 let allResults=[];
