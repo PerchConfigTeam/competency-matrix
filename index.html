@@ -328,10 +328,11 @@ function showApp() {
     document.getElementById('adminToggle').classList.toggle('hidden', !isAdmin); renderProductTabs();
 }
 function toggleAdmin() {
-    const a = document.getElementById('assessmentView'), b = document.getElementById('adminView');
-    if (b.classList.contains('hidden')) { a.classList.add('hidden'); b.classList.remove('hidden'); renderAdminProductTabs(); loadAllResults(); }
-    else { b.classList.add('hidden'); a.classList.remove('hidden'); }
+    const a = document.getElementById('assessmentView'), b = document.getElementById('adminView'), btn = document.getElementById('adminToggle');
+    if (b.classList.contains('hidden')) { a.classList.add('hidden'); b.classList.remove('hidden'); btn.textContent = 'Back to Form'; renderAdminProductTabs(); loadAllResults(); }
+    else { b.classList.add('hidden'); a.classList.remove('hidden'); btn.textContent = 'Admin'; }
 }
+
 function switchAdminTab(tab) {
     document.querySelectorAll('#adminView > .tabs .tab').forEach(t => t.classList.toggle('active', t.textContent.toLowerCase().includes(tab.substring(0,4))));
     document.getElementById('adminQuestions').classList.toggle('hidden', tab !== 'questions');
