@@ -195,11 +195,10 @@
     <header class="app-header">
         <h2>Competency Matrix</h2>
         <div class="header-right">
-            <span class="user-badge" id="userBadge"></span>
-          <button class="btn btn-sm btn-secondary" onclick="showAddProductModal()">+ Product</button>
-<button class="btn btn-sm btn-secondary" onclick="showProductOptions()">Manage Products</button>
-<button class="btn btn-sm btn-primary" onclick="showAddSkillModal()">+ Skill</button>
-        </div>
+<span class="user-badge" id="userBadge"></span>
+<button class="btn btn-sm btn-secondary" id="adminToggle" onclick="toggleAdmin()">Admin</button>
+<button class="btn btn-sm btn-secondary" onclick="handleLogout()">Logout</button>
+</div>
     </header>
     <div class="app-content">
         <div id="assessmentView">
