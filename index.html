@@ -40,18 +40,12 @@
         .hidden { display: none !important; }
 
         .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; padding: 20px;
         }
         .login-box {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
+            background: var(--surface); border-radius: var(--radius);
+            padding: 40px; width: 100%; max-width: 400px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
         .login-box h1 { font-size: 1.5rem; margin-bottom: 8px; color: var(--accent); }
@@ -60,29 +54,16 @@
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 4px; }
         input[type="email"], input[type="password"], input[type="text"], input[type="number"], select, textarea {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text);
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s;
+            width: 100%; padding: 12px; background: var(--bg);
+            border: 1px solid var(--border); border-radius: var(--radius);
+            color: var(--text); font-size: 1rem; outline: none; transition: border-color 0.2s;
         }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 
         .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            padding: 12px 24px; border: none; border-radius: var(--radius);
+            font-size: 0.95rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
         }
         .btn-primary { background: var(--accent); color: white; }
         .btn-primary:hover { background: #d63851; transform: translateY(-1px); }
@@ -96,139 +77,67 @@
         .btn-block { width: 100%; justify-content: center; }
 
         .app-header {
-            background: var(--surface);
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: var(--surface); padding: 16px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
         }
         .app-header h2 { font-size: 1.1rem; color: var(--accent); }
         .header-right { display: flex; align-items: center; gap: 12px; }
-        .user-badge {
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            background: var(--bg);
-            padding: 6px 12px;
-            border-radius: 20px;
-        }
+        .user-badge { font-size: 0.85rem; color: var(--text-dim); background: var(--bg); padding: 6px 12px; border-radius: 20px; }
 
         .app-content { padding: 24px; max-width: 1200px; margin: 0 auto; }
 
-        .tabs {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 24px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            flex-wrap: wrap;
-        }
+        .tabs { display: flex; gap: 4px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; flex-wrap: wrap; }
         .tab {
-            padding: 10px 20px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 0.9rem;
-            white-space: nowrap;
-            transition: all 0.2s;
+            padding: 10px 20px; background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); cursor: pointer; font-size: 0.9rem;
+            white-space: nowrap; transition: all 0.2s;
         }
         .tab:hover { border-color: var(--accent); }
         .tab.active { background: var(--accent); border-color: var(--accent); color: white; }
 
-        /* Skill Group (parent skill) */
         .skill-group { margin-bottom: 20px; }
         .skill-group-header {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: var(--radius) var(--radius) 0 0;
-            padding: 14px 20px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            user-select: none;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: var(--radius) var(--radius) 0 0; padding: 14px 20px;
+            font-weight: 600; font-size: 0.95rem; color: var(--accent);
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; user-select: none;
         }
         .skill-group-header:hover { border-color: var(--accent); }
-        .skill-group-header .toggle-icon {
-            font-size: 0.8rem;
-            transition: transform 0.2s;
-        }
+        .skill-group-header .toggle-icon { font-size: 0.8rem; transition: transform 0.2s; }
         .skill-group-header.collapsed .toggle-icon { transform: rotate(-90deg); }
         .skill-group-children {
-            border: 1px solid var(--border);
-            border-top: none;
-            border-radius: 0 0 var(--radius) var(--radius);
-            overflow: hidden;
+            border: 1px solid var(--border); border-top: none;
+            border-radius: 0 0 var(--radius) var(--radius); overflow: hidden;
         }
         .skill-group-children.collapsed { display: none; }
 
         .skill-card {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
+            background: var(--surface); border-bottom: 1px solid var(--border);
             padding: 14px 20px 14px 36px;
         }
         .skill-card:last-child { border-bottom: none; }
-        .skill-card .skill-name {
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            color: var(--text);
-        }
-        .skill-card .skill-ratings {
-            display: flex;
-            gap: 32px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .skill-card .skill-name { font-size: 0.9rem; margin-bottom: 10px; color: var(--text); }
+        .skill-card .skill-ratings { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
         .skill-card.standalone {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px 20px;
-            margin-bottom: 12px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px;
         }
         .skill-card.standalone .skill-name { font-weight: 500; }
 
-        .rating-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .rating-group .rating-label {
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            min-width: 75px;
-        }
+        .rating-group { display: flex; align-items: center; gap: 8px; }
+        .rating-group .rating-label { font-size: 0.8rem; color: var(--text-dim); min-width: 75px; }
         .pill-group { display: flex; gap: 4px; }
         .pill {
-            width: 40px;
-            height: 34px;
-            border-radius: 6px;
-            border: 2px solid var(--border);
-            background: var(--bg);
-            color: var(--text-dim);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s ease;
-            user-select: none;
+            width: 40px; height: 34px; border-radius: 6px;
+            border: 2px solid var(--border); background: var(--bg);
+            color: var(--text-dim); font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s ease; user-select: none;
         }
         .pill:hover { border-color: var(--text-dim); transform: translateY(-1px); }
-        .pill.selected {
-            color: white;
-            border-color: transparent;
-            transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
+        .pill.selected { color: white; border-color: transparent; transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
         .pill.sl-1.selected { background: var(--sl1); }
         .pill.sl-2.selected { background: var(--sl2); }
         .pill.sl-3.selected { background: var(--sl3); }
@@ -237,25 +146,13 @@
         .pill.int-2.selected { background: var(--int2); }
 
         .rating-key {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px 20px;
-            margin-bottom: 24px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 20px; margin-bottom: 24px;
         }
         .rating-key h4 { margin-bottom: 10px; font-size: 0.9rem; color: var(--accent); }
         .rating-key .keys { display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-dim); }
         .key-pills { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
-        .key-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: white;
-        }
+        .key-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; color: white; }
         .key-pill.kp-1 { background: var(--sl1); }
         .key-pill.kp-2 { background: var(--sl2); }
         .key-pill.kp-3 { background: var(--sl3); }
@@ -266,170 +163,57 @@
         .admin-section h3 { margin-bottom: 16px; font-size: 1.1rem; }
 
         .drag-hint {
-            background: var(--bg);
-            border: 1px dashed var(--border);
-            border-radius: var(--radius);
-            padding: 10px 16px;
-            margin-bottom: 16px;
-            font-size: 0.8rem;
-            color: var(--text-dim);
+            background: var(--bg); border: 1px dashed var(--border); border-radius: var(--radius);
+            padding: 10px 16px; margin-bottom: 16px; font-size: 0.8rem; color: var(--text-dim);
         }
 
         .skill-admin-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: grab;
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 10px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
             transition: all 0.2s;
         }
-        .skill-admin-card:active { cursor: grabbing; }
-        .skill-admin-card.is-parent {
-            background: var(--surface2);
-            border-color: var(--accent);
-            font-weight: 600;
-        }
-        .skill-admin-card.is-child {
-            margin-left: 32px;
-            border-left: 3px solid var(--accent);
-        }
-        .skill-admin-card.drag-over {
-            border-color: var(--success) !important;
-            box-shadow: 0 0 12px rgba(76,175,80,0.4);
-            transform: scale(1.01);
-        }
-        .skill-admin-card.dragging {
-            opacity: 0.4;
-            transform: scale(0.95);
-        }
-        .skill-admin-card .drag-handle {
-            cursor: grab;
-            color: var(--text-dim);
-            font-size: 1.2rem;
-            padding: 0 4px;
-            user-select: none;
-        }
+        .skill-admin-card.is-parent { background: var(--surface2); border-color: var(--accent); font-weight: 600; }
+        .skill-admin-card.is-child { margin-left: 32px; border-left: 3px solid var(--accent); }
+        .skill-admin-card.drag-over { border-color: var(--success) !important; box-shadow: 0 0 12px rgba(76,175,80,0.4); transform: scale(1.01); }
+        .skill-admin-card.dragging { opacity: 0.4; transform: scale(0.95); }
+        .skill-admin-card .drag-handle { cursor: grab; color: var(--text-dim); font-size: 1.1rem; padding: 0 2px; user-select: none; }
         .skill-admin-card .drag-handle:active { cursor: grabbing; }
         .skill-admin-card .skill-text { flex: 1; font-size: 0.9rem; }
-        .skill-admin-card .skill-badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: var(--accent);
-            color: white;
-            margin-left: 8px;
-        }
-        .skill-admin-card .skill-actions { display: flex; gap: 6px; }
+        .skill-admin-card .skill-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: var(--accent); color: white; margin-left: 8px; }
+        .skill-admin-card .skill-actions { display: flex; gap: 4px; align-items: center; }
         .skill-admin-card .btn-icon {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            cursor: pointer;
-            color: var(--text-dim);
-            font-size: 1rem;
-            transition: all 0.2s;
+            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+            background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+            cursor: pointer; color: var(--text-dim); font-size: 0.9rem; transition: all 0.2s;
         }
         .skill-admin-card .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+        .skill-admin-card .btn-icon:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        /* Drop zone indicator between items */
-        .drop-zone {
-            height: 4px;
-            margin: 2px 0;
-            border-radius: 2px;
-            transition: all 0.2s;
-        }
-        .drop-zone.active {
-            height: 8px;
-            background: var(--success);
-            margin: 6px 0;
-        }
-
-        /* Promote/demote buttons */
         .btn-promote {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            background: var(--warning);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
+            font-size: 0.7rem; padding: 3px 8px; background: var(--warning); color: #1a1a2e;
+            border: none; border-radius: 4px; cursor: pointer; font-weight: 600;
         }
+        .btn-promote:hover { background: #e68900; }
 
-        .result-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 16px;
-        }
+        .drop-zone { height: 4px; margin: 2px 0; border-radius: 2px; transition: all 0.2s; }
+        .drop-zone.active { height: 8px; background: var(--success); margin: 6px 0; }
+
+        .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
         .result-card h4 { margin-bottom: 12px; color: var(--accent); }
-
-        .gap-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin: 2px;
-        }
+        .gap-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; margin: 2px; }
         .gap-critical { background: rgba(244,67,54,0.2); color: var(--danger); }
         .gap-warning { background: rgba(255,152,0,0.2); color: var(--warning); }
 
-        .settings-row {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
+        .settings-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
         .settings-row label { font-size: 0.9rem; min-width: 150px; }
         .settings-row input, .settings-row select { max-width: 200px; }
 
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-        .modal {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 32px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal { background: var(--surface); border-radius: var(--radius); padding: 32px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
         .modal h3 { margin-bottom: 16px; }
         .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
 
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: var(--success);
-            color: white;
-            padding: 12px 24px;
-            border-radius: var(--radius);
-            font-size: 0.9rem;
-            font-weight: 600;
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-        }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: var(--success); color: white; padding: 12px 24px; border-radius: var(--radius); font-size: 0.9rem; font-weight: 600; z-index: 2000; animation: slideIn 0.3s ease; }
         .toast.error { background: var(--danger); }
         @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -450,14 +234,8 @@
     <div class="login-box">
         <h1>Competency Matrix</h1>
         <p>Config Team Self-Assessment</p>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="loginEmail" placeholder="your.name@company.com">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="loginPassword" placeholder="Enter password">
-        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="your.name@company.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password"></div>
         <button class="btn btn-primary btn-block" onclick="handleLogin()">Sign In</button>
         <p id="loginError" style="color:var(--danger);margin-top:12px;font-size:0.85rem;"></p>
     </div>
@@ -472,7 +250,6 @@
             <button class="btn btn-sm btn-secondary" onclick="handleLogout()">Logout</button>
         </div>
     </header>
-
     <div class="app-content">
         <div id="assessmentView">
             <div class="rating-key">
@@ -483,9 +260,7 @@
                     <span class="key-pill kp-3">3 Advanced</span>
                     <span class="key-pill kp-4">4 Trainer</span>
                 </div>
-                <div class="keys" style="margin-top:10px;">
-                    <span><strong>Interest:</strong> 1 = No interest / Not relevant &nbsp;|&nbsp; 2 = Interested</span>
-                </div>
+                <div class="keys" style="margin-top:10px;"><span><strong>Interest:</strong> 1 = No interest / Not relevant &nbsp;|&nbsp; 2 = Interested</span></div>
             </div>
             <div class="tabs" id="productTabs"></div>
             <div id="skillsList"></div>
@@ -501,7 +276,6 @@
                 <div class="tab" onclick="switchAdminTab('results')">View Results</div>
                 <div class="tab" onclick="switchAdminTab('settings')">Settings</div>
             </div>
-
             <div id="adminQuestions">
                 <div class="admin-section">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
@@ -511,12 +285,11 @@
                             <button class="btn btn-sm btn-primary" onclick="showAddSkillModal()">+ Skill</button>
                         </div>
                     </div>
-                    <div class="drag-hint">&#9776; Drag skills to reorder. Drop a skill onto a parent to make it a sub-skill. Use the &#8592; button to promote a sub-skill back to top level.</div>
+                    <div class="drag-hint">&#9776; Drag a skill onto a parent to nest it as a sub-skill. Use arrows to reorder. Click "&#8592; Top" to promote a sub-skill back to top level.</div>
                     <div class="tabs" id="adminProductTabs"></div>
                     <div id="adminSkillsList"></div>
                 </div>
             </div>
-
             <div id="adminResults" class="hidden">
                 <div class="admin-section">
                     <h3>Team Results & Gap Analysis</h3>
@@ -527,18 +300,11 @@
                     <div id="resultsContainer"></div>
                 </div>
             </div>
-
             <div id="adminSettings" class="hidden">
                 <div class="admin-section">
                     <h3>Settings</h3>
-                    <div class="form-group">
-                        <label>Notification Email (receives gap reports)</label>
-                        <input type="email" id="notifEmail" placeholder="your@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Skill Level Threshold (flags scores below this)</label>
-                        <input type="number" id="settingsThreshold" min="1" max="4" value="3">
-                    </div>
+                    <div class="form-group"><label>Notification Email (receives gap reports)</label><input type="email" id="notifEmail" placeholder="your@email.com"></div>
+                    <div class="form-group"><label>Skill Level Threshold (flags scores below this)</label><input type="number" id="settingsThreshold" min="1" max="4" value="3"></div>
                     <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
                     <hr style="margin:32px 0;border-color:var(--border);">
                     <h3>Manage Team Members</h3>
@@ -559,9 +325,6 @@
 </div>
 
 <script>
-// =====================================================
-// CONFIG
-// =====================================================
 const firebaseConfig = {
     apiKey: "AIzaSyA5xE8YJkAVzOgCXiD3wEiHE-ybFvEE1qM",
     authDomain: "competency-matrix-2d086.firebaseapp.com",
@@ -575,9 +338,6 @@ const EMAILJS_PUBLIC_KEY = "ptOv5d4JHIriHLzD_";
 const EMAILJS_SERVICE_ID = "service_13gunnx";
 const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID_HERE";
 
-// =====================================================
-// INIT
-// =====================================================
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
@@ -589,9 +349,7 @@ let adminCurrentProduct = null;
 let questionsData = {};
 let userResponses = {};
 let settings = { threshold: 3, notifEmail: '' };
-
-// Drag state
-let dragData = null; // { type: 'parent'|'child', parentIdx, childIdx, skillObj }
+let dragData = null;
 
 // =====================================================
 // AUTH
@@ -605,8 +363,7 @@ auth.onAuthStateChanged(async (user) => {
         await loadSettings();
         showApp();
     } else {
-        currentUser = null;
-        isAdmin = false;
+        currentUser = null; isAdmin = false;
         document.getElementById('loginView').classList.remove('hidden');
         document.getElementById('appView').classList.add('hidden');
     }
@@ -618,19 +375,15 @@ async function handleLogin() {
     try { await auth.signInWithEmailAndPassword(email, pass); }
     catch (e) { document.getElementById('loginError').textContent = e.message; }
 }
-
 function handleLogout() { auth.signOut(); }
 
 async function loadUserRole() {
     const doc = await db.collection('users').doc(currentUser.uid).get();
-    if (doc.exists) {
-        isAdmin = doc.data().role === 'admin';
-    } else {
+    if (doc.exists) { isAdmin = doc.data().role === 'admin'; }
+    else {
         await db.collection('users').doc(currentUser.uid).set({
-            email: currentUser.email,
-            name: currentUser.email.split('@')[0],
-            role: 'member',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            email: currentUser.email, name: currentUser.email.split('@')[0],
+            role: 'member', createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         isAdmin = false;
     }
@@ -648,23 +401,13 @@ function showApp() {
 }
 
 function toggleAdmin() {
-    const assessView = document.getElementById('assessmentView');
-    const adminView = document.getElementById('adminView');
-    if (adminView.classList.contains('hidden')) {
-        assessView.classList.add('hidden');
-        adminView.classList.remove('hidden');
-        renderAdminProductTabs();
-        loadAllResults();
-    } else {
-        adminView.classList.add('hidden');
-        assessView.classList.remove('hidden');
-    }
+    const a = document.getElementById('assessmentView'), b = document.getElementById('adminView');
+    if (b.classList.contains('hidden')) { a.classList.add('hidden'); b.classList.remove('hidden'); renderAdminProductTabs(); loadAllResults(); }
+    else { b.classList.add('hidden'); a.classList.remove('hidden'); }
 }
 
 function switchAdminTab(tab) {
-    document.querySelectorAll('#adminView > .tabs .tab').forEach((t) => {
-        t.classList.toggle('active', t.textContent.toLowerCase().includes(tab.substring(0, 4)));
-    });
+    document.querySelectorAll('#adminView > .tabs .tab').forEach(t => t.classList.toggle('active', t.textContent.toLowerCase().includes(tab.substring(0,4))));
     document.getElementById('adminQuestions').classList.toggle('hidden', tab !== 'questions');
     document.getElementById('adminResults').classList.toggle('hidden', tab !== 'results');
     document.getElementById('adminSettings').classList.toggle('hidden', tab !== 'settings');
@@ -679,99 +422,64 @@ async function loadQuestions() {
     const snap = await db.collection('config').doc('questions').get();
     if (snap.exists) {
         questionsData = snap.data().products || {};
-        for (const product of Object.keys(questionsData)) {
-            questionsData[product] = questionsData[product].map(skill => {
-                if (!skill.children) skill.children = [];
-                return skill;
-            });
+        for (const p of Object.keys(questionsData)) {
+            questionsData[p] = questionsData[p].map(s => { if (!s.children) s.children = []; return s; });
         }
-    } else {
-        questionsData = {};
-    }
+    } else { questionsData = {}; }
 }
-
-async function saveQuestions() {
-    await db.collection('config').doc('questions').set({ products: questionsData });
-}
+async function saveQuestions() { await db.collection('config').doc('questions').set({ products: questionsData }); }
 
 // =====================================================
 // ASSESSMENT VIEW
 // =====================================================
 function renderProductTabs() {
     const products = Object.keys(questionsData);
-    if (!products.length) {
-        document.getElementById('productTabs').innerHTML = '<p style="color:var(--text-dim)">No products configured yet. Ask your admin to add some.</p>';
-        document.getElementById('skillsList').innerHTML = '';
-        return;
-    }
+    if (!products.length) { document.getElementById('productTabs').innerHTML = '<p style="color:var(--text-dim)">No products configured yet.</p>'; document.getElementById('skillsList').innerHTML = ''; return; }
     if (!currentProduct || !products.includes(currentProduct)) currentProduct = products[0];
-    document.getElementById('productTabs').innerHTML = products.map(p =>
-        `<div class="tab ${p === currentProduct ? 'active' : ''}" onclick="selectProduct('${p}')">${p}</div>`
-    ).join('');
+    document.getElementById('productTabs').innerHTML = products.map(p => `<div class="tab ${p===currentProduct?'active':''}" onclick="selectProduct('${p}')">${p}</div>`).join('');
     renderSkills();
 }
-
 function selectProduct(p) { currentProduct = p; renderProductTabs(); }
 
 function renderSkills() {
     const skills = questionsData[currentProduct] || [];
-    if (!skills.length) {
-        document.getElementById('skillsList').innerHTML = '<p style="color:var(--text-dim)">No skills in this product yet.</p>';
-        return;
-    }
-    const responses = (userResponses[currentProduct] || {});
+    if (!skills.length) { document.getElementById('skillsList').innerHTML = '<p style="color:var(--text-dim)">No skills yet.</p>'; return; }
+    const responses = userResponses[currentProduct] || {};
     let html = '';
     for (const skill of skills) {
         if (skill.children && skill.children.length > 0) {
-            html += `<div class="skill-group">`;
-            html += `<div class="skill-group-header" onclick="toggleGroup(this)"><span>${skill.text}</span><span class="toggle-icon">&#9660;</span></div>`;
-            html += `<div class="skill-group-children">`;
-            for (const child of skill.children) { html += renderSkillCard(child, responses, false); }
+            html += `<div class="skill-group"><div class="skill-group-header" onclick="toggleGroup(this)"><span>${skill.text}</span><span class="toggle-icon">&#9660;</span></div><div class="skill-group-children">`;
+            for (const child of skill.children) html += renderSkillCard(child, responses, false);
             html += `</div></div>`;
-        } else {
-            html += renderSkillCard(skill, responses, true);
-        }
+        } else { html += renderSkillCard(skill, responses, true); }
     }
     document.getElementById('skillsList').innerHTML = html;
 }
 
 function renderSkillCard(skill, responses, standalone) {
     const r = responses[skill.id] || { sl: '', int: '' };
-    return `
-    <div class="skill-card ${standalone ? 'standalone' : ''}">
+    return `<div class="skill-card ${standalone?'standalone':''}">
         <div class="skill-name">${skill.text}</div>
         <div class="skill-ratings">
-            <div class="rating-group">
-                <span class="rating-label">Skill Level</span>
-                <div class="pill-group">
-                    <div class="pill sl-1 ${r.sl==1?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',1)">1</div>
-                    <div class="pill sl-2 ${r.sl==2?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',2)">2</div>
-                    <div class="pill sl-3 ${r.sl==3?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',3)">3</div>
-                    <div class="pill sl-4 ${r.sl==4?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',4)">4</div>
-                </div>
-            </div>
-            <div class="rating-group">
-                <span class="rating-label">Interest</span>
-                <div class="pill-group">
-                    <div class="pill int-1 ${r.int==1?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','int',1)">1</div>
-                    <div class="pill int-2 ${r.int==2?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','int',2)">2</div>
-                </div>
-            </div>
+            <div class="rating-group"><span class="rating-label">Skill Level</span><div class="pill-group">
+                <div class="pill sl-1 ${r.sl==1?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',1)">1</div>
+                <div class="pill sl-2 ${r.sl==2?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',2)">2</div>
+                <div class="pill sl-3 ${r.sl==3?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',3)">3</div>
+                <div class="pill sl-4 ${r.sl==4?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',4)">4</div>
+            </div></div>
+            <div class="rating-group"><span class="rating-label">Interest</span><div class="pill-group">
+                <div class="pill int-1 ${r.int==1?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','int',1)">1</div>
+                <div class="pill int-2 ${r.int==2?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','int',2)">2</div>
+            </div></div>
         </div>
     </div>`;
 }
 
-function toggleGroup(header) {
-    header.classList.toggle('collapsed');
-    header.nextElementSibling.classList.toggle('collapsed');
-}
-
+function toggleGroup(h) { h.classList.toggle('collapsed'); h.nextElementSibling.classList.toggle('collapsed'); }
 function selectPill(el, product, skillId, field, value) {
     el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
-    el.classList.add('selected');
-    updateResponse(product, skillId, field, value);
+    el.classList.add('selected'); updateResponse(product, skillId, field, value);
 }
-
 function updateResponse(product, skillId, field, value) {
     if (!userResponses[product]) userResponses[product] = {};
     if (!userResponses[product][skillId]) userResponses[product][skillId] = {};
@@ -785,48 +493,24 @@ async function loadUserResponses() {
     const doc = await db.collection('responses').doc(currentUser.uid).get();
     if (doc.exists) userResponses = doc.data().responses || {};
 }
-
 async function saveProgress() {
-    await db.collection('responses').doc(currentUser.uid).set({
-        responses: userResponses,
-        email: currentUser.email,
-        name: currentUser.email.split('@')[0],
-        lastSaved: firebase.firestore.FieldValue.serverTimestamp(),
-        submitted: false
-    }, { merge: true });
+    await db.collection('responses').doc(currentUser.uid).set({ responses: userResponses, email: currentUser.email, name: currentUser.email.split('@')[0], lastSaved: firebase.firestore.FieldValue.serverTimestamp(), submitted: false }, { merge: true });
     showToast('Progress saved!');
 }
-
 async function submitAssessment() {
     let incomplete = [];
     for (const [product, skills] of Object.entries(questionsData)) {
         for (const skill of skills) {
             if (skill.children && skill.children.length > 0) {
-                for (const child of skill.children) {
-                    const r = (userResponses[product] || {})[child.id];
-                    if (!r || !r.sl || !r.int) incomplete.push(`${product}: ${child.text}`);
-                }
-            } else {
-                const r = (userResponses[product] || {})[skill.id];
-                if (!r || !r.sl || !r.int) incomplete.push(`${product}: ${skill.text}`);
-            }
+                for (const child of skill.children) { const r = (userResponses[product]||{})[child.id]; if (!r||!r.sl||!r.int) incomplete.push(`${product}: ${child.text}`); }
+            } else { const r = (userResponses[product]||{})[skill.id]; if (!r||!r.sl||!r.int) incomplete.push(`${product}: ${skill.text}`); }
         }
     }
-    if (incomplete.length > 0) {
-        if (!confirm(`You have ${incomplete.length} unanswered skill(s). Submit anyway?`)) return;
-    }
-    await db.collection('responses').doc(currentUser.uid).set({
-        responses: userResponses,
-        email: currentUser.email,
-        name: currentUser.email.split('@')[0],
-        lastSaved: firebase.firestore.FieldValue.serverTimestamp(),
-        submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        submitted: true
-    }, { merge: true });
+    if (incomplete.length > 0 && !confirm(`You have ${incomplete.length} unanswered skill(s). Submit anyway?`)) return;
+    await db.collection('responses').doc(currentUser.uid).set({ responses: userResponses, email: currentUser.email, name: currentUser.email.split('@')[0], lastSaved: firebase.firestore.FieldValue.serverTimestamp(), submittedAt: firebase.firestore.FieldValue.serverTimestamp(), submitted: true }, { merge: true });
     await sendNotificationEmail();
     showToast('Assessment submitted successfully!');
 }
-
 async function sendNotificationEmail() {
     if (!settings.notifEmail) return;
     const threshold = settings.threshold || 3;
@@ -835,28 +519,12 @@ async function sendNotificationEmail() {
     for (const [product, skills] of Object.entries(questionsData)) {
         for (const skill of skills) {
             if (skill.children && skill.children.length > 0) {
-                for (const child of skill.children) {
-                    const r = (userResponses[product] || {})[child.id];
-                    if (r && r.sl && r.sl < threshold) gaps.push(`[${product}] ${skill.text} > ${child.text}: Level ${r.sl}/${threshold}`);
-                }
-            } else {
-                const r = (userResponses[product] || {})[skill.id];
-                if (r && r.sl && r.sl < threshold) gaps.push(`[${product}] ${skill.text}: Level ${r.sl}/${threshold}`);
-            }
+                for (const child of skill.children) { const r = (userResponses[product]||{})[child.id]; if (r&&r.sl&&r.sl<threshold) gaps.push(`[${product}] ${skill.text} > ${child.text}: Level ${r.sl}/${threshold}`); }
+            } else { const r = (userResponses[product]||{})[skill.id]; if (r&&r.sl&&r.sl<threshold) gaps.push(`[${product}] ${skill.text}: Level ${r.sl}/${threshold}`); }
         }
     }
-    const gapText = gaps.length > 0
-        ? `IMPROVEMENT AREAS (below level ${threshold}):\n${gaps.join('\n')}`
-        : 'No gaps identified - all skills at or above threshold!';
-    try {
-        emailjs.init(EMAILJS_PUBLIC_KEY);
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-            to_email: settings.notifEmail,
-            from_name: 'Competency Matrix',
-            subject: `Assessment Submitted: ${userName}`,
-            message: `${userName} has submitted their competency assessment.\n\n${gapText}`
-        });
-    } catch (e) { console.error('Email failed:', e); }
+    const gapText = gaps.length > 0 ? `IMPROVEMENT AREAS (below level ${threshold}):\n${gaps.join('\n')}` : 'No gaps identified - all skills at or above threshold!';
+    try { emailjs.init(EMAILJS_PUBLIC_KEY); await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { to_email: settings.notifEmail, from_name: 'Competency Matrix', subject: `Assessment Submitted: ${userName}`, message: `${userName} has submitted their competency assessment.\n\n${gapText}` }); } catch(e) { console.error('Email failed:', e); }
 }
 
 // =====================================================
@@ -864,125 +532,85 @@ async function sendNotificationEmail() {
 // =====================================================
 function handleDragStart(e, type, parentIdx, childIdx) {
     const skills = questionsData[adminCurrentProduct];
-    let skillObj;
-    if (type === 'parent') {
-        skillObj = { ...skills[parentIdx], children: [...(skills[parentIdx].children || [])] };
-    } else {
-        skillObj = { ...skills[parentIdx].children[childIdx] };
-    }
+    let skillObj = type === 'parent' ? { ...skills[parentIdx], children: [...(skills[parentIdx].children||[])] } : { ...skills[parentIdx].children[childIdx] };
     dragData = { type, parentIdx, childIdx, skillObj };
     e.currentTarget.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', ''); // Required for Firefox
+    e.dataTransfer.setData('text/plain', '');
 }
-
 function handleDragEnd(e) {
     e.currentTarget.classList.remove('dragging');
     document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
     document.querySelectorAll('.drop-zone.active').forEach(el => el.classList.remove('active'));
     dragData = null;
 }
-
-function handleDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-}
-
-function handleDragEnter(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add('drag-over');
-}
-
-function handleDragLeave(e) {
-    e.currentTarget.classList.remove('drag-over');
-}
+function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+function handleDragEnter(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
 
 async function handleDropOnParent(e, targetParentIdx) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
+    e.preventDefault(); e.currentTarget.classList.remove('drag-over');
     if (!dragData) return;
-
     const skills = questionsData[adminCurrentProduct];
-
-    // Don't drop on yourself
     if (dragData.type === 'parent' && dragData.parentIdx === targetParentIdx) return;
-
-    // Remove from original position
     let movedSkill;
     if (dragData.type === 'parent') {
-        // If parent has children, we just move the parent itself (without children) as a sub-skill
-        movedSkill = { id: dragData.skillObj.id, text: dragData.skillObj.text };
-        // If it had children, they become top-level
-        const removedParent = skills.splice(dragData.parentIdx, 1)[0];
-        if (removedParent.children && removedParent.children.length > 0) {
-            // Insert children as top-level skills at the old position
-            const insertIdx = dragData.parentIdx > targetParentIdx ? dragData.parentIdx : dragData.parentIdx;
-            for (let i = removedParent.children.length - 1; i >= 0; i--) {
-                skills.splice(insertIdx > skills.length ? skills.length : insertIdx, 0, { ...removedParent.children[i], children: [] });
-            }
+        const removed = skills.splice(dragData.parentIdx, 1)[0];
+        movedSkill = { id: removed.id, text: removed.text };
+        // Orphaned children become top-level
+        if (removed.children && removed.children.length > 0) {
+            const insertAt = Math.min(dragData.parentIdx, skills.length);
+            for (let i = removed.children.length - 1; i >= 0; i--) skills.splice(insertAt, 0, { ...removed.children[i], children: [] });
         }
     } else {
-        // Remove child from its parent
         movedSkill = skills[dragData.parentIdx].children.splice(dragData.childIdx, 1)[0];
     }
-
-    // Recalculate target index (may have shifted after removal)
-    // Add as child of target parent
-    const actualTarget = skills[targetParentIdx >= skills.length ? skills.length - 1 : targetParentIdx];
-    if (!actualTarget) return;
-    if (!actualTarget.children) actualTarget.children = [];
-    actualTarget.children.push({ id: movedSkill.id, text: movedSkill.text });
-
-    await saveQuestions();
-    renderAdminSkills();
-    renderProductTabs();
-    showToast('Skill moved!');
+    // Recalculate target
+    const target = skills[targetParentIdx >= skills.length ? skills.length - 1 : targetParentIdx];
+    if (!target) return;
+    if (!target.children) target.children = [];
+    target.children.push({ id: movedSkill.id, text: movedSkill.text });
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); showToast('Skill nested!');
 }
 
 async function handleDropOnZone(e, targetIdx) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('active');
+    e.preventDefault(); e.currentTarget.classList.remove('active');
     if (!dragData) return;
-
     const skills = questionsData[adminCurrentProduct];
-
-    // Remove from original position
     let movedSkill;
-    if (dragData.type === 'parent') {
-        movedSkill = skills.splice(dragData.parentIdx, 1)[0];
-    } else {
-        const child = skills[dragData.parentIdx].children.splice(dragData.childIdx, 1)[0];
-        movedSkill = { ...child, children: [] };
-    }
-
-    // Insert at new position
-    const insertIdx = targetIdx > skills.length ? skills.length : targetIdx;
-    skills.splice(insertIdx, 0, movedSkill);
-
-    await saveQuestions();
-    renderAdminSkills();
-    renderProductTabs();
-    showToast('Skill reordered!');
+    if (dragData.type === 'parent') { movedSkill = skills.splice(dragData.parentIdx, 1)[0]; }
+    else { const child = skills[dragData.parentIdx].children.splice(dragData.childIdx, 1)[0]; movedSkill = { ...child, children: [] }; }
+    skills.splice(Math.min(targetIdx, skills.length), 0, movedSkill);
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); showToast('Skill reordered!');
 }
 
-function handleZoneDragEnter(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add('active');
-}
-
-function handleZoneDragLeave(e) {
-    e.currentTarget.classList.remove('active');
-}
+function handleZoneDragEnter(e) { e.preventDefault(); e.currentTarget.classList.add('active'); }
+function handleZoneDragLeave(e) { e.currentTarget.classList.remove('active'); }
 
 async function promoteToParent(parentIdx, childIdx) {
     const skills = questionsData[adminCurrentProduct];
     const child = skills[parentIdx].children.splice(childIdx, 1)[0];
-    // Insert as top-level after the current parent
     skills.splice(parentIdx + 1, 0, { ...child, children: [] });
-    await saveQuestions();
-    renderAdminSkills();
-    renderProductTabs();
-    showToast('Promoted to top level!');
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); showToast('Promoted to top level!');
+}
+
+// =====================================================
+// ADMIN - REORDER WITH ARROWS
+// =====================================================
+async function moveParent(index, direction) {
+    const skills = questionsData[adminCurrentProduct];
+    const newIdx = index + direction;
+    if (newIdx < 0 || newIdx >= skills.length) return;
+    [skills[index], skills[newIdx]] = [skills[newIdx], skills[index]];
+    await saveQuestions(); renderAdminSkills();
+}
+
+async function moveChild(parentIdx, childIdx, direction) {
+    const children = questionsData[adminCurrentProduct][parentIdx].children;
+    const newIdx = childIdx + direction;
+    if (newIdx < 0 || newIdx >= children.length) return;
+    [children[childIdx], children[newIdx]] = [children[newIdx], children[childIdx]];
+    await saveQuestions(); renderAdminSkills();
 }
 
 // =====================================================
@@ -991,68 +619,44 @@ async function promoteToParent(parentIdx, childIdx) {
 function renderAdminProductTabs() {
     const products = Object.keys(questionsData);
     if (!adminCurrentProduct && products.length) adminCurrentProduct = products[0];
-    document.getElementById('adminProductTabs').innerHTML = products.map(p =>
-        `<div class="tab ${p === adminCurrentProduct ? 'active' : ''}" onclick="selectAdminProduct('${p}')">${p}</div>`
-    ).join('');
+    document.getElementById('adminProductTabs').innerHTML = products.map(p => `<div class="tab ${p===adminCurrentProduct?'active':''}" onclick="selectAdminProduct('${p}')">${p}</div>`).join('');
     renderAdminSkills();
 }
-
 function selectAdminProduct(p) { adminCurrentProduct = p; renderAdminProductTabs(); }
 
 function renderAdminSkills() {
     const skills = questionsData[adminCurrentProduct] || [];
-    if (!skills.length) {
-        document.getElementById('adminSkillsList').innerHTML = '<p style="color:var(--text-dim)">No skills yet. Click "+ Skill" to add one.</p>';
-        return;
-    }
-    let html = '';
-
-    // Drop zone at top
-    html += `<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event, 0)"></div>`;
-
+    if (!skills.length) { document.getElementById('adminSkillsList').innerHTML = '<p style="color:var(--text-dim)">No skills yet. Click "+ Skill" to add one.</p>'; return; }
+    let html = `<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event,0)"></div>`;
     skills.forEach((skill, i) => {
-        const childCount = skill.children ? skill.children.length : 0;
-        html += `
-        <div class="skill-admin-card is-parent" draggable="true"
-            ondragstart="handleDragStart(event,'parent',${i},null)"
-            ondragend="handleDragEnd(event)"
-            ondragover="handleDragOver(event)"
-            ondragenter="handleDragEnter(event)"
-            ondragleave="handleDragLeave(event)"
-            ondrop="handleDropOnParent(event,${i})">
+        const cc = skill.children ? skill.children.length : 0;
+        html += `<div class="skill-admin-card is-parent" draggable="true" ondragstart="handleDragStart(event,'parent',${i},null)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropOnParent(event,${i})">
             <span class="drag-handle">&#9776;</span>
-            <span class="skill-text">${skill.text} ${childCount > 0 ? `<span class="skill-badge">${childCount} sub-skills</span>` : ''}</span>
+            <span class="skill-text">${skill.text}${cc > 0 ? ` <span class="skill-badge">${cc} sub</span>` : ''}</span>
             <div class="skill-actions">
-                <button class="btn-icon" onclick="editSkill(${i})" title="Edit">&#9998;</button>
-                <button class="btn-icon" onclick="deleteSkill(${i})" title="Delete">&times;</button>
+                <button class="btn-icon" onclick="event.stopPropagation();moveParent(${i},-1)" ${i===0?'disabled':''} title="Move up">&uarr;</button>
+                <button class="btn-icon" onclick="event.stopPropagation();moveParent(${i},1)" ${i===skills.length-1?'disabled':''} title="Move down">&darr;</button>
+                <button class="btn-icon" onclick="event.stopPropagation();editSkill(${i})" title="Edit">&#9998;</button>
+                <button class="btn-icon" onclick="event.stopPropagation();deleteSkill(${i})" title="Delete">&times;</button>
             </div>
         </div>`;
-
         if (skill.children) {
             skill.children.forEach((child, ci) => {
-                html += `
-                <div class="skill-admin-card is-child" draggable="true"
-                    ondragstart="handleDragStart(event,'child',${i},${ci})"
-                    ondragend="handleDragEnd(event)"
-                    ondragover="handleDragOver(event)"
-                    ondragenter="handleDragEnter(event)"
-                    ondragleave="handleDragLeave(event)"
-                    ondrop="handleDropOnParent(event,${i})">
+                html += `<div class="skill-admin-card is-child" draggable="true" ondragstart="handleDragStart(event,'child',${i},${ci})" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropOnParent(event,${i})">
                     <span class="drag-handle">&#9776;</span>
                     <span class="skill-text">${child.text}</span>
                     <div class="skill-actions">
-                        <button class="btn-promote" onclick="promoteToParent(${i},${ci})" title="Promote to top level">&#8592; Top</button>
-                        <button class="btn-icon" onclick="editSubSkill(${i},${ci})" title="Edit">&#9998;</button>
-                        <button class="btn-icon" onclick="deleteSubSkill(${i},${ci})" title="Delete">&times;</button>
+                        <button class="btn-icon" onclick="event.stopPropagation();moveChild(${i},${ci},-1)" ${ci===0?'disabled':''} title="Move up">&uarr;</button>
+                        <button class="btn-icon" onclick="event.stopPropagation();moveChild(${i},${ci},1)" ${ci===skill.children.length-1?'disabled':''} title="Move down">&darr;</button>
+                        <button class="btn-promote" onclick="event.stopPropagation();promoteToParent(${i},${ci})" title="Promote">&#8592; Top</button>
+                        <button class="btn-icon" onclick="event.stopPropagation();editSubSkill(${i},${ci})" title="Edit">&#9998;</button>
+                        <button class="btn-icon" onclick="event.stopPropagation();deleteSubSkill(${i},${ci})" title="Delete">&times;</button>
                     </div>
                 </div>`;
             });
         }
-
-        // Drop zone after each parent
-        html += `<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event, ${i + 1})"></div>`;
+        html += `<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event,${i+1})"></div>`;
     });
-
     document.getElementById('adminSkillsList').innerHTML = html;
 }
 
@@ -1061,237 +665,124 @@ function renderAdminSkills() {
 // =====================================================
 function showAddProductModal() {
     document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('modalContent').innerHTML = `
-        <h3>Add Product</h3>
-        <div class="form-group"><label>Product Name</label><input type="text" id="newProductName" placeholder="e.g. Financial Cloud"></div>
-        <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="addProduct()">Add</button>
-        </div>`;
+    document.getElementById('modalContent').innerHTML = `<h3>Add Product</h3><div class="form-group"><label>Product Name</label><input type="text" id="newProductName" placeholder="e.g. Financial Cloud"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addProduct()">Add</button></div>`;
 }
-
 async function addProduct() {
     const name = document.getElementById('newProductName').value.trim();
-    if (!name) return;
-    if (questionsData[name]) { alert('Product already exists'); return; }
-    questionsData[name] = [];
-    await saveQuestions();
-    adminCurrentProduct = name;
-    renderAdminProductTabs();
-    renderProductTabs();
-    closeModal();
-    showToast('Product added!');
+    if (!name) return; if (questionsData[name]) { alert('Already exists'); return; }
+    questionsData[name] = []; await saveQuestions(); adminCurrentProduct = name;
+    renderAdminProductTabs(); renderProductTabs(); closeModal(); showToast('Product added!');
 }
-
 function showAddSkillModal() {
     if (!adminCurrentProduct) { alert('Select a product first'); return; }
     document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('modalContent').innerHTML = `
-        <h3>Add Skill to ${adminCurrentProduct}</h3>
-        <div class="form-group"><label>Skill Name</label><input type="text" id="newSkillText" placeholder="e.g. Workflow"></div>
-        <p style="color:var(--text-dim);font-size:0.8rem;margin-top:8px;">Added as a top-level skill. Drag other skills onto it to make them sub-skills.</p>
-        <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="addSkill()">Add</button>
-        </div>`;
+    document.getElementById('modalContent').innerHTML = `<h3>Add Skill to ${adminCurrentProduct}</h3><div class="form-group"><label>Skill Name</label><input type="text" id="newSkillText" placeholder="e.g. Workflow"></div><p style="color:var(--text-dim);font-size:0.8rem;margin-top:8px;">Added as top-level. Drag other skills onto it to nest them.</p><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addSkill()">Add</button></div>`;
 }
-
 async function addSkill() {
-    const text = document.getElementById('newSkillText').value.trim();
-    if (!text) return;
-    const id = 'skill_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-    questionsData[adminCurrentProduct].push({ id, text, children: [] });
-    await saveQuestions();
-    renderAdminSkills();
-    renderProductTabs();
-    closeModal();
-    showToast('Skill added!');
+    const text = document.getElementById('newSkillText').value.trim(); if (!text) return;
+    questionsData[adminCurrentProduct].push({ id: 'skill_'+Date.now()+'_'+Math.random().toString(36).substr(2,5), text, children: [] });
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); closeModal(); showToast('Skill added!');
 }
-
 function editSkill(index) {
     const skill = questionsData[adminCurrentProduct][index];
     document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('modalContent').innerHTML = `
-        <h3>Edit Skill</h3>
-        <div class="form-group"><label>Skill Name</label><input type="text" id="editSkillText" value="${skill.text}"></div>
-        <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveEditSkill(${index})">Save</button>
-        </div>`;
+    document.getElementById('modalContent').innerHTML = `<h3>Edit Skill</h3><div class="form-group"><label>Skill Name</label><input type="text" id="editSkillText" value="${skill.text}"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditSkill(${index})">Save</button></div>`;
 }
-
 async function saveEditSkill(index) {
-    const text = document.getElementById('editSkillText').value.trim();
-    if (!text) return;
+    const text = document.getElementById('editSkillText').value.trim(); if (!text) return;
     questionsData[adminCurrentProduct][index].text = text;
-    await saveQuestions();
-    renderAdminSkills();
-    renderProductTabs();
-    closeModal();
-    showToast('Skill updated!');
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); closeModal(); showToast('Updated!');
 }
-
 function editSubSkill(parentIdx, childIdx) {
     const child = questionsData[adminCurrentProduct][parentIdx].children[childIdx];
     document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('modalContent').innerHTML = `
-        <h3>Edit Sub-Skill</h3>
-        <div class="form-group"><label>Sub-Skill Name</label><input type="text" id="editSubSkillText" value="${child.text}"></div>
-        <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveEditSubSkill(${parentIdx},${childIdx})">Save</button>
-        </div>`;
+    document.getElementById('modalContent').innerHTML = `<h3>Edit Sub-Skill</h3><div class="form-group"><label>Sub-Skill Name</label><input type="text" id="editSubSkillText" value="${child.text}"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditSubSkill(${parentIdx},${childIdx})">Save</button></div>`;
 }
-
-async function saveEditSubSkill(parentIdx, childIdx) {
-    const text = document.getElementById('editSubSkillText').value.trim();
-    if (!text) return;
-    questionsData[adminCurrentProduct][parentIdx].children[childIdx].text = text;
-    await saveQuestions();
-    renderAdminSkills();
-    renderProductTabs();
-    closeModal();
-    showToast('Sub-skill updated!');
+async function saveEditSubSkill(pi, ci) {
+    const text = document.getElementById('editSubSkillText').value.trim(); if (!text) return;
+    questionsData[adminCurrentProduct][pi].children[ci].text = text;
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); closeModal(); showToast('Updated!');
 }
-
 async function deleteSkill(index) {
-    const skill = questionsData[adminCurrentProduct][index];
-    const childCount = skill.children ? skill.children.length : 0;
-    const msg = childCount > 0 ? `Delete "${skill.text}" and its ${childCount} sub-skill(s)?` : `Delete "${skill.text}"?`;
-    if (!confirm(msg)) return;
+    const s = questionsData[adminCurrentProduct][index];
+    const cc = s.children ? s.children.length : 0;
+    if (!confirm(cc > 0 ? `Delete "${s.text}" and its ${cc} sub-skill(s)?` : `Delete "${s.text}"?`)) return;
     questionsData[adminCurrentProduct].splice(index, 1);
-    await saveQuestions();
-    renderAdminSkills();
-    renderProductTabs();
-    showToast('Skill deleted');
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); showToast('Deleted');
 }
-
-async function deleteSubSkill(parentIdx, childIdx) {
+async function deleteSubSkill(pi, ci) {
     if (!confirm('Delete this sub-skill?')) return;
-    questionsData[adminCurrentProduct][parentIdx].children.splice(childIdx, 1);
-    await saveQuestions();
-    renderAdminSkills();
-    renderProductTabs();
-    showToast('Sub-skill deleted');
+    questionsData[adminCurrentProduct][pi].children.splice(ci, 1);
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); showToast('Deleted');
 }
-
 function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
 // =====================================================
 // ADMIN - RESULTS
 // =====================================================
 let allResults = [];
-
 async function loadAllResults() {
-    const snap = await db.collection('responses').get();
-    allResults = [];
-    snap.forEach(doc => { allResults.push({ uid: doc.id, ...doc.data() }); });
-    renderResults();
+    const snap = await db.collection('responses').get(); allResults = [];
+    snap.forEach(doc => { allResults.push({ uid: doc.id, ...doc.data() }); }); renderResults();
 }
-
 function getAllRateableSkills() {
     const all = [];
     for (const [product, skills] of Object.entries(questionsData)) {
         for (const skill of skills) {
-            if (skill.children && skill.children.length > 0) {
-                for (const child of skill.children) {
-                    all.push({ product, parentText: skill.text, skillId: child.id, skillText: child.text });
-                }
-            } else {
-                all.push({ product, parentText: null, skillId: skill.id, skillText: skill.text });
-            }
+            if (skill.children && skill.children.length > 0) { for (const c of skill.children) all.push({ product, parentText: skill.text, skillId: c.id, skillText: c.text }); }
+            else all.push({ product, parentText: null, skillId: skill.id, skillText: skill.text });
         }
-    }
-    return all;
+    } return all;
 }
-
 function renderResults() {
     const threshold = parseInt(document.getElementById('thresholdInput')?.value) || settings.threshold || 3;
     const container = document.getElementById('resultsContainer');
-    const rateableSkills = getAllRateableSkills();
-    if (!allResults.length) {
-        container.innerHTML = '<p style="color:var(--text-dim)">No submissions yet.</p>';
-        return;
-    }
+    const rs = getAllRateableSkills();
+    if (!allResults.length) { container.innerHTML = '<p style="color:var(--text-dim)">No submissions yet.</p>'; return; }
     container.innerHTML = allResults.map(result => {
         const name = result.name || result.email || 'Unknown';
         const submitted = result.submitted ? '&#10003; Submitted' : '&#9998; In progress';
         let gaps = [];
-        for (const rs of rateableSkills) {
-            const r = (result.responses?.[rs.product] || {})[rs.skillId];
-            if (r && r.sl && r.sl < threshold) {
-                const label = rs.parentText ? `${rs.parentText} > ${rs.skillText}` : rs.skillText;
-                gaps.push({ product: rs.product, skill: label, level: r.sl });
-            }
-        }
-        const gapHtml = gaps.length > 0
-            ? gaps.map(g => `<span class="gap-badge ${g.level === 1 ? 'gap-critical' : 'gap-warning'}">${g.product}: ${g.skill} (${g.level})</span>`).join(' ')
-            : '<span style="color:var(--success);font-size:0.85rem;">All skills at or above threshold</span>';
+        for (const s of rs) { const r = (result.responses?.[s.product]||{})[s.skillId]; if (r&&r.sl&&r.sl<threshold) gaps.push({ product: s.product, skill: s.parentText ? `${s.parentText} > ${s.skillText}` : s.skillText, level: r.sl }); }
+        const gapHtml = gaps.length > 0 ? gaps.map(g => `<span class="gap-badge ${g.level===1?'gap-critical':'gap-warning'}">${g.product}: ${g.skill} (${g.level})</span>`).join(' ') : '<span style="color:var(--success);font-size:0.85rem;">All at or above threshold</span>';
         return `<div class="result-card"><h4>${name} <span style="font-size:0.8rem;font-weight:normal;color:var(--text-dim);">${submitted}</span></h4><div style="margin-top:8px;">${gapHtml}</div></div>`;
     }).join('');
 }
 
 // =====================================================
-// ADMIN - SETTINGS
+// SETTINGS
 // =====================================================
-async function loadSettings() {
-    const doc = await db.collection('config').doc('settings').get();
-    if (doc.exists) settings = doc.data();
-}
-
-function loadSettingsUI() {
-    document.getElementById('notifEmail').value = settings.notifEmail || '';
-    document.getElementById('settingsThreshold').value = settings.threshold || 3;
-    loadTeamList();
-}
-
+async function loadSettings() { const doc = await db.collection('config').doc('settings').get(); if (doc.exists) settings = doc.data(); }
+function loadSettingsUI() { document.getElementById('notifEmail').value = settings.notifEmail||''; document.getElementById('settingsThreshold').value = settings.threshold||3; loadTeamList(); }
 async function saveSettings() {
     settings.notifEmail = document.getElementById('notifEmail').value.trim();
-    settings.threshold = parseInt(document.getElementById('settingsThreshold').value) || 3;
-    await db.collection('config').doc('settings').set(settings);
-    showToast('Settings saved!');
+    settings.threshold = parseInt(document.getElementById('settingsThreshold').value)||3;
+    await db.collection('config').doc('settings').set(settings); showToast('Settings saved!');
 }
-
 async function loadTeamList() {
-    const snap = await db.collection('users').get();
-    const container = document.getElementById('teamList');
-    let html = '';
-    snap.forEach(doc => {
-        const u = doc.data();
-        html += `<div class="skill-admin-card"><span class="skill-text">${u.email} <span style="color:var(--text-dim);font-size:0.8rem;">(${u.role})</span></span></div>`;
-    });
-    container.innerHTML = html || '<p style="color:var(--text-dim)">No users yet.</p>';
+    const snap = await db.collection('users').get(); let html = '';
+    snap.forEach(doc => { const u = doc.data(); html += `<div class="skill-admin-card"><span class="skill-text">${u.email} <span style="color:var(--text-dim);font-size:0.8rem;">(${u.role})</span></span></div>`; });
+    document.getElementById('teamList').innerHTML = html || '<p style="color:var(--text-dim)">No users yet.</p>';
 }
-
 async function grantAdmin() {
-    const email = document.getElementById('adminEmailInput').value.trim();
-    if (!email) return;
-    const snap = await db.collection('users').where('email', '==', email).get();
+    const email = document.getElementById('adminEmailInput').value.trim(); if (!email) return;
+    const snap = await db.collection('users').where('email','==',email).get();
     if (snap.empty) { alert('User not found. They need to sign in first.'); return; }
     snap.forEach(async doc => { await db.collection('users').doc(doc.id).update({ role: 'admin' }); });
-    document.getElementById('adminEmailInput').value = '';
-    loadTeamList();
-    showToast('Admin granted!');
+    document.getElementById('adminEmailInput').value = ''; loadTeamList(); showToast('Admin granted!');
 }
 
 // =====================================================
 // UTILS
 // =====================================================
-function showToast(msg, isError = false) {
-    const t = document.createElement('div');
-    t.className = 'toast' + (isError ? ' error' : '');
-    t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 3000);
+function showToast(msg, isError=false) {
+    const t = document.createElement('div'); t.className = 'toast'+(isError?' error':''); t.textContent = msg;
+    document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
 }
-
 async function deleteProduct(name) {
-    if (!confirm(`Delete product "${name}" and all its skills?`)) return;
-    delete questionsData[name];
-    await saveQuestions();
-    adminCurrentProduct = Object.keys(questionsData)[0] || null;
-    renderAdminProductTabs();
-    renderProductTabs();
+    if (!confirm(`Delete "${name}" and all skills?`)) return;
+    delete questionsData[name]; await saveQuestions();
+    adminCurrentProduct = Object.keys(questionsData)[0]||null; renderAdminProductTabs(); renderProductTabs();
 }
 </script>
 </body>
