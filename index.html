@@ -318,13 +318,13 @@ function handleLogout() { auth.signOut(); }
 
 async function loadUserRole() {
     var doc = await db.collection('users').doc(currentUser.uid).get();
-    if (doc.exists) { isAdmin = doc.data().role === 'admin'; }
+    if (doc.exists) { isAdmin = doc.data().role === 'admin'; userAllowedProducts = doc.data().products || null; }
     else {
         await db.collection('users').doc(currentUser.uid).set({
             email: currentUser.email, name: currentUser.email.split('@')[0],
             role: 'member', createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        isAdmin = false;
+        isAdmin = false; userAllowedProducts = null;
     }
 }
 
@@ -375,10 +375,15 @@ async function loadUserResponses() {
 }
 
 // ASSESSMENT
+var userAllowedProducts = null;
 function renderProductTabs() {
-    var products = Object.keys(questionsData);
+    var allProducts = Object.keys(questionsData);
+    var products = allProducts;
+    if (!isAdmin && userAllowedProducts && userAllowedProducts.length > 0) {
+        products = allProducts.filter(function(p) { return userAllowedProducts.indexOf(p) > -1; });
+    }
     if (!products.length) { document.getElementById('productTabs').innerHTML = '<p style="color:var(--text-dim)">No products configured yet.</p>'; document.getElementById('skillsList').innerHTML = ''; document.getElementById('productProgress').innerHTML = ''; document.getElementById('submitSection').innerHTML = ''; return; }
-    if (!currentProduct || !products.includes(currentProduct)) currentProduct = products[0];
+    if (!currentProduct || products.indexOf(currentProduct) === -1) currentProduct = products[0];
     document.getElementById('productTabs').innerHTML = products.map(function(p) {
         var score = calculateProductScore(p);
         var statusClass = 'empty';
@@ -623,10 +628,13 @@ async function loadTeamList(){
         var u=doc.data();
         var uid=doc.id;
         var roleToggle=u.role==='admin'?'<button class="btn-icon" onclick="changeRole(\''+uid+'\',\''+u.email+'\',\'member\')" title="Demote to member" style="color:var(--warning);">&#9660;</button>':'<button class="btn-icon" onclick="changeRole(\''+uid+'\',\''+u.email+'\',\'admin\')" title="Promote to admin" style="color:var(--success);">&#9650;</button>';
-        html+='<div class="user-card"><span class="user-info">'+u.email+'<span class="user-role">'+u.role+'</span></span><div class="user-actions">'+roleToggle+'<button class="btn-icon" onclick="deleteUser(\''+uid+'\',\''+u.email+'\')" title="Remove" style="color:var(--danger);">&times;</button></div></div>';
+        html+='<div class="user-card"><span class="user-info">'+u.email+'<span class="user-role">'+u.role+'</span>'+(u.products?' <span style="font-size:0.7rem;color:var(--text-dim);">('+u.products.length+' products)</span>':'')+'</span><div class="user-actions"><button class="btn-icon" onclick="showAssignProductsModal(\''+uid+'\',\''+u.email+'\')" title="Assign products" style="color:var(--accent);">&#9881;</button>'+roleToggle+'<button class="btn-icon" onclick="deleteUser(\''+uid+'\',\''+u.email+'\')" title="Remove" style="color:var(--danger);">&times;</button></div></div>';
     });
     document.getElementById('teamList').innerHTML=html||'<p style="color:var(--text-dim)">No users yet.</p>';
 }
+    async function showAssignProductsModal(uid,email){var userDoc=await db.collection('users').doc(uid).get();var userData=userDoc.exists?userDoc.data():{};var userProducts=userData.products||[];var allProducts=Object.keys(questionsData);var checkboxes='';for(var i=0;i<allProducts.length;i++){var checked=userProducts.indexOf(allProducts[i])>-1?'checked':'';checkboxes+='<label style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg);border-radius:var(--radius);margin-bottom:4px;cursor:pointer;"><input type="checkbox" class="prodCheckbox" value="'+allProducts[i]+'" '+checked+' style="width:18px;height:18px;"> '+allProducts[i]+'</label>';}document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Assign Products to '+email+'</h3><p style="color:var(--text-dim);font-size:0.8rem;margin-bottom:12px;">User will only see checked products in their assessment.</p><div style="margin-bottom:16px;"><label style="display:flex;align-items:center;gap:8px;padding:8px;cursor:pointer;color:var(--accent);font-weight:600;"><input type="checkbox" id="assignAll" onchange="toggleAllProducts(this)" style="width:18px;height:18px;"'+(userProducts.length===allProducts.length?' checked':'')+' > All Products</label><hr style="border-color:var(--border);margin:8px 0;">'+checkboxes+'</div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveProductAssignment(\''+uid+'\')" >Save</button></div>';}
+function toggleAllProducts(el){var boxes=document.querySelectorAll('.prodCheckbox');for(var i=0;i<boxes.length;i++){boxes[i].checked=el.checked;}}
+async function saveProductAssignment(uid){var boxes=document.querySelectorAll('.prodCheckbox');var selected=[];for(var i=0;i<boxes.length;i++){if(boxes[i].checked)selected.push(boxes[i].value);}await db.collection('users').doc(uid).update({products:selected});closeModal();loadTeamList();showToast('Products assigned!');}
 async function grantAdmin(){var email=document.getElementById('adminEmailInput').value.trim();if(!email)return;var snap=await db.collection('users').where('email','==',email).get();if(snap.empty){alert('User not found. They need to log in first.');return;}snap.forEach(async function(doc){await db.collection('users').doc(doc.id).update({role:'admin'});});document.getElementById('adminEmailInput').value='';loadTeamList();showToast('Admin granted!');}
 
 function showToast(msg,isError){var t=document.createElement('div');t.className='toast'+(isError?' error':'');t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3000);}
