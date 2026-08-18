@@ -511,8 +511,8 @@ async function sendProductEmail() {
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
             to_email: settings.notifEmail,
             from_name: 'Competency Matrix',
-            subject: \`\[${currentProduct}\] Assessment: ${userName} - ${score.pct}% (${score.grade})\`,
-message: \`${userName} submitted their ${currentProduct} assessment.\\nSubmitted: ${new Date().toLocaleString('en-GB',{dateStyle:'full',timeStyle:'short'})}\\n\\n${lines.join('\\n')}\`
+            subject: '['+currentProduct+'] Assessment: '+userName+' - '+score.pct+'% ('+score.grade+')',
+message: userName+' submitted their '+currentProduct+' assessment.\nSubmitted: '+new Date().toLocaleString('en-GB',{dateStyle:'full',timeStyle:'short'})+'\n\n'+lines.join('\n')
         });
     } catch(e) { console.error('Email failed:', e); }
 }
