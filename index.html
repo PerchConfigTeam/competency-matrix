@@ -1,272 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Config Team Competency Matrix</title>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg: #1a1a2e;
-            --surface: #16213e;
-            --surface2: #0f3460;
-            --accent: #e94560;
-            --accent2: #533483;
-            --text: #eaeaea;
-            --text-dim: #a0a0b0;
-            --success: #4caf50;
-            --warning: #ff9800;
-            --danger: #f44336;
-            --border: #2a2a4a;
-            --radius: 8px;
-            --sl1: #e53935;
-            --sl2: #fb8c00;
-            --sl3: #43a047;
-            --sl4: #ffd600;
-            --int1: #78909c;
-            --int2: #7c4dff;
-        }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
-        .hidden { display: none !important; }
-
-        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .login-box { background: var(--surface); border-radius: var(--radius); padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-        .login-box h1 { font-size: 1.5rem; margin-bottom: 8px; color: var(--accent); }
-        .login-box p { color: var(--text-dim); margin-bottom: 24px; font-size: 0.9rem; }
-
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 4px; }
-        input[type="email"], input[type="password"], input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 1rem; outline: none; transition: border-color 0.2s; }
-        textarea { resize: vertical; min-height: 60px; font-family: inherit; }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
-
-        .btn { padding: 12px 24px; border: none; border-radius: var(--radius); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { background: #d63851; transform: translateY(-1px); }
-        .btn-secondary { background: var(--surface2); color: var(--text); }
-        .btn-secondary:hover { background: #1a4a7a; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-success:hover { background: #388e3c; }
-        .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
-        .btn-block { width: 100%; justify-content: center; }
-
-        .app-header { background: var(--surface); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-        .app-header h2 { font-size: 1.1rem; color: var(--accent); }
-        .header-right { display: flex; align-items: center; gap: 12px; }
-        .user-badge { font-size: 0.85rem; color: var(--text-dim); background: var(--bg); padding: 6px 12px; border-radius: 20px; }
-
-        .app-content { padding: 24px; max-width: 1200px; margin: 0 auto; }
-
-        .tabs { display: flex; gap: 4px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; flex-wrap: wrap; }
-        .tab { padding: 10px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 0.9rem; white-space: nowrap; transition: all 0.2s; position: relative; }
-        .tab:hover { border-color: var(--accent); }
-        .tab.active { background: var(--accent); border-color: var(--accent); color: white; }
-        .tab .tab-status { position: absolute; top: -4px; right: -4px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--bg); }
-        .tab .tab-status.complete { background: var(--success); }
-        .tab .tab-status.incomplete { background: var(--warning); }
-        .tab .tab-status.empty { background: var(--border); }
-
-        .skill-group { margin-bottom: 20px; }
-        .skill-group-header { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; padding: 14px 20px; font-weight: 600; font-size: 0.95rem; color: var(--accent); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
-        .skill-group-header:hover { border-color: var(--accent); }
-        .skill-group-header .toggle-icon { font-size: 0.8rem; transition: transform 0.2s; }
-        .skill-group-header.collapsed .toggle-icon { transform: rotate(-90deg); }
-        .skill-group-children { border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius); overflow: visible; }
-        .skill-group-children.collapsed { display: none; }
-
-        .skill-card { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 20px 14px 36px; }
-        .skill-card:last-child { border-bottom: none; }
-        .skill-card .skill-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-        .skill-card .skill-name { font-size: 0.9rem; color: var(--text); }
-        .skill-card .skill-ratings { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
-        .skill-card.standalone { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px; }
-        .skill-card.standalone .skill-name { font-weight: 500; }
-        .skill-card.unanswered { border-left: 3px solid var(--danger); }
-
-        .info-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--border); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; font-style: italic; cursor: help; position: relative; flex-shrink: 0; font-family: Georgia, serif; }
-        .info-icon:hover { background: var(--accent); color: white; }
-        .info-icon .tooltip { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; font-size: 0.8rem; font-style: normal; font-weight: 400; color: var(--text); min-width: 220px; max-width: 320px; white-space: normal; box-shadow: 0 4px 16px rgba(0,0,0,0.4); z-index: 50; line-height: 1.4; }
-        .info-icon .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--border); }
-        .info-icon:hover .tooltip { display: block; }
-
-        .rating-group { display: flex; align-items: center; gap: 8px; }
-        .rating-group .rating-label { font-size: 0.8rem; color: var(--text-dim); min-width: 75px; }
-        .pill-group { display: flex; gap: 4px; }
-        .pill { width: 40px; height: 34px; border-radius: 6px; border: 2px solid var(--border); background: var(--bg); color: var(--text-dim); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; user-select: none; }
-        .pill:hover { border-color: var(--text-dim); transform: translateY(-1px); }
-        .pill.selected { color: white; border-color: transparent; transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .pill.sl-1.selected { background: var(--sl1); }
-        .pill.sl-2.selected { background: var(--sl2); }
-        .pill.sl-3.selected { background: var(--sl3); }
-        .pill.sl-4.selected { background: var(--sl4); color: #1a1a2e; }
-        .pill.int-1.selected { background: var(--int1); }
-        .pill.int-2.selected { background: var(--int2); }
-
-        .rating-key { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 24px; }
-        .rating-key h4 { margin-bottom: 10px; font-size: 0.9rem; color: var(--accent); }
-        .rating-key .keys { display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-dim); }
-        .key-pills { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
-        .key-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; color: white; }
-        .key-pill.kp-1 { background: var(--sl1); }
-        .key-pill.kp-2 { background: var(--sl2); }
-        .key-pill.kp-3 { background: var(--sl3); }
-        .key-pill.kp-4 { background: var(--sl4); color: #1a1a2e; }
-
-        /* Progress & Score */
-        .product-progress { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-        .progress-bar-wrap { flex: 1; min-width: 150px; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease, background 0.3s ease; }
-        .progress-text { font-size: 0.85rem; color: var(--text-dim); white-space: nowrap; }
-        .score-display { font-size: 0.85rem; font-weight: 600; padding: 4px 12px; border-radius: 12px; }
-        .score-low { background: rgba(244,67,54,0.2); color: var(--danger); }
-        .score-mid { background: rgba(255,152,0,0.2); color: var(--warning); }
-        .score-high { background: rgba(76,175,80,0.2); color: var(--success); }
-        .score-perfect { background: rgba(255,214,0,0.2); color: var(--sl4); }
-
-        .submit-section { margin-top: 24px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-        .submit-section .submit-info { font-size: 0.85rem; color: var(--text-dim); }
-        .submit-section .submit-info strong { color: var(--text); }
-        .submitted-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; background: rgba(76,175,80,0.15); color: var(--success); font-size: 0.85rem; font-weight: 600; }
-
-        /* Admin (same as v6) */
-        .admin-section { margin-bottom: 32px; }
-        .admin-section h3 { margin-bottom: 16px; font-size: 1.1rem; }
-        .drag-hint { background: var(--bg); border: 1px dashed var(--border); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 16px; font-size: 0.8rem; color: var(--text-dim); }
-        .skill-admin-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
-        .skill-admin-card.is-parent { background: var(--surface2); border-color: var(--accent); font-weight: 600; }
-        .skill-admin-card.is-child { margin-left: 32px; border-left: 3px solid var(--accent); }
-        .skill-admin-card.drag-over { border-color: var(--success) !important; box-shadow: 0 0 12px rgba(76,175,80,0.4); transform: scale(1.01); }
-        .skill-admin-card.dragging { opacity: 0.4; transform: scale(0.95); }
-        .skill-admin-card .drag-handle { cursor: grab; color: var(--text-dim); font-size: 1.1rem; padding: 0 2px; user-select: none; }
-        .skill-admin-card .drag-handle:active { cursor: grabbing; }
-        .skill-admin-card .skill-text { flex: 1; font-size: 0.9rem; }
-        .skill-admin-card .skill-desc-preview { font-size: 0.75rem; color: var(--text-dim); font-weight: 400; margin-left: 8px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .skill-admin-card .skill-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: var(--accent); color: white; margin-left: 8px; }
-        .skill-admin-card .skill-actions { display: flex; gap: 4px; align-items: center; }
-        .skill-admin-card .btn-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; color: var(--text-dim); font-size: 0.9rem; transition: all 0.2s; }
-        .skill-admin-card .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
-        .skill-admin-card .btn-icon:disabled { opacity: 0.3; cursor: not-allowed; }
-        .btn-promote { font-size: 0.7rem; padding: 3px 8px; background: var(--warning); color: #1a1a2e; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .drop-zone { height: 4px; margin: 2px 0; border-radius: 2px; transition: all 0.2s; }
-        .drop-zone.active { height: 8px; background: var(--success); margin: 6px 0; }
-
-        .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
-        .result-card h4 { margin-bottom: 12px; color: var(--accent); }
-        .result-score-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 12px; }
-        .result-score-item { padding: 8px 12px; background: var(--bg); border-radius: 4px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
-        .gap-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; margin: 2px; }
-        .gap-critical { background: rgba(244,67,54,0.2); color: var(--danger); }
-        .gap-warning { background: rgba(255,152,0,0.2); color: var(--warning); }
-
-        .settings-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
-        .settings-row label { font-size: 0.9rem; min-width: 150px; }
-        .settings-row input, .settings-row select { max-width: 200px; }
-
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal { background: var(--surface); border-radius: var(--radius); padding: 32px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
-        .modal h3 { margin-bottom: 16px; }
-        .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
-
-        .toast { position: fixed; bottom: 24px; right: 24px; background: var(--success); color: white; padding: 12px 24px; border-radius: var(--radius); font-size: 0.9rem; font-weight: 600; z-index: 2000; animation: slideIn 0.3s ease; }
-        .toast.error { background: var(--danger); }
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        @media (max-width: 768px) { .app-header { padding: 12px 16px; } .app-content { padding: 16px; } .skill-card .skill-ratings { gap: 16px; } .skill-card { padding-left: 20px; } .header-right { gap: 8px; } .user-badge { display: none; } .skill-admin-card.is-child { margin-left: 16px; } .info-icon .tooltip { left: 0; transform: none; min-width: 180px; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Config Team Competency Matrix</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --bg: #1a1a2e; --surface: #16213e; --surface2: #0f3460; --accent: #e94560; --accent2: #533483; --text: #eaeaea; --text-dim: #a0a0b0; --success: #4caf50; --warning: #ff9800; --danger: #f44336; --border: #2a2a4a; --radius: 8px; --sl1: #e53935; --sl2: #fb8c00; --sl3: #43a047; --sl4: #ffd600; --int1: #78909c; --int2: #7c4dff; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+.hidden { display: none !important; }
+.login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+.login-box { background: var(--surface); border-radius: var(--radius); padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+.login-box h1 { font-size: 1.5rem; margin-bottom: 8px; color: var(--accent); }
+.login-box p { color: var(--text-dim); margin-bottom: 24px; font-size: 0.9rem; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 4px; }
+input[type="email"], input[type="password"], input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 1rem; outline: none; transition: border-color 0.2s; }
+textarea { resize: vertical; min-height: 60px; font-family: inherit; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+.btn { padding: 12px 24px; border: none; border-radius: var(--radius); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: #d63851; transform: translateY(-1px); }
+.btn-secondary { background: var(--surface2); color: var(--text); }
+.btn-secondary:hover { background: #1a4a7a; }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #388e3c; }
+.btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+.btn-block { width: 100%; justify-content: center; }
+.app-header { background: var(--surface); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.app-header h2 { font-size: 1.1rem; color: var(--accent); }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.user-badge { font-size: 0.85rem; color: var(--text-dim); background: var(--bg); padding: 6px 12px; border-radius: 20px; }
+.app-content { padding: 24px; max-width: 1200px; margin: 0 auto; }
+.tabs { display: flex; gap: 4px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; flex-wrap: wrap; }
+.tab { padding: 10px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 0.9rem; white-space: nowrap; transition: all 0.2s; position: relative; }
+.tab:hover { border-color: var(--accent); }
+.tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+.tab .tab-status { position: absolute; top: -4px; right: -4px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--bg); }
+.tab .tab-status.complete { background: var(--success); }
+.tab .tab-status.incomplete { background: var(--warning); }
+.tab .tab-status.empty { background: var(--border); }
+.skill-group { margin-bottom: 20px; }
+.skill-group-header { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; padding: 14px 20px; font-weight: 600; font-size: 0.95rem; color: var(--accent); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+.skill-group-header:hover { border-color: var(--accent); }
+.skill-group-header .toggle-icon { font-size: 0.8rem; transition: transform 0.2s; }
+.skill-group-header.collapsed .toggle-icon { transform: rotate(-90deg); }
+.skill-group-children { border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius); overflow: visible; }
+.skill-group-children.collapsed { display: none; }
+.skill-card { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 20px 14px 36px; }
+.skill-card:last-child { border-bottom: none; }
+.skill-card .skill-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.skill-card .skill-name { font-size: 0.9rem; color: var(--text); }
+.skill-card .skill-ratings { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+.skill-card.standalone { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px; }
+.skill-card.standalone .skill-name { font-weight: 500; }
+.skill-card.unanswered { border-left: 3px solid var(--danger); }
+.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--border); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; font-style: italic; cursor: help; position: relative; flex-shrink: 0; font-family: Georgia, serif; }
+.info-icon:hover { background: var(--accent); color: white; }
+.info-icon .tooltip { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; font-size: 0.8rem; font-style: normal; font-weight: 400; color: var(--text); min-width: 220px; max-width: 320px; white-space: normal; box-shadow: 0 4px 16px rgba(0,0,0,0.4); z-index: 50; line-height: 1.4; }
+.info-icon .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--border); }
+.info-icon:hover .tooltip { display: block; }
+.rating-group { display: flex; align-items: center; gap: 8px; }
+.rating-group .rating-label { font-size: 0.8rem; color: var(--text-dim); min-width: 75px; }
+.pill-group { display: flex; gap: 4px; }
+.pill { width: 40px; height: 34px; border-radius: 6px; border: 2px solid var(--border); background: var(--bg); color: var(--text-dim); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; user-select: none; }
+.pill:hover { border-color: var(--text-dim); transform: translateY(-1px); }
+.pill.selected { color: white; border-color: transparent; transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.pill.sl-1.selected { background: var(--sl1); }
+.pill.sl-2.selected { background: var(--sl2); }
+.pill.sl-3.selected { background: var(--sl3); }
+.pill.sl-4.selected { background: var(--sl4); color: #1a1a2e; }
+.pill.int-1.selected { background: var(--int1); }
+.pill.int-2.selected { background: var(--int2); }
+.rating-key { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 24px; }
+.rating-key h4 { margin-bottom: 10px; font-size: 0.9rem; color: var(--accent); }
+.rating-key .keys { display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-dim); }
+.key-pills { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.key-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; color: white; }
+.key-pill.kp-1 { background: var(--sl1); }
+.key-pill.kp-2 { background: var(--sl2); }
+.key-pill.kp-3 { background: var(--sl3); }
+.key-pill.kp-4 { background: var(--sl4); color: #1a1a2e; }
+.product-progress { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.progress-bar-wrap { flex: 1; min-width: 150px; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease, background 0.3s ease; }
+.progress-text { font-size: 0.85rem; color: var(--text-dim); white-space: nowrap; }
+.score-display { font-size: 0.85rem; font-weight: 600; padding: 4px 12px; border-radius: 12px; }
+.score-low { background: rgba(244,67,54,0.2); color: var(--danger); }
+.score-mid { background: rgba(255,152,0,0.2); color: var(--warning); }
+.score-high { background: rgba(76,175,80,0.2); color: var(--success); }
+.score-perfect { background: rgba(255,214,0,0.2); color: var(--sl4); }
+.submit-section { margin-top: 24px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.submit-section .submit-info { font-size: 0.85rem; color: var(--text-dim); }
+.submit-section .submit-info strong { color: var(--text); }
+.submitted-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; background: rgba(76,175,80,0.15); color: var(--success); font-size: 0.85rem; font-weight: 600; }
+.admin-section { margin-bottom: 32px; }
+.admin-section h3 { margin-bottom: 16px; font-size: 1.1rem; }
+.drag-hint { background: var(--bg); border: 1px dashed var(--border); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 16px; font-size: 0.8rem; color: var(--text-dim); }
+.skill-admin-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+.skill-admin-card.is-parent { background: var(--surface2); border-color: var(--accent); font-weight: 600; }
+.skill-admin-card.is-child { margin-left: 32px; border-left: 3px solid var(--accent); }
+.skill-admin-card.drag-over { border-color: var(--success) !important; box-shadow: 0 0 12px rgba(76,175,80,0.4); transform: scale(1.01); }
+.skill-admin-card.dragging { opacity: 0.4; transform: scale(0.95); }
+.skill-admin-card .drag-handle { cursor: grab; color: var(--text-dim); font-size: 1.1rem; padding: 0 2px; user-select: none; }
+.skill-admin-card .drag-handle:active { cursor: grabbing; }
+.skill-admin-card .skill-text { flex: 1; font-size: 0.9rem; }
+.skill-admin-card .skill-desc-preview { font-size: 0.75rem; color: var(--text-dim); font-weight: 400; margin-left: 8px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.skill-admin-card .skill-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: var(--accent); color: white; margin-left: 8px; }
+.skill-admin-card .skill-actions { display: flex; gap: 4px; align-items: center; }
+.skill-admin-card .btn-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; color: var(--text-dim); font-size: 0.9rem; transition: all 0.2s; }
+.skill-admin-card .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+.skill-admin-card .btn-icon:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-promote { font-size: 0.7rem; padding: 3px 8px; background: var(--warning); color: #1a1a2e; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+.drop-zone { height: 4px; margin: 2px 0; border-radius: 2px; transition: all 0.2s; }
+.drop-zone.active { height: 8px; background: var(--success); margin: 6px 0; }
+.result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+.result-card h4 { margin-bottom: 12px; color: var(--accent); }
+.result-score-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 12px; }
+.result-score-item { padding: 8px 12px; background: var(--bg); border-radius: 4px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
+.gap-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; margin: 2px; }
+.gap-critical { background: rgba(244,67,54,0.2); color: var(--danger); }
+.gap-warning { background: rgba(255,152,0,0.2); color: var(--warning); }
+.settings-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.settings-row label { font-size: 0.9rem; min-width: 150px; }
+.settings-row input, .settings-row select { max-width: 200px; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.modal { background: var(--surface); border-radius: var(--radius); padding: 32px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+.modal h3 { margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--success); color: white; padding: 12px 24px; border-radius: var(--radius); font-size: 0.9rem; font-weight: 600; z-index: 2000; animation: slideIn 0.3s ease; }
+.toast.error { background: var(--danger); }
+@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.user-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.user-card .user-info { font-size: 0.85rem; }
+.user-card .user-role { font-size: 0.75rem; color: var(--text-dim); margin-left: 8px; padding: 2px 8px; background: var(--bg); border-radius: 10px; }
+.user-card .user-actions { display: flex; gap: 4px; }
+@media (max-width: 768px) { .app-header { padding: 12px 16px; } .app-content { padding: 16px; } .skill-card .skill-ratings { gap: 16px; } .skill-card { padding-left: 20px; } .header-right { gap: 8px; } .user-badge { display: none; } .skill-admin-card.is-child { margin-left: 16px; } .info-icon .tooltip { left: 0; transform: none; min-width: 180px; } }
+</style>
 </head>
 <body>
 
 <div id="loginView" class="login-container">
-    <div class="login-box">
-        <h1>Competency Matrix</h1>
-        <p>Config Team Self-Assessment</p>
-        <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="your.name@company.com"></div>
-        <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password"></div>
-        <button class="btn btn-primary btn-block" onclick="handleLogin()">Sign In</button>
-        <p id="loginError" style="color:var(--danger);margin-top:12px;font-size:0.85rem;"></p>
-    </div>
+<div class="login-box">
+<h1>Competency Matrix</h1>
+<p>Config Team Self-Assessment</p>
+<div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="your.name@company.com"></div>
+<div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password"></div>
+<button class="btn btn-primary btn-block" onclick="handleLogin()">Sign In</button>
+<p id="loginError" style="color:var(--danger);margin-top:12px;font-size:0.85rem;"></p>
+</div>
 </div>
 
 <div id="appView" class="hidden">
-    <header class="app-header">
-        <h2>Competency Matrix</h2>
-        <div class="header-right">
+<header class="app-header">
+<h2>Competency Matrix</h2>
+<div class="header-right">
 <span class="user-badge" id="userBadge"></span>
 <button class="btn btn-sm btn-secondary" id="adminToggle" onclick="toggleAdmin()">Admin</button>
 <button class="btn btn-sm btn-secondary" onclick="handleLogout()">Logout</button>
 </div>
-    </header>
-    <div class="app-content">
-        <div id="assessmentView">
-            <div class="rating-key">
-                <h4>Rating Key</h4>
-                <div class="key-pills">
-                    <span class="key-pill kp-1">1 Basic</span>
-                    <span class="key-pill kp-2">2 Intermediate</span>
-                    <span class="key-pill kp-3">3 Advanced</span>
-                    <span class="key-pill kp-4">4 Trainer</span>
-                </div>
-                <div class="keys" style="margin-top:10px;"><span><strong>Interest:</strong> 1 = No interest / Not relevant &nbsp;|&nbsp; 2 = Interested</span></div>
-            </div>
-            <div class="tabs" id="productTabs"></div>
-            <div id="productProgress"></div>
-            <div id="skillsList"></div>
-            <div id="submitSection"></div>
-        </div>
+</header>
+<div class="app-content">
+<div id="assessmentView">
+<div class="rating-key">
+<h4>Rating Key</h4>
+<div class="key-pills">
+<span class="key-pill kp-1">1 Basic</span>
+<span class="key-pill kp-2">2 Intermediate</span>
+<span class="key-pill kp-3">3 Advanced</span>
+<span class="key-pill kp-4">4 Trainer</span>
+</div>
+<div class="keys" style="margin-top:10px;"><span><strong>Interest:</strong> 1 = No interest / Not relevant &nbsp;|&nbsp; 2 = Interested</span></div>
+</div>
+<div class="tabs" id="productTabs"></div>
+<div id="productProgress"></div>
+<div id="skillsList"></div>
+<div id="submitSection"></div>
+</div>
 
-        <div id="adminView" class="hidden">
-            <div class="tabs" style="margin-bottom:16px;">
-                <div class="tab active" onclick="switchAdminTab('questions')">Manage Questions</div>
-                <div class="tab" onclick="switchAdminTab('results')">View Results</div>
-                <div class="tab" onclick="switchAdminTab('settings')">Settings</div>
-            </div>
-            <div id="adminQuestions">
-                <div class="admin-section">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
-                        <h3>Manage Skills</h3>
-                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <button class="btn btn-sm btn-secondary" onclick="showAddProductModal()">+ Product</button>
+<div id="adminView" class="hidden">
+<div class="tabs" style="margin-bottom:16px;">
+<div class="tab active" onclick="switchAdminTab('questions')">Manage Questions</div>
+<div class="tab" onclick="switchAdminTab('results')">View Results</div>
+<div class="tab" onclick="switchAdminTab('users')">Manage Users</div>
+<div class="tab" onclick="switchAdminTab('settings')">Settings</div>
+</div>
+<div id="adminQuestions">
+<div class="admin-section">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+<h3>Manage Skills</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">
+<button class="btn btn-sm btn-secondary" onclick="showAddProductModal()">+ Product</button>
 <button class="btn btn-sm btn-secondary" onclick="showProductOptions()">Manage Products</button>
 <button class="btn btn-sm btn-primary" onclick="showAddSkillModal()">+ Skill</button>
-                        </div>
-                    </div>
-                    <div class="drag-hint">&#9776; Drag a skill onto a parent to nest it. Use arrows to reorder. Click "&#8592; Top" to promote a sub-skill.</div>
-                    <div class="tabs" id="adminProductTabs"></div>
-                    <div id="adminSkillsList"></div>
-                </div>
-            </div>
-            <div id="adminResults" class="hidden">
-                <div class="admin-section">
-                    <h3>Team Results & Gap Analysis</h3>
-                    <div class="settings-row"><label>Minimum Skill Threshold:</label><input type="number" id="thresholdInput" min="1" max="4" value="3" style="max-width:80px;" onchange="renderResults()"></div>
-                    <div id="resultsContainer"></div>
-                </div>
-            </div>
-            <div id="adminSettings" class="hidden">
-                <div class="admin-section">
-                    <h3>Settings</h3>
-                    <div class="form-group"><label>Notification Email (receives gap reports)</label><input type="email" id="notifEmail" placeholder="your@email.com"></div>
-                    <div class="form-group"><label>Skill Level Threshold (flags scores below this)</label><input type="number" id="settingsThreshold" min="1" max="4" value="3"></div>
-                    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
-                    <hr style="margin:32px 0;border-color:var(--border);">
-                    <h3>Manage Team Members</h3>
-                    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">Add users in Firebase Console > Authentication.</p>
-                    <div id="teamList"></div>
-                    <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;"><input type="email" id="adminEmailInput" placeholder="user@email.com" style="max-width:250px;"><button class="btn btn-sm btn-secondary" onclick="grantAdmin()">Grant Admin</button></div>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
+</div>
+<div class="drag-hint">&#9776; Drag a skill onto a parent to nest it. Use arrows to reorder. Click "&#8592; Top" to promote a sub-skill.</div>
+<div class="tabs" id="adminProductTabs"></div>
+<div id="adminSkillsList"></div>
+</div>
+</div>
+<div id="adminResults" class="hidden">
+<div class="admin-section">
+<h3>Team Results & Gap Analysis</h3>
+<div class="settings-row"><label>Minimum Skill Threshold:</label><input type="number" id="thresholdInput" min="1" max="4" value="3" style="max-width:80px;" onchange="renderResults()"></div>
+<div id="resultsContainer"></div>
+</div>
+</div>
+<div id="adminUsers" class="hidden">
+<div class="admin-section">
+<h3>Manage Users</h3>
+<p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">Create, manage, and remove team member accounts.</p>
+<button class="btn btn-sm btn-success" onclick="showAddUserModal()" style="margin-bottom:16px;">+ Add User</button>
+<div id="teamList"></div>
+<hr style="margin:24px 0;border-color:var(--border);">
+<h4 style="margin-bottom:12px;font-size:0.95rem;">Grant Admin Role</h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="email" id="adminEmailInput" placeholder="user@email.com" style="max-width:250px;"><button class="btn btn-sm btn-secondary" onclick="grantAdmin()">Grant Admin</button></div>
+</div>
+</div>
+<div id="adminSettings" class="hidden">
+<div class="admin-section">
+<h3>Settings</h3>
+<div class="form-group"><label>Notification Email (receives gap reports)</label><input type="email" id="notifEmail" placeholder="your@email.com"></div>
+<div class="form-group"><label>Skill Level Threshold (flags scores below this)</label><input type="number" id="settingsThreshold" min="1" max="4" value="3"></div>
+<button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+</div>
+</div>
+</div>
+</div>
 </div>
 
 <div id="modal" class="modal-overlay hidden"><div class="modal" id="modalContent"></div></div>
 
 <script>
-const firebaseConfig = {
+var firebaseConfig = {
     apiKey: "AIzaSyA5xE8YJkAVzOgCXiD3wEiHE-ybFvEE1qM",
     authDomain: "competency-matrix-2d086.firebaseapp.com",
     projectId: "competency-matrix-2d086",
@@ -274,43 +245,36 @@ const firebaseConfig = {
     messagingSenderId: "156072705192",
     appId: "1:156072705192:web:499355f2bddcc3049a169d"
 };
-const EMAILJS_PUBLIC_KEY = "ptOv5d4JHIriHLzD_";
-const EMAILJS_SERVICE_ID = "service_lokf8zw";
-const EMAILJS_TEMPLATE_ID = "template_gy3dfd3";
+var EMAILJS_PUBLIC_KEY = "ptOv5d4JHIriHLzD_";
+var EMAILJS_SERVICE_ID = "service_lokf8zw";
+var EMAILJS_TEMPLATE_ID = "template_gy3dfd3";
 
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+var auth = firebase.auth();
+var db = firebase.firestore();
+var secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
+var secondaryAuth = secondaryApp.auth();
 
-let currentUser = null, isAdmin = false, currentProduct = null, adminCurrentProduct = null;
-let questionsData = {}, userResponses = {}, submissionStatus = {}, settings = { threshold: 3, notifEmail: '' };
-let dragData = null;
+var currentUser = null, isAdmin = false, currentProduct = null, adminCurrentProduct = null;
+var questionsData = {}, userResponses = {}, submissionStatus = {}, settings = { threshold: 3, notifEmail: '' };
+var dragData = null;
 
-// =====================================================
-// SCORING SYSTEM
-// Scores per product: (sum of all skill levels) / (total skills * 4) * 100 = percentage
-// Grades:
-//   90-100% = Expert (all skills near trainer level)
-//   70-89%  = Proficient
-//   50-69%  = Developing
-//   Below 50% = Foundational
-// =====================================================
 function calculateProductScore(product) {
-    const skills = getRateableSkillsForProduct(product);
+    var skills = getRateableSkillsForProduct(product);
     if (!skills.length) return { pct: 0, answered: 0, total: 0, grade: 'N/A', sum: 0, max: 0 };
-    const responses = userResponses[product] || {};
-    let sum = 0, answered = 0;
-    for (const s of skills) {
-        const r = responses[s.id];
+    var responses = userResponses[product] || {};
+    var sum = 0, answered = 0;
+    for (var i = 0; i < skills.length; i++) {
+        var r = responses[skills[i].id];
         if (r && r.sl) { sum += r.sl; answered++; }
     }
-    const max = skills.length * 4;
-    const pct = max > 0 ? Math.round((sum / max) * 100) : 0;
-    let grade = 'Foundational';
+    var max = skills.length * 4;
+    var pct = max > 0 ? Math.round((sum / max) * 100) : 0;
+    var grade = 'Foundational';
     if (pct >= 90) grade = 'Expert';
     else if (pct >= 70) grade = 'Proficient';
     else if (pct >= 50) grade = 'Developing';
-    return { pct, answered, total: skills.length, grade, sum, max };
+    return { pct: pct, answered: answered, total: skills.length, grade: grade, sum: sum, max: max };
 }
 
 function getScoreClass(pct) {
@@ -320,190 +284,207 @@ function getScoreClass(pct) {
     return 'score-low';
 }
 
-function getProgressColor(pct) {
-    if (pct >= 90) return 'var(--sl4)';
-    if (pct >= 70) return 'var(--success)';
-    if (pct >= 50) return 'var(--warning)';
-    return 'var(--danger)';
-}
-
 function getRateableSkillsForProduct(product) {
-    const skills = questionsData[product] || [];
-    const rateable = [];
-    for (const skill of skills) {
-        if (skill.children && skill.children.length > 0) {
-            for (const c of skill.children) rateable.push(c);
-        } else { rateable.push(skill); }
+    var skills = questionsData[product] || [];
+    var rateable = [];
+    for (var i = 0; i < skills.length; i++) {
+        if (skills[i].children && skills[i].children.length > 0) {
+            for (var j = 0; j < skills[i].children.length; j++) rateable.push(skills[i].children[j]);
+        } else { rateable.push(skills[i]); }
     }
     return rateable;
 }
 
 // AUTH
-auth.onAuthStateChanged(async (user) => {
-    if (user) { currentUser = user; await loadUserRole(); await loadQuestions(); await loadUserResponses(); await loadSettings(); showApp(); }
-    else { currentUser = null; isAdmin = false; document.getElementById('loginView').classList.remove('hidden'); document.getElementById('appView').classList.add('hidden'); }
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        currentUser = user;
+        Promise.all([loadUserRole(), loadQuestions(), loadUserResponses(), loadSettings()]).then(function() { showApp(); });
+    } else {
+        currentUser = null; isAdmin = false;
+        document.getElementById('loginView').classList.remove('hidden');
+        document.getElementById('appView').classList.add('hidden');
+    }
 });
-async function handleLogin() { const email = document.getElementById('loginEmail').value.trim(), pass = document.getElementById('loginPassword').value; try { await auth.signInWithEmailAndPassword(email, pass); } catch(e) { document.getElementById('loginError').textContent = e.message; } }
-function handleLogout() { auth.signOut(); }
-async function loadUserRole() { const doc = await db.collection('users').doc(currentUser.uid).get(); if (doc.exists) { isAdmin = doc.data().role === 'admin'; } else { await db.collection('users').doc(currentUser.uid).set({ email: currentUser.email, name: currentUser.email.split('@')[0], role: 'member', createdAt: firebase.firestore.FieldValue.serverTimestamp() }); isAdmin = false; } }
 
-// APP
-function showApp() {
-    document.getElementById('loginView').classList.add('hidden'); document.getElementById('appView').classList.remove('hidden');
-    document.getElementById('userBadge').textContent = currentUser.email.split('@')[0];
-    document.getElementById('adminToggle').classList.toggle('hidden', !isAdmin); renderProductTabs();
+function handleLogin() {
+    var email = document.getElementById('loginEmail').value.trim();
+    var pass = document.getElementById('loginPassword').value;
+    auth.signInWithEmailAndPassword(email, pass).catch(function(e) {
+        document.getElementById('loginError').textContent = e.message;
+    });
 }
+function handleLogout() { auth.signOut(); }
+
+async function loadUserRole() {
+    var doc = await db.collection('users').doc(currentUser.uid).get();
+    if (doc.exists) { isAdmin = doc.data().role === 'admin'; }
+    else {
+        await db.collection('users').doc(currentUser.uid).set({
+            email: currentUser.email, name: currentUser.email.split('@')[0],
+            role: 'member', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        isAdmin = false;
+    }
+}
+
+function showApp() {
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('appView').classList.remove('hidden');
+    document.getElementById('userBadge').textContent = currentUser.email.split('@')[0];
+    document.getElementById('adminToggle').classList.toggle('hidden', !isAdmin);
+    renderProductTabs();
+}
+
 function toggleAdmin() {
-    const a = document.getElementById('assessmentView'), b = document.getElementById('adminView'), btn = document.getElementById('adminToggle');
+    var a = document.getElementById('assessmentView'), b = document.getElementById('adminView'), btn = document.getElementById('adminToggle');
     if (b.classList.contains('hidden')) { a.classList.add('hidden'); b.classList.remove('hidden'); btn.textContent = 'Back to Form'; renderAdminProductTabs(); loadAllResults(); }
     else { b.classList.add('hidden'); a.classList.remove('hidden'); btn.textContent = 'Admin'; }
 }
-function switchAdminTab(tab) { document.querySelectorAll('#adminView > .tabs .tab').forEach(t => t.classList.toggle('active', t.textContent.toLowerCase().includes(tab.substring(0,4)))); document.getElementById('adminQuestions').classList.toggle('hidden', tab!=='questions'); document.getElementById('adminResults').classList.toggle('hidden', tab!=='results'); document.getElementById('adminSettings').classList.toggle('hidden', tab!=='settings'); if(tab==='results')loadAllResults(); if(tab==='settings')loadSettingsUI(); }
+
+function switchAdminTab(tab) {
+    document.querySelectorAll('#adminView > .tabs .tab').forEach(function(t) { t.classList.toggle('active', t.textContent.toLowerCase().includes(tab.substring(0,4))); });
+    document.getElementById('adminQuestions').classList.toggle('hidden', tab !== 'questions');
+    document.getElementById('adminResults').classList.toggle('hidden', tab !== 'results');
+    document.getElementById('adminUsers').classList.toggle('hidden', tab !== 'users');
+    document.getElementById('adminSettings').classList.toggle('hidden', tab !== 'settings');
+    if (tab === 'results') loadAllResults();
+    if (tab === 'settings') loadSettingsUI();
+    if (tab === 'users') loadTeamList();
+}
 
 // DATA
-async function loadQuestions() { const snap = await db.collection('config').doc('questions').get(); if (snap.exists) { questionsData = snap.data().products||{}; for (const p of Object.keys(questionsData)) questionsData[p] = questionsData[p].map(s => { if(!s.children)s.children=[]; if(!s.description)s.description=''; s.children=s.children.map(c=>{if(!c.description)c.description='';return c;}); return s; }); } else questionsData={}; }
+async function loadQuestions() {
+    var snap = await db.collection('config').doc('questions').get();
+    if (snap.exists) {
+        questionsData = snap.data().products || {};
+        for (var p of Object.keys(questionsData)) {
+            questionsData[p] = questionsData[p].map(function(s) {
+                if (!s.children) s.children = [];
+                if (!s.description) s.description = '';
+                s.children = s.children.map(function(c) { if (!c.description) c.description = ''; return c; });
+                return s;
+            });
+        }
+    } else { questionsData = {}; }
+}
 async function saveQuestions() { await db.collection('config').doc('questions').set({ products: questionsData }); }
-async function loadUserResponses() { const doc = await db.collection('responses').doc(currentUser.uid).get(); if (doc.exists) { const data = doc.data(); userResponses = data.responses||{}; submissionStatus = data.submitted||{}; } }
+async function loadUserResponses() {
+    var doc = await db.collection('responses').doc(currentUser.uid).get();
+    if (doc.exists) { var data = doc.data(); userResponses = data.responses || {}; submissionStatus = data.submitted || {}; }
+}
 
 // ASSESSMENT
 function renderProductTabs() {
-    const products = Object.keys(questionsData);
+    var products = Object.keys(questionsData);
     if (!products.length) { document.getElementById('productTabs').innerHTML = '<p style="color:var(--text-dim)">No products configured yet.</p>'; document.getElementById('skillsList').innerHTML = ''; document.getElementById('productProgress').innerHTML = ''; document.getElementById('submitSection').innerHTML = ''; return; }
     if (!currentProduct || !products.includes(currentProduct)) currentProduct = products[0];
-    document.getElementById('productTabs').innerHTML = products.map(p => {
-        const score = calculateProductScore(p);
-        let statusClass = 'empty';
+    document.getElementById('productTabs').innerHTML = products.map(function(p) {
+        var score = calculateProductScore(p);
+        var statusClass = 'empty';
         if (submissionStatus[p]) statusClass = 'complete';
         else if (score.answered > 0) statusClass = 'incomplete';
-        return `<div class="tab ${p===currentProduct?'active':''}" onclick="selectProduct('${p}')">${p}<span class="tab-status ${statusClass}"></span></div>`;
+        return '<div class="tab '+(p===currentProduct?'active':'')+'" onclick="selectProduct(\''+p+'\')">' + p + '<span class="tab-status '+statusClass+'"></span></div>';
     }).join('');
     renderSkills();
 }
 function selectProduct(p) { currentProduct = p; renderProductTabs(); }
 
 function renderSkills() {
-    const skills = questionsData[currentProduct] || [];
+    var skills = questionsData[currentProduct] || [];
     if (!skills.length) { document.getElementById('skillsList').innerHTML = '<p style="color:var(--text-dim)">No skills yet.</p>'; document.getElementById('productProgress').innerHTML = ''; document.getElementById('submitSection').innerHTML = ''; return; }
-    const responses = userResponses[currentProduct] || {};
-    const score = calculateProductScore(currentProduct);
-    const isSubmitted = submissionStatus[currentProduct] === true;
+    var responses = userResponses[currentProduct] || {};
+    var score = calculateProductScore(currentProduct);
+    var isSubmitted = submissionStatus[currentProduct] === true;
+    var completionPct = score.total > 0 ? Math.round((score.answered / score.total) * 100) : 0;
 
-    // Progress bar
-    const completionPct = score.total > 0 ? Math.round((score.answered / score.total) * 100) : 0;
-    document.getElementById('productProgress').innerHTML = `
-        <div class="product-progress">
-            <div class="progress-text">${score.answered}/${score.total} skills rated</div>
-            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${completionPct}%;background:${completionPct===100?'var(--success)':'var(--accent)'}"></div></div>
-            ${score.answered > 0 ? `<span class="score-display ${getScoreClass(score.pct)}">${score.pct}% - ${score.grade}</span>` : ''}
-            ${isSubmitted ? '<span class="submitted-badge">&#10003; Submitted</span>' : ''}
-        </div>`;
+    document.getElementById('productProgress').innerHTML = '<div class="product-progress"><div class="progress-text">'+score.answered+'/'+score.total+' skills rated</div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:'+completionPct+'%;background:'+(completionPct===100?'var(--success)':'var(--accent)')+'"></div></div>'+(score.answered>0?'<span class="score-display '+getScoreClass(score.pct)+'">'+score.pct+'% - '+score.grade+'</span>':'')+(isSubmitted?'<span class="submitted-badge">&#10003; Submitted</span>':'')+'</div>';
 
-    // Skills
-    let html = '';
-    for (const skill of skills) {
+    var html = '';
+    for (var i = 0; i < skills.length; i++) {
+        var skill = skills[i];
         if (skill.children && skill.children.length > 0) {
-            html += `<div class="skill-group"><div class="skill-group-header" onclick="toggleGroup(this)"><span>${skill.text}</span><span class="toggle-icon">&#9660;</span></div><div class="skill-group-children">`;
-            for (const child of skill.children) html += renderSkillCard(child, responses);
-            html += `</div></div>`;
+            html += '<div class="skill-group"><div class="skill-group-header" onclick="toggleGroup(this)"><span>'+skill.text+'</span><span class="toggle-icon">&#9660;</span></div><div class="skill-group-children">';
+            for (var j = 0; j < skill.children.length; j++) html += renderSkillCard(skill.children[j], responses, false);
+            html += '</div></div>';
         } else { html += renderSkillCard(skill, responses, true); }
     }
     document.getElementById('skillsList').innerHTML = html;
 
-    // Submit section
-    const unanswered = score.total - score.answered;
-    document.getElementById('submitSection').innerHTML = `
-        <div class="submit-section">
-            <div class="submit-info">
-                ${unanswered > 0 ? `<strong>${unanswered} skill(s)</strong> still need a rating` : '<strong>All skills rated!</strong> Ready to submit'}
-                ${score.answered > 0 ? ` &nbsp;|&nbsp; Current score: <strong>${score.pct}% (${score.grade})</strong>` : ''}
-            </div>
-            <div style="display:flex;gap:8px;">
-                <button class="btn btn-secondary btn-sm" onclick="saveProductProgress()">Save Draft</button>
-                <button class="btn btn-primary" onclick="submitProduct()" ${unanswered > 0 ? '' : ''}>${isSubmitted ? 'Resubmit' : 'Submit'} ${currentProduct}</button>
-            </div>
-        </div>`;
+    var unanswered = score.total - score.answered;
+    document.getElementById('submitSection').innerHTML = '<div class="submit-section"><div class="submit-info">'+(unanswered>0?'<strong>'+unanswered+' skill(s)</strong> still need a rating':'<strong>All skills rated!</strong> Ready to submit')+(score.answered>0?' &nbsp;|&nbsp; Current score: <strong>'+score.pct+'% ('+score.grade+')</strong>':'')+'</div><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" onclick="saveProductProgress()">Save Draft</button><button class="btn btn-primary" onclick="submitProduct()">'+(isSubmitted?'Resubmit':'Submit')+' '+currentProduct+'</button></div></div>';
 }
 
 function renderSkillCard(skill, responses, standalone) {
-    const r = responses[skill.id] || { sl: '', int: '' };
-    const unanswered = !r.sl || !r.int;
-    const desc = skill.description ? `<span class="info-icon">i<span class="tooltip">${escHtml(skill.description)}</span></span>` : '';
-    return `<div class="skill-card ${standalone?'standalone':''} ${unanswered?'unanswered':''}">
-        <div class="skill-name-row"><span class="skill-name">${skill.text}</span>${desc}</div>
-        <div class="skill-ratings">
-            <div class="rating-group"><span class="rating-label">Skill Level</span><div class="pill-group">
-                <div class="pill sl-1 ${r.sl==1?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',1)">1</div>
-                <div class="pill sl-2 ${r.sl==2?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',2)">2</div>
-                <div class="pill sl-3 ${r.sl==3?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',3)">3</div>
-                <div class="pill sl-4 ${r.sl==4?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','sl',4)">4</div>
-            </div></div>
-            <div class="rating-group"><span class="rating-label">Interest</span><div class="pill-group">
-                <div class="pill int-1 ${r.int==1?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','int',1)">1</div>
-                <div class="pill int-2 ${r.int==2?'selected':''}" onclick="selectPill(this,'${currentProduct}','${skill.id}','int',2)">2</div>
-            </div></div>
-        </div>
-    </div>`;
+    var r = responses[skill.id] || { sl: '', int: '' };
+    var unanswered = !r.sl || !r.int;
+    var desc = skill.description ? '<span class="info-icon">i<span class="tooltip">'+escHtml(skill.description)+'</span></span>' : '';
+    return '<div class="skill-card '+(standalone?'standalone':'')+' '+(unanswered?'unanswered':'')+'"><div class="skill-name-row"><span class="skill-name">'+skill.text+'</span>'+desc+'</div><div class="skill-ratings"><div class="rating-group"><span class="rating-label">Skill Level</span><div class="pill-group"><div class="pill sl-1 '+(r.sl==1?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',1)">1</div><div class="pill sl-2 '+(r.sl==2?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',2)">2</div><div class="pill sl-3 '+(r.sl==3?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',3)">3</div><div class="pill sl-4 '+(r.sl==4?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',4)">4</div></div></div><div class="rating-group"><span class="rating-label">Interest</span><div class="pill-group"><div class="pill int-1 '+(r.int==1?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',1)">1</div><div class="pill int-2 '+(r.int==2?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',2)">2</div></div></div></div></div>';
 }
 
-function escHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function toggleGroup(h){h.classList.toggle('collapsed');h.nextElementSibling.classList.toggle('collapsed');}
-function selectPill(el,product,skillId,field,value){
-    el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('selected'));
-    el.classList.add('selected'); updateResponse(product,skillId,field,value);
-    // Re-render progress without full re-render
+function escHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toggleGroup(h) { h.classList.toggle('collapsed'); h.nextElementSibling.classList.toggle('collapsed'); }
+function selectPill(el, product, skillId, field, value) {
+    el.parentElement.querySelectorAll('.pill').forEach(function(p) { p.classList.remove('selected'); });
+    el.classList.add('selected');
+    updateResponse(product, skillId, field, value);
     renderSkills();
 }
-function updateResponse(product,skillId,field,value){if(!userResponses[product])userResponses[product]={};if(!userResponses[product][skillId])userResponses[product][skillId]={};userResponses[product][skillId][field]=value?parseInt(value):'';}
+function updateResponse(product, skillId, field, value) {
+    if (!userResponses[product]) userResponses[product] = {};
+    if (!userResponses[product][skillId]) userResponses[product][skillId] = {};
+    userResponses[product][skillId][field] = value ? parseInt(value) : '';
+}
 
-// SAVE & SUBMIT PER PRODUCT
+// SAVE & SUBMIT
 async function saveProductProgress() {
     await db.collection('responses').doc(currentUser.uid).set({ responses: userResponses, email: currentUser.email, name: currentUser.email.split('@')[0], lastSaved: firebase.firestore.FieldValue.serverTimestamp(), submitted: submissionStatus }, { merge: true });
     showToast('Draft saved!');
 }
 
 async function submitProduct() {
-    const score = calculateProductScore(currentProduct);
+    var score = calculateProductScore(currentProduct);
     if (score.answered === 0) { alert('Please rate at least one skill before submitting.'); return; }
     if (score.answered < score.total) {
-        if (!confirm(`You have ${score.total - score.answered} unanswered skill(s) in ${currentProduct}. Submit anyway?`)) return;
+        if (!confirm('You have '+(score.total - score.answered)+' unanswered skill(s) in '+currentProduct+'. Submit anyway?')) return;
     }
     submissionStatus[currentProduct] = true;
     await db.collection('responses').doc(currentUser.uid).set({
         responses: userResponses, email: currentUser.email, name: currentUser.email.split('@')[0],
         lastSaved: firebase.firestore.FieldValue.serverTimestamp(),
-        submitted: submissionStatus,
-        [`submittedAt_${currentProduct.replace(/\s/g,'_')}`]: firebase.firestore.FieldValue.serverTimestamp()
+        submitted: submissionStatus
     }, { merge: true });
     await sendProductEmail();
     renderProductTabs();
-    showToast(`${currentProduct} submitted!`);
+    showToast(currentProduct + ' submitted!');
 }
 
 async function sendProductEmail() {
     if (!settings.notifEmail) return;
-    const threshold = settings.threshold || 3;
-    const userName = currentUser.email.split('@')[0];
-    const score = calculateProductScore(currentProduct);
-    const skills = getRateableSkillsForProduct(currentProduct);
-    const responses = userResponses[currentProduct] || {};
+    var threshold = settings.threshold || 3;
+    var userName = currentUser.email.split('@')[0];
+    var score = calculateProductScore(currentProduct);
+    var skills = getRateableSkillsForProduct(currentProduct);
+    var responses = userResponses[currentProduct] || {};
 
-    let lines = [];
-    lines.push(`PRODUCT: ${currentProduct}`);
-    lines.push(`OVERALL SCORE: ${score.pct}% (${score.grade})`);
-    lines.push(`Skills Rated: ${score.answered}/${score.total}`);
+    var lines = [];
+    lines.push('PRODUCT: ' + currentProduct);
+    lines.push('OVERALL SCORE: ' + score.pct + '% (' + score.grade + ')');
+    lines.push('Skills Rated: ' + score.answered + '/' + score.total);
+    lines.push('Submitted: ' + new Date().toLocaleString('en-GB', {dateStyle:'full', timeStyle:'short'}));
     lines.push('');
     lines.push('--- SKILL BREAKDOWN ---');
-    for (const s of skills) {
-        const r = responses[s.id];
-        const sl = r && r.sl ? r.sl : '-';
-        const flag = (r && r.sl && r.sl < threshold) ? ' *** IMPROVEMENT NEEDED ***' : '';
-        lines.push(`${s.text}: Level ${sl}/4${flag}`);
+    for (var i = 0; i < skills.length; i++) {
+        var r = responses[skills[i].id];
+        var sl = r && r.sl ? r.sl : '-';
+        var flag = (r && r.sl && r.sl < threshold) ? ' *** IMPROVEMENT NEEDED ***' : '';
+        lines.push(skills[i].text + ': Level ' + sl + '/4' + flag);
     }
     lines.push('');
-    let gaps = skills.filter(s => { const r = responses[s.id]; return r && r.sl && r.sl < threshold; });
+    var gaps = skills.filter(function(s) { var r = responses[s.id]; return r && r.sl && r.sl < threshold; });
     if (gaps.length > 0) {
-        lines.push(`--- IMPROVEMENT AREAS (${gaps.length} skills below level ${threshold}) ---`);
-        for (const g of gaps) { const r = responses[g.id]; lines.push(`  - ${g.text}: Level ${r.sl}/${threshold}`); }
+        lines.push('--- IMPROVEMENT AREAS (' + gaps.length + ' skills below level ' + threshold + ') ---');
+        for (var g = 0; g < gaps.length; g++) { var rg = responses[gaps[g].id]; lines.push('  - ' + gaps[g].text + ': Level ' + rg.sl + '/' + threshold); }
     } else { lines.push('No improvement areas identified - all skills at or above threshold!'); }
 
     try {
@@ -511,92 +492,145 @@ async function sendProductEmail() {
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
             to_email: settings.notifEmail,
             from_name: 'Competency Matrix',
-            subject: '['+currentProduct+'] Assessment: '+userName+' - '+score.pct+'% ('+score.grade+')',
-message: userName+' submitted their '+currentProduct+' assessment.\nSubmitted: '+new Date().toLocaleString('en-GB',{dateStyle:'full',timeStyle:'short'})+'\n\n'+lines.join('\n')
+            subject: '[' + currentProduct + '] Assessment: ' + userName + ' - ' + score.pct + '% (' + score.grade + ')',
+            message: userName + ' submitted their ' + currentProduct + ' assessment.\n\n' + lines.join('\n')
         });
     } catch(e) { console.error('Email failed:', e); }
 }
 
-// ADMIN DRAG (same as v5)
-function handleDragStart(e,type,parentIdx,childIdx){const skills=questionsData[adminCurrentProduct];let skillObj=type==='parent'?{...skills[parentIdx],children:[...(skills[parentIdx].children||[])]}:{...skills[parentIdx].children[childIdx]};dragData={type,parentIdx,childIdx,skillObj};e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','');}
-function handleDragEnd(e){e.currentTarget.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));document.querySelectorAll('.drop-zone.active').forEach(el=>el.classList.remove('active'));dragData=null;}
+// ADMIN DRAG
+function handleDragStart(e,type,parentIdx,childIdx){var skills=questionsData[adminCurrentProduct];var skillObj=type==='parent'?Object.assign({},skills[parentIdx],{children:(skills[parentIdx].children||[]).slice()}):Object.assign({},skills[parentIdx].children[childIdx]);dragData={type:type,parentIdx:parentIdx,childIdx:childIdx,skillObj:skillObj};e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','');}
+function handleDragEnd(e){e.currentTarget.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(function(el){el.classList.remove('drag-over');});document.querySelectorAll('.drop-zone.active').forEach(function(el){el.classList.remove('active');});dragData=null;}
 function handleDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
 function handleDragEnter(e){e.preventDefault();e.currentTarget.classList.add('drag-over');}
 function handleDragLeave(e){e.currentTarget.classList.remove('drag-over');}
-async function handleDropOnParent(e,targetParentIdx){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(!dragData)return;const skills=questionsData[adminCurrentProduct];if(dragData.type==='parent'&&dragData.parentIdx===targetParentIdx)return;let movedSkill;if(dragData.type==='parent'){const removed=skills.splice(dragData.parentIdx,1)[0];movedSkill={id:removed.id,text:removed.text,description:removed.description||''};if(removed.children&&removed.children.length>0){const ins=Math.min(dragData.parentIdx,skills.length);for(let i=removed.children.length-1;i>=0;i--)skills.splice(ins,0,{...removed.children[i],children:[]});}}else{movedSkill=skills[dragData.parentIdx].children.splice(dragData.childIdx,1)[0];}const target=skills[targetParentIdx>=skills.length?skills.length-1:targetParentIdx];if(!target)return;if(!target.children)target.children=[];target.children.push({id:movedSkill.id,text:movedSkill.text,description:movedSkill.description||''});await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Nested!');}
-async function handleDropOnZone(e,targetIdx){e.preventDefault();e.currentTarget.classList.remove('active');if(!dragData)return;const skills=questionsData[adminCurrentProduct];let movedSkill;if(dragData.type==='parent'){movedSkill=skills.splice(dragData.parentIdx,1)[0];}else{const child=skills[dragData.parentIdx].children.splice(dragData.childIdx,1)[0];movedSkill={...child,children:[]};}skills.splice(Math.min(targetIdx,skills.length),0,movedSkill);await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Reordered!');}
+async function handleDropOnParent(e,targetParentIdx){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(!dragData)return;var skills=questionsData[adminCurrentProduct];if(dragData.type==='parent'&&dragData.parentIdx===targetParentIdx)return;var movedSkill;if(dragData.type==='parent'){var removed=skills.splice(dragData.parentIdx,1)[0];movedSkill={id:removed.id,text:removed.text,description:removed.description||''};if(removed.children&&removed.children.length>0){var ins=Math.min(dragData.parentIdx,skills.length);for(var i=removed.children.length-1;i>=0;i--)skills.splice(ins,0,Object.assign({},removed.children[i],{children:[]}));}}else{movedSkill=skills[dragData.parentIdx].children.splice(dragData.childIdx,1)[0];}var target=skills[targetParentIdx>=skills.length?skills.length-1:targetParentIdx];if(!target)return;if(!target.children)target.children=[];target.children.push({id:movedSkill.id,text:movedSkill.text,description:movedSkill.description||''});await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Nested!');}
+async function handleDropOnZone(e,targetIdx){e.preventDefault();e.currentTarget.classList.remove('active');if(!dragData)return;var skills=questionsData[adminCurrentProduct];var movedSkill;if(dragData.type==='parent'){movedSkill=skills.splice(dragData.parentIdx,1)[0];}else{var child=skills[dragData.parentIdx].children.splice(dragData.childIdx,1)[0];movedSkill=Object.assign({},child,{children:[]});}skills.splice(Math.min(targetIdx,skills.length),0,movedSkill);await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Reordered!');}
 function handleZoneDragEnter(e){e.preventDefault();e.currentTarget.classList.add('active');}
 function handleZoneDragLeave(e){e.currentTarget.classList.remove('active');}
-async function promoteToParent(pi,ci){const skills=questionsData[adminCurrentProduct];const child=skills[pi].children.splice(ci,1)[0];skills.splice(pi+1,0,{...child,children:[]});await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Promoted!');}
-async function moveParent(i,dir){const s=questionsData[adminCurrentProduct];const n=i+dir;if(n<0||n>=s.length)return;[s[i],s[n]]=[s[n],s[i]];await saveQuestions();renderAdminSkills();}
-async function moveChild(pi,ci,dir){const c=questionsData[adminCurrentProduct][pi].children;const n=ci+dir;if(n<0||n>=c.length)return;[c[ci],c[n]]=[c[n],c[ci]];await saveQuestions();renderAdminSkills();}
+async function promoteToParent(pi,ci){var skills=questionsData[adminCurrentProduct];var child=skills[pi].children.splice(ci,1)[0];skills.splice(pi+1,0,Object.assign({},child,{children:[]}));await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Promoted!');}
+async function moveParent(i,dir){var s=questionsData[adminCurrentProduct];var n=i+dir;if(n<0||n>=s.length)return;var tmp=s[i];s[i]=s[n];s[n]=tmp;await saveQuestions();renderAdminSkills();}
+async function moveChild(pi,ci,dir){var c=questionsData[adminCurrentProduct][pi].children;var n=ci+dir;if(n<0||n>=c.length)return;var tmp=c[ci];c[ci]=c[n];c[n]=tmp;await saveQuestions();renderAdminSkills();}
 
 // ADMIN RENDER
-function renderAdminProductTabs(){const products=Object.keys(questionsData);if(!adminCurrentProduct&&products.length)adminCurrentProduct=products[0];document.getElementById('adminProductTabs').innerHTML=products.map(p=>`<div class="tab ${p===adminCurrentProduct?'active':''}" onclick="selectAdminProduct('${p}')">${p}</div>`).join('');renderAdminSkills();}
+function renderAdminProductTabs(){var products=Object.keys(questionsData);if(!adminCurrentProduct&&products.length)adminCurrentProduct=products[0];document.getElementById('adminProductTabs').innerHTML=products.map(function(p){return '<div class="tab '+(p===adminCurrentProduct?'active':'')+'" onclick="selectAdminProduct(\''+p+'\')">' + p + '</div>';}).join('');renderAdminSkills();}
 function selectAdminProduct(p){adminCurrentProduct=p;renderAdminProductTabs();}
+
 function renderAdminSkills(){
-    const skills=questionsData[adminCurrentProduct]||[];if(!skills.length){document.getElementById('adminSkillsList').innerHTML='<p style="color:var(--text-dim)">No skills yet.</p>';return;}
-    let html=`<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event,0)"></div>`;
-    skills.forEach((skill,i)=>{const cc=skill.children?skill.children.length:0;const dp=skill.description?`<span class="skill-desc-preview">${escHtml(skill.description.substring(0,30))}${skill.description.length>30?'...':''}</span>`:'';
-    html+=`<div class="skill-admin-card is-parent" draggable="true" ondragstart="handleDragStart(event,'parent',${i},null)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropOnParent(event,${i})"><span class="drag-handle">&#9776;</span><span class="skill-text">${skill.text}${cc>0?` <span class="skill-badge">${cc} sub</span>`:''}${dp}</span><div class="skill-actions"><button class="btn-icon" onclick="event.stopPropagation();moveParent(${i},-1)" ${i===0?'disabled':''} title="Up">&uarr;</button><button class="btn-icon" onclick="event.stopPropagation();moveParent(${i},1)" ${i===skills.length-1?'disabled':''} title="Down">&darr;</button><button class="btn-icon" onclick="event.stopPropagation();showAddSubSkillModal(${i})" title="Add sub-skill" style="color:var(--success);border-color:var(--success);">+</button><button class="btn-icon" onclick="event.stopPropagation();showDuplicateModal('parent',${i},null)" title="Duplicate">&#10697;</button><button class="btn-icon" onclick="event.stopPropagation();editSkill(${i})" title="Edit">&#9998;</button><button class="btn-icon" onclick="event.stopPropagation();deleteSkill(${i})" title="Delete">&times;</button></div></div>`;
-    if(skill.children){skill.children.forEach((child,ci)=>{const cdp=child.description?`<span class="skill-desc-preview">${escHtml(child.description.substring(0,30))}${child.description.length>30?'...':''}</span>`:'';
-    html+=`<div class="skill-admin-card is-child" draggable="true" ondragstart="handleDragStart(event,'child',${i},${ci})" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropOnParent(event,${i})"><span class="drag-handle">&#9776;</span><span class="skill-text">${child.text}${cdp}</span><div class="skill-actions"><button class="btn-icon" onclick="event.stopPropagation();moveChild(${i},${ci},-1)" ${ci===0?'disabled':''} title="Up">&uarr;</button><button class="btn-icon" onclick="event.stopPropagation();moveChild(${i},${ci},1)" ${ci===skill.children.length-1?'disabled':''} title="Down">&darr;</button><button class="btn-promote" onclick="event.stopPropagation();promoteToParent(${i},${ci})">&#8592; Top</button><button class="btn-icon" onclick="event.stopPropagation();showDuplicateModal('child',${i},${ci})" title="Duplicate">&#10697;</button><button class="btn-icon" onclick="event.stopPropagation();editSubSkill(${i},${ci})" title="Edit">&#9998;</button><button class="btn-icon" onclick="event.stopPropagation();deleteSubSkill(${i},${ci})" title="Delete">&times;</button></div></div>`;});}
-    html+=`<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event,${i+1})"></div>`;});
+    var skills=questionsData[adminCurrentProduct]||[];if(!skills.length){document.getElementById('adminSkillsList').innerHTML='<p style="color:var(--text-dim)">No skills yet.</p>';return;}
+    var html='<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event,0)"></div>';
+    for(var i=0;i<skills.length;i++){
+        var skill=skills[i];var cc=skill.children?skill.children.length:0;
+        var dp=skill.description?'<span class="skill-desc-preview">'+escHtml(skill.description.substring(0,30))+(skill.description.length>30?'...':'')+'</span>':'';
+        html+='<div class="skill-admin-card is-parent" draggable="true" ondragstart="handleDragStart(event,\'parent\','+i+',null)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropOnParent(event,'+i+')"><span class="drag-handle">&#9776;</span><span class="skill-text">'+skill.text+(cc>0?' <span class="skill-badge">'+cc+' sub</span>':'')+dp+'</span><div class="skill-actions"><button class="btn-icon" onclick="event.stopPropagation();moveParent('+i+',-1)" '+(i===0?'disabled':'')+' title="Up">&uarr;</button><button class="btn-icon" onclick="event.stopPropagation();moveParent('+i+',1)" '+(i===skills.length-1?'disabled':'')+' title="Down">&darr;</button><button class="btn-icon" onclick="event.stopPropagation();showAddSubSkillModal('+i+')" title="Add sub-skill" style="color:var(--success);border-color:var(--success);">+</button><button class="btn-icon" onclick="event.stopPropagation();showDuplicateModal(\'parent\','+i+',null)" title="Duplicate">&#10697;</button><button class="btn-icon" onclick="event.stopPropagation();editSkill('+i+')" title="Edit">&#9998;</button><button class="btn-icon" onclick="event.stopPropagation();deleteSkill('+i+')" title="Delete">&times;</button></div></div>';
+        if(skill.children){for(var ci=0;ci<skill.children.length;ci++){
+            var child=skill.children[ci];var cdp=child.description?'<span class="skill-desc-preview">'+escHtml(child.description.substring(0,30))+(child.description.length>30?'...':'')+'</span>':'';
+            html+='<div class="skill-admin-card is-child" draggable="true" ondragstart="handleDragStart(event,\'child\','+i+','+ci+')" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropOnParent(event,'+i+')"><span class="drag-handle">&#9776;</span><span class="skill-text">'+child.text+cdp+'</span><div class="skill-actions"><button class="btn-icon" onclick="event.stopPropagation();moveChild('+i+','+ci+',-1)" '+(ci===0?'disabled':'')+' title="Up">&uarr;</button><button class="btn-icon" onclick="event.stopPropagation();moveChild('+i+','+ci+',1)" '+(ci===skill.children.length-1?'disabled':'')+' title="Down">&darr;</button><button class="btn-promote" onclick="event.stopPropagation();promoteToParent('+i+','+ci+')">&#8592; Top</button><button class="btn-icon" onclick="event.stopPropagation();showDuplicateModal(\'child\','+i+','+ci+')" title="Duplicate">&#10697;</button><button class="btn-icon" onclick="event.stopPropagation();editSubSkill('+i+','+ci+')" title="Edit">&#9998;</button><button class="btn-icon" onclick="event.stopPropagation();deleteSubSkill('+i+','+ci+')" title="Delete">&times;</button></div></div>';
+        }}
+        html+='<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event,'+(i+1)+')"></div>';
+    }
     document.getElementById('adminSkillsList').innerHTML=html;
 }
 
 // ADMIN CRUD
-function showAddProductModal(){document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML=`<h3>Add Product</h3><div class="form-group"><label>Product Name</label><input type="text" id="newProductName" placeholder="e.g. Financial Cloud"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addProduct()">Add</button></div>`;}
-async function addProduct(){const name=document.getElementById('newProductName').value.trim();if(!name)return;if(questionsData[name]){alert('Already exists');return;}questionsData[name]=[];await saveQuestions();adminCurrentProduct=name;renderAdminProductTabs();renderProductTabs();closeModal();showToast('Product added!');}
-function showAddSkillModal(){if(!adminCurrentProduct){alert('Select a product first');return;}document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML=`<h3>Add Skill to ${adminCurrentProduct}</h3><div class="form-group"><label>Skill Name</label><input type="text" id="newSkillText" placeholder="e.g. Workflow"></div><div class="form-group"><label>Description (optional)</label><textarea id="newSkillDesc" placeholder="What does this skill involve?"></textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addSkill()">Add</button></div>`;}
-async function addSkill(){const text=document.getElementById('newSkillText').value.trim();if(!text)return;const desc=document.getElementById('newSkillDesc').value.trim();questionsData[adminCurrentProduct].push({id:'skill_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),text,description:desc,children:[]});await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Skill added!');}
-function editSkill(index){const skill=questionsData[adminCurrentProduct][index];document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML=`<h3>Edit Skill</h3><div class="form-group"><label>Skill Name</label><input type="text" id="editSkillText" value="${escHtml(skill.text)}"></div><div class="form-group"><label>Description</label><textarea id="editSkillDesc">${escHtml(skill.description||'')}</textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditSkill(${index})">Save</button></div>`;}
-async function saveEditSkill(index){const text=document.getElementById('editSkillText').value.trim();if(!text)return;questionsData[adminCurrentProduct][index].text=text;questionsData[adminCurrentProduct][index].description=document.getElementById('editSkillDesc').value.trim();await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Updated!');}
-function editSubSkill(pi,ci){const child=questionsData[adminCurrentProduct][pi].children[ci];document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML=`<h3>Edit Sub-Skill</h3><div class="form-group"><label>Sub-Skill Name</label><input type="text" id="editSubSkillText" value="${escHtml(child.text)}"></div><div class="form-group"><label>Description</label><textarea id="editSubSkillDesc">${escHtml(child.description||'')}</textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditSubSkill(${pi},${ci})">Save</button></div>`;}
-async function saveEditSubSkill(pi,ci){const text=document.getElementById('editSubSkillText').value.trim();if(!text)return;questionsData[adminCurrentProduct][pi].children[ci].text=text;questionsData[adminCurrentProduct][pi].children[ci].description=document.getElementById('editSubSkillDesc').value.trim();await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Updated!');}
-async function deleteSkill(index){const s=questionsData[adminCurrentProduct][index];const cc=s.children?s.children.length:0;if(!confirm(cc>0?`Delete "${s.text}" and ${cc} sub-skill(s)?`:`Delete "${s.text}"?`))return;questionsData[adminCurrentProduct].splice(index,1);await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Deleted');}
+function showAddProductModal(){document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Add Product</h3><div class="form-group"><label>Product Name</label><input type="text" id="newProductName" placeholder="e.g. Financial Cloud"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addProduct()">Add</button></div>';}
+async function addProduct(){var name=document.getElementById('newProductName').value.trim();if(!name)return;if(questionsData[name]){alert('Already exists');return;}questionsData[name]=[];await saveQuestions();adminCurrentProduct=name;renderAdminProductTabs();renderProductTabs();closeModal();showToast('Product added!');}
+function showAddSkillModal(){if(!adminCurrentProduct){alert('Select a product first');return;}document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Add Skill to '+adminCurrentProduct+'</h3><div class="form-group"><label>Skill Name</label><input type="text" id="newSkillText" placeholder="e.g. Workflow"></div><div class="form-group"><label>Description (optional)</label><textarea id="newSkillDesc" placeholder="What does this skill involve?"></textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addSkill()">Add</button></div>';}
+async function addSkill(){var text=document.getElementById('newSkillText').value.trim();if(!text)return;var desc=document.getElementById('newSkillDesc').value.trim();questionsData[adminCurrentProduct].push({id:'skill_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),text:text,description:desc,children:[]});await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Skill added!');}
+function editSkill(index){var skill=questionsData[adminCurrentProduct][index];document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Edit Skill</h3><div class="form-group"><label>Skill Name</label><input type="text" id="editSkillText" value="'+escHtml(skill.text)+'"></div><div class="form-group"><label>Description</label><textarea id="editSkillDesc">'+escHtml(skill.description||'')+'</textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditSkill('+index+')">Save</button></div>';}
+async function saveEditSkill(index){var text=document.getElementById('editSkillText').value.trim();if(!text)return;questionsData[adminCurrentProduct][index].text=text;questionsData[adminCurrentProduct][index].description=document.getElementById('editSkillDesc').value.trim();await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Updated!');}
+function editSubSkill(pi,ci){var child=questionsData[adminCurrentProduct][pi].children[ci];document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Edit Sub-Skill</h3><div class="form-group"><label>Sub-Skill Name</label><input type="text" id="editSubSkillText" value="'+escHtml(child.text)+'"></div><div class="form-group"><label>Description</label><textarea id="editSubSkillDesc">'+escHtml(child.description||'')+'</textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditSubSkill('+pi+','+ci+')">Save</button></div>';}
+async function saveEditSubSkill(pi,ci){var text=document.getElementById('editSubSkillText').value.trim();if(!text)return;questionsData[adminCurrentProduct][pi].children[ci].text=text;questionsData[adminCurrentProduct][pi].children[ci].description=document.getElementById('editSubSkillDesc').value.trim();await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Updated!');}
+async function deleteSkill(index){var s=questionsData[adminCurrentProduct][index];var cc=s.children?s.children.length:0;if(!confirm(cc>0?'Delete "'+s.text+'" and '+cc+' sub-skill(s)?':'Delete "'+s.text+'"?'))return;questionsData[adminCurrentProduct].splice(index,1);await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Deleted');}
 async function deleteSubSkill(pi,ci){if(!confirm('Delete this sub-skill?'))return;questionsData[adminCurrentProduct][pi].children.splice(ci,1);await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Deleted');}
-function closeModal(){document.getElementById('modal').classList.add('hidden');}function showDuplicateModal(type,parentIdx,childIdx){var skills=questionsData[adminCurrentProduct];var skill=type==='parent'?skills[parentIdx]:skills[parentIdx].children[childIdx];var options='<option value="top">-- Top Level (standalone) --</option>';skills.forEach(function(s,i){options+='<option value="'+i+'">'+escHtml(s.text)+'</option>';});document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Duplicate: "'+escHtml(skill.text)+'"</h3><div class="form-group"><label>Place copy under:</label><select id="dupTarget">'+options+'</select></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="executeDuplicate(\''+type+'\','+parentIdx+','+(childIdx===null?'null':childIdx)+')">Duplicate</button></div>';}
+function closeModal(){document.getElementById('modal').classList.add('hidden');}
+
+function showDuplicateModal(type,parentIdx,childIdx){var skills=questionsData[adminCurrentProduct];var skill=type==='parent'?skills[parentIdx]:skills[parentIdx].children[childIdx];var options='<option value="top">-- Top Level (standalone) --</option>';for(var i=0;i<skills.length;i++){options+='<option value="'+i+'">'+escHtml(skills[i].text)+'</option>';}document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Duplicate: "'+escHtml(skill.text)+'"</h3><div class="form-group"><label>Place copy under:</label><select id="dupTarget">'+options+'</select></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="executeDuplicate(\''+type+'\','+parentIdx+','+(childIdx===null?'null':childIdx)+')">Duplicate</button></div>';}
 async function executeDuplicate(type,parentIdx,childIdx){var skills=questionsData[adminCurrentProduct];var original=type==='parent'?skills[parentIdx]:skills[parentIdx].children[childIdx];var copy={id:'dup_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),text:original.text+' (copy)',description:original.description||''};var target=document.getElementById('dupTarget').value;if(target==='top'){copy.children=[];skills.push(copy);}else{var idx=parseInt(target);if(!skills[idx].children)skills[idx].children=[];skills[idx].children.push(copy);}await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Duplicated!');}
- function showAddSubSkillModal(parentIdx){var skill=questionsData[adminCurrentProduct][parentIdx];document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML=`<h3>Add Sub-Skill to "${escHtml(skill.text)}"</h3><div class="form-group"><label>Sub-Skill Name</label><input type="text" id="newSubSkillText" placeholder="e.g. Status and Reason"></div><div class="form-group"><label>Description (optional)</label><textarea id="newSubSkillDesc" placeholder="What does this sub-skill involve?"></textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-success" onclick="addSubSkill(${parentIdx})">Add</button></div>`;} async function addSubSkill(parentIdx){var text=document.getElementById('newSubSkillText').value.trim();if(!text)return;var desc=document.getElementById('newSubSkillDesc').value.trim();questionsData[adminCurrentProduct][parentIdx].children.push({id:'sub_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),text:text,description:desc});await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Sub-skill added!');}  function showProductOptions(){     const products=Object.keys(questionsData);     const options=products.map(p=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg);border-radius:var(--radius);margin-bottom:6px;"><span>${p}</span><div style="display:flex;gap:6px;"><button class="btn-icon" onclick="renameProduct('${p}')" title="Rename">&#9998;</button><button class="btn-icon" onclick="removeProduct('${p}')" title="Delete" style="color:var(--danger);">&times;</button></div></div>`).join('');     document.getElementById('modal').classList.remove('hidden');     document.getElementById('modalContent').innerHTML=`<h3>Manage Products</h3>${options}<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>`; } function renameProduct(oldName){     const newName=prompt('Rename product:',oldName);     if(!newName||newName===oldName)return;if(questionsData[newName]){alert('Name already exists');return;}     questionsData[newName]=questionsData[oldName];delete questionsData[oldName];     if(adminCurrentProduct===oldName)adminCurrentProduct=newName;if(currentProduct===oldName)currentProduct=newName;     saveQuestions();renderAdminProductTabs();renderProductTabs();closeModal();showToast('Renamed!'); } function removeProduct(name){     if(!confirm(`Delete "${name}" and ALL its skills?`))return;     delete questionsData[name];adminCurrentProduct=Object.keys(questionsData)[0]||null;currentProduct=null;     saveQuestions();renderAdminProductTabs();renderProductTabs();closeModal();showToast('Product deleted'); }
+
+function showAddSubSkillModal(parentIdx){var skill=questionsData[adminCurrentProduct][parentIdx];document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Add Sub-Skill to "'+escHtml(skill.text)+'"</h3><div class="form-group"><label>Sub-Skill Name</label><input type="text" id="newSubSkillText" placeholder="e.g. Status and Reason"></div><div class="form-group"><label>Description (optional)</label><textarea id="newSubSkillDesc" placeholder="What does this sub-skill involve?"></textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-success" onclick="addSubSkill('+parentIdx+')">Add</button></div>';}
+async function addSubSkill(parentIdx){var text=document.getElementById('newSubSkillText').value.trim();if(!text)return;var desc=document.getElementById('newSubSkillDesc').value.trim();questionsData[adminCurrentProduct][parentIdx].children.push({id:'sub_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),text:text,description:desc});await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Sub-skill added!');}
+
+function showProductOptions(){var products=Object.keys(questionsData);var options='';for(var i=0;i<products.length;i++){options+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg);border-radius:var(--radius);margin-bottom:6px;"><span>'+products[i]+'</span><div style="display:flex;gap:6px;"><button class="btn-icon" onclick="renameProduct(\''+products[i]+'\')">&#9998;</button><button class="btn-icon" onclick="removeProduct(\''+products[i]+'\')"; style="color:var(--danger);">&times;</button></div></div>';}document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Manage Products</h3>'+options+'<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>';}
+function renameProduct(oldName){var newName=prompt('Rename product:',oldName);if(!newName||newName===oldName)return;if(questionsData[newName]){alert('Name already exists');return;}questionsData[newName]=questionsData[oldName];delete questionsData[oldName];if(adminCurrentProduct===oldName)adminCurrentProduct=newName;if(currentProduct===oldName)currentProduct=newName;saveQuestions();renderAdminProductTabs();renderProductTabs();closeModal();showToast('Renamed!');}
+function removeProduct(name){if(!confirm('Delete "'+name+'" and ALL its skills?'))return;delete questionsData[name];adminCurrentProduct=Object.keys(questionsData)[0]||null;currentProduct=null;saveQuestions();renderAdminProductTabs();renderProductTabs();closeModal();showToast('Product deleted');}
+
+// USER MANAGEMENT
+function showAddUserModal(){
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modalContent').innerHTML='<h3>Add Team Member</h3><div class="form-group"><label>Email</label><input type="email" id="newUserEmail" placeholder="name@company.com"></div><div class="form-group"><label>Temporary Password (min 6 chars)</label><input type="text" id="newUserPassword" value="TempPass123!"></div><div class="form-group"><label>Role</label><select id="newUserRole"><option value="member">Member</option><option value="admin">Admin</option></select></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-success" onclick="createUser()">Create User</button></div>';
+}
+async function createUser(){
+    var email=document.getElementById('newUserEmail').value.trim();
+    var password=document.getElementById('newUserPassword').value;
+    var role=document.getElementById('newUserRole').value;
+    if(!email||password.length<6){alert('Email required and password must be 6+ characters.');return;}
+    try{
+        var userCred=await secondaryAuth.createUserWithEmailAndPassword(email,password);
+        await db.collection('users').doc(userCred.user.uid).set({email:email,name:email.split('@')[0],role:role,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+        await secondaryAuth.signOut();
+        closeModal();loadTeamList();showToast('User created: '+email);
+    }catch(e){alert('Error: '+e.message);}
+}
+async function deleteUser(uid,email){
+    if(!confirm('Remove '+email+'? This deletes their profile data. Their login must be removed separately in Firebase Console > Authentication.'))return;
+    await db.collection('users').doc(uid).delete();
+    loadTeamList();showToast('User removed');
+}
+async function changeRole(uid,email,newRole){
+    await db.collection('users').doc(uid).update({role:newRole});
+    loadTeamList();showToast(email+' is now '+newRole);
+}
 
 // RESULTS
-let allResults=[];
-async function loadAllResults(){const snap=await db.collection('responses').get();allResults=[];snap.forEach(doc=>{allResults.push({uid:doc.id,...doc.data()});});renderResults();}
+var allResults=[];
+async function loadAllResults(){var snap=await db.collection('responses').get();allResults=[];snap.forEach(function(doc){allResults.push(Object.assign({uid:doc.id},doc.data()));});renderResults();}
 function renderResults(){
-    const threshold=parseInt(document.getElementById('thresholdInput')?.value)||settings.threshold||3;
-    const container=document.getElementById('resultsContainer');
+    var threshold=parseInt(document.getElementById('thresholdInput')?document.getElementById('thresholdInput').value:3)||settings.threshold||3;
+    var container=document.getElementById('resultsContainer');
     if(!allResults.length){container.innerHTML='<p style="color:var(--text-dim)">No submissions yet.</p>';return;}
-    container.innerHTML=allResults.map(result=>{
-        const name=result.name||result.email||'Unknown';
-        const subStatus=result.submitted||{};
-        let productScores=[];
-        let allGaps=[];
-        for(const[product,skills]of Object.entries(questionsData)){
-            const rateable=getRateableSkillsForProduct(product);
-            const responses=result.responses?.[product]||{};
-            let sum=0,answered=0;
-            for(const s of rateable){const r=responses[s.id];if(r&&r.sl){sum+=r.sl;answered++;}if(r&&r.sl&&r.sl<threshold)allGaps.push({product,skill:s.text,level:r.sl});}
-            const max=rateable.length*4;const pct=max>0?Math.round((sum/max)*100):0;
-            let grade='Foundational';if(pct>=90)grade='Expert';else if(pct>=70)grade='Proficient';else if(pct>=50)grade='Developing';
-            const submitted=subStatus[product]?true:false;
-            if(answered>0)productScores.push({product,pct,grade,answered,total:rateable.length,submitted});
+    var html='';
+    for(var ri=0;ri<allResults.length;ri++){
+        var result=allResults[ri];
+        var name=result.name||result.email||'Unknown';
+        var subStatus=result.submitted||{};
+        var productScores=[],allGaps=[];
+        for(var product in questionsData){
+            var rateable=getRateableSkillsForProduct(product);
+            var responses=(result.responses&&result.responses[product])||{};
+            var sum=0,answered=0;
+            for(var si=0;si<rateable.length;si++){var r=responses[rateable[si].id];if(r&&r.sl){sum+=r.sl;answered++;}if(r&&r.sl&&r.sl<threshold)allGaps.push({product:product,skill:rateable[si].text,level:r.sl});}
+            var max=rateable.length*4;var pct=max>0?Math.round((sum/max)*100):0;
+            var grade='Foundational';if(pct>=90)grade='Expert';else if(pct>=70)grade='Proficient';else if(pct>=50)grade='Developing';
+            var submitted=subStatus[product]?true:false;
+            if(answered>0)productScores.push({product:product,pct:pct,grade:grade,answered:answered,total:rateable.length,submitted:submitted});
         }
-        const scoresHtml=productScores.map(ps=>`<div class="result-score-item"><span>${ps.product} ${ps.submitted?'&#10003;':''}</span><span class="score-display ${getScoreClass(ps.pct)}">${ps.pct}% ${ps.grade}</span></div>`).join('');
-        const gapHtml=allGaps.length>0?allGaps.map(g=>`<span class="gap-badge ${g.level===1?'gap-critical':'gap-warning'}">${g.product}: ${g.skill} (${g.level})</span>`).join(' '):'<span style="color:var(--success);font-size:0.85rem;">All at or above threshold</span>';
-        return `<div class="result-card"><h4>${name}</h4><div class="result-score-grid">${scoresHtml}</div><div style="margin-top:12px;"><strong style="font-size:0.8rem;color:var(--text-dim);">Gaps (below level ${threshold}):</strong><div style="margin-top:6px;">${gapHtml}</div></div></div>`;
-    }).join('');
+        var scoresHtml='';for(var ps=0;ps<productScores.length;ps++){scoresHtml+='<div class="result-score-item"><span>'+productScores[ps].product+(productScores[ps].submitted?' &#10003;':'')+'</span><span class="score-display '+getScoreClass(productScores[ps].pct)+'">'+productScores[ps].pct+'% '+productScores[ps].grade+'</span></div>';}
+        var gapHtml='';if(allGaps.length>0){for(var gi=0;gi<allGaps.length;gi++){gapHtml+='<span class="gap-badge '+(allGaps[gi].level===1?'gap-critical':'gap-warning')+'">'+allGaps[gi].product+': '+allGaps[gi].skill+' ('+allGaps[gi].level+')</span> ';}}else{gapHtml='<span style="color:var(--success);font-size:0.85rem;">All at or above threshold</span>';}
+        html+='<div class="result-card"><h4>'+name+'</h4><div class="result-score-grid">'+scoresHtml+'</div><div style="margin-top:12px;"><strong style="font-size:0.8rem;color:var(--text-dim);">Gaps (below level '+threshold+'):</strong><div style="margin-top:6px;">'+gapHtml+'</div></div></div>';
+    }
+    container.innerHTML=html;
 }
 
 // SETTINGS
-async function loadSettings(){const doc=await db.collection('config').doc('settings').get();if(doc.exists)settings=doc.data();}
-function loadSettingsUI(){document.getElementById('notifEmail').value=settings.notifEmail||'';document.getElementById('settingsThreshold').value=settings.threshold||3;loadTeamList();}
+async function loadSettings(){var doc=await db.collection('config').doc('settings').get();if(doc.exists)settings=doc.data();}
+function loadSettingsUI(){document.getElementById('notifEmail').value=settings.notifEmail||'';document.getElementById('settingsThreshold').value=settings.threshold||3;}
 async function saveSettings(){settings.notifEmail=document.getElementById('notifEmail').value.trim();settings.threshold=parseInt(document.getElementById('settingsThreshold').value)||3;await db.collection('config').doc('settings').set(settings);showToast('Settings saved!');}
-async function loadTeamList(){const snap=await db.collection('users').get();let html='';snap.forEach(doc=>{const u=doc.data();html+=`<div class="skill-admin-card"><span class="skill-text">${u.email} <span style="color:var(--text-dim);font-size:0.8rem;">(${u.role})</span></span></div>`;});document.getElementById('teamList').innerHTML=html||'<p style="color:var(--text-dim)">No users yet.</p>';}
-async function grantAdmin(){const email=document.getElementById('adminEmailInput').value.trim();if(!email)return;const snap=await db.collection('users').where('email','==',email).get();if(snap.empty){alert('User not found.');return;}snap.forEach(async doc=>{await db.collection('users').doc(doc.id).update({role:'admin'});});document.getElementById('adminEmailInput').value='';loadTeamList();showToast('Admin granted!');}
+async function loadTeamList(){
+    var snap=await db.collection('users').get();
+    var html='';
+    snap.forEach(function(doc){
+        var u=doc.data();
+        var uid=doc.id;
+        var roleToggle=u.role==='admin'?'<button class="btn-icon" onclick="changeRole(\''+uid+'\',\''+u.email+'\',\'member\')" title="Demote to member" style="color:var(--warning);">&#9660;</button>':'<button class="btn-icon" onclick="changeRole(\''+uid+'\',\''+u.email+'\',\'admin\')" title="Promote to admin" style="color:var(--success);">&#9650;</button>';
+        html+='<div class="user-card"><span class="user-info">'+u.email+'<span class="user-role">'+u.role+'</span></span><div class="user-actions">'+roleToggle+'<button class="btn-icon" onclick="deleteUser(\''+uid+'\',\''+u.email+'\')" title="Remove" style="color:var(--danger);">&times;</button></div></div>';
+    });
+    document.getElementById('teamList').innerHTML=html||'<p style="color:var(--text-dim)">No users yet.</p>';
+}
+async function grantAdmin(){var email=document.getElementById('adminEmailInput').value.trim();if(!email)return;var snap=await db.collection('users').where('email','==',email).get();if(snap.empty){alert('User not found. They need to log in first.');return;}snap.forEach(async function(doc){await db.collection('users').doc(doc.id).update({role:'admin'});});document.getElementById('adminEmailInput').value='';loadTeamList();showToast('Admin granted!');}
 
-function showToast(msg,isError=false){const t=document.createElement('div');t.className='toast'+(isError?' error':'');t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
-async function deleteProduct(name){if(!confirm(`Delete "${name}"?`))return;delete questionsData[name];await saveQuestions();adminCurrentProduct=Object.keys(questionsData)[0]||null;renderAdminProductTabs();renderProductTabs();}
+function showToast(msg,isError){var t=document.createElement('div');t.className='toast'+(isError?' error':'');t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3000);}
+async function deleteProduct(name){if(!confirm('Delete "'+name+'"?'))return;delete questionsData[name];await saveQuestions();adminCurrentProduct=Object.keys(questionsData)[0]||null;renderAdminProductTabs();renderProductTabs();}
 </script>
 </body>
 </html>
