@@ -59,7 +59,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .skill-card.standalone { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px; }
 .skill-card.standalone .skill-name { font-weight: 500; }
 .skill-card.unanswered { border-left: 3px solid var(--danger); }
-.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--border); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; font-style: italic; cursor: help; position: relative; flex-shrink: 0; font-family: Georgia, serif; }
+.skill-notes { margin-top: 8px; }
+.skill-notes input { width: 100%; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 0.8rem; }
+.skill-notes input:focus { border-color: var(--accent); outline: none; }
+.skill-notes input.evidence-needed { border-color: var(--warning); background: rgba(255,152,0,0.05); }
+.skill-notes .evidence-prompt { font-size: 0.7rem; color: var(--warning); margin-top: 3px; font-weight: 600; }.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--border); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; font-style: italic; cursor: help; position: relative; flex-shrink: 0; font-family: Georgia, serif; }
 .info-icon:hover { background: var(--accent); color: white; }
 .info-icon .tooltip { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; font-size: 0.8rem; font-style: normal; font-weight: 400; color: var(--text); min-width: 220px; max-width: 320px; white-space: normal; box-shadow: 0 4px 16px rgba(0,0,0,0.4); z-index: 50; line-height: 1.4; }
 .info-icon .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--border); }
@@ -139,6 +143,17 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .user-card .user-info { font-size: 0.85rem; }
 .user-card .user-role { font-size: 0.75rem; color: var(--text-dim); margin-left: 8px; padding: 2px 8px; background: var(--bg); border-radius: 10px; }
 .user-card .user-actions { display: flex; gap: 4px; }
+.history-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.2s; }
+.history-item:hover { border-color: var(--accent); }
+.history-item .history-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.history-item .history-user { font-weight: 600; font-size: 0.9rem; }
+.history-item .history-date { font-size: 0.75rem; color: var(--text-dim); }
+.history-item .history-product { font-size: 0.8rem; color: var(--accent); }
+.history-detail { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.8rem; }
+.history-detail .detail-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.history-detail .detail-row:last-child { border-bottom: none; }
+.history-detail .detail-notes { font-size: 0.75rem; color: var(--text-dim); font-style: italic; padding: 2px 0 6px; }
+
 @media (max-width: 768px) { .app-header { padding: 12px 16px; } .app-content { padding: 16px; } .skill-card .skill-ratings { gap: 16px; } .skill-card { padding-left: 20px; } .header-right { gap: 8px; } .user-badge { display: none; } .skill-admin-card.is-child { margin-left: 16px; } .info-icon .tooltip { left: 0; transform: none; min-width: 180px; } }
 </style>
 </head>
@@ -187,6 +202,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 <div class="tab active" onclick="switchAdminTab('questions')">Manage Questions</div>
 <div class="tab" onclick="switchAdminTab('results')">View Results</div>
 <div class="tab" onclick="switchAdminTab('users')">Manage Users</div>
+<div class="tab" onclick="switchAdminTab('history')">History</div>
 <div class="tab" onclick="switchAdminTab('settings')">Settings</div>
 </div>
 <div id="adminQuestions">
@@ -211,8 +227,15 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 <div id="resultsContainer"></div>
 </div>
 </div>
-<div id="adminUsers" class="hidden">
+<div id="adminHistory" class="hidden">
 <div class="admin-section">
+<h3>Submission History (Audit Trail)</h3>
+<p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">All completed assessments, date-stamped. Staff cannot see this.</p>
+<div class="settings-row"><label>Filter by user:</label><select id="historyUserFilter" onchange="loadHistory()" style="max-width:250px;"><option value="all">All Users</option></select></div>
+<div id="historyList"></div>
+</div>
+</div>
+<div id="adminUsers" class="hidden"><div class="admin-section">
 <h3>Manage Users</h3>
 <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">Create, manage, and remove team member accounts.</p>
 <button class="btn btn-sm btn-success" onclick="showAddUserModal()" style="margin-bottom:16px;">+ Add User</button>
@@ -347,10 +370,13 @@ function switchAdminTab(tab) {
     document.getElementById('adminQuestions').classList.toggle('hidden', tab !== 'questions');
     document.getElementById('adminResults').classList.toggle('hidden', tab !== 'results');
     document.getElementById('adminUsers').classList.toggle('hidden', tab !== 'users');
+    document.getElementById('adminHistory').classList.toggle('hidden', tab !== 'history');
     document.getElementById('adminSettings').classList.toggle('hidden', tab !== 'settings');
     if (tab === 'results') loadAllResults();
     if (tab === 'settings') loadSettingsUI();
     if (tab === 'users') loadTeamList();
+    if (tab === 'history') loadHistory();
+
 }
 
 // DATA
@@ -421,11 +447,31 @@ function renderSkills() {
 }
 
 function renderSkillCard(skill, responses, standalone) {
-    var r = responses[skill.id] || { sl: '', int: '' };
+    var r = responses[skill.id] || { sl: '', int: '', notes: '' };
     var unanswered = !r.sl || !r.int;
+    var needsEvidence = r.sl >= 3;
+    var notesVal = r.notes || '';
     var desc = skill.description ? '<span class="info-icon">i<span class="tooltip">'+escHtml(skill.description)+'</span></span>' : '';
-    return '<div class="skill-card '+(standalone?'standalone':'')+' '+(unanswered?'unanswered':'')+'"><div class="skill-name-row"><span class="skill-name">'+skill.text+'</span>'+desc+'</div><div class="skill-ratings"><div class="rating-group"><span class="rating-label">Skill Level</span><div class="pill-group"><div class="pill sl-1 '+(r.sl==1?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',1)">1</div><div class="pill sl-2 '+(r.sl==2?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',2)">2</div><div class="pill sl-3 '+(r.sl==3?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',3)">3</div><div class="pill sl-4 '+(r.sl==4?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',4)">4</div></div></div><div class="rating-group"><span class="rating-label">Interest</span><div class="pill-group"><div class="pill int-1 '+(r.int==1?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',1)">1</div><div class="pill int-2 '+(r.int==2?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',2)">2</div></div></div></div></div>';
+    var notesClass = (needsEvidence && !notesVal) ? 'evidence-needed' : '';
+    var evidencePrompt = (needsEvidence && !notesVal) ? '<div class="evidence-prompt">Evidence recommended for level 3+</div>' : '';
+    return '<div class="skill-card '+(standalone?'standalone':'')+' '+(unanswered?'unanswered':'')+'">' +
+        '<div class="skill-name-row"><span class="skill-name">'+skill.text+'</span>'+desc+'</div>' +
+        '<div class="skill-ratings">' +
+        '<div class="rating-group"><span class="rating-label">Skill Level</span><div class="pill-group">' +
+        '<div class="pill sl-1 '+(r.sl==1?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',1)">1</div>' +
+        '<div class="pill sl-2 '+(r.sl==2?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',2)">2</div>' +
+        '<div class="pill sl-3 '+(r.sl==3?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',3)">3</div>' +
+        '<div class="pill sl-4 '+(r.sl==4?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',4)">4</div>' +
+        '</div></div>' +
+        '<div class="rating-group"><span class="rating-label">Interest</span><div class="pill-group">' +
+        '<div class="pill int-1 '+(r.int==1?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',1)">1</div>' +
+        '<div class="pill int-2 '+(r.int==2?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',2)">2</div>' +
+        '</div></div>' +
+        '</div>' +
+        '<div class="skill-notes"><input type="text" class="'+notesClass+'" placeholder="Evidence / ticket ref / notes" value="'+escHtml(notesVal)+'" onchange="updateNotes(\''+currentProduct+'\',\''+skill.id+'\',this.value)" onclick="event.stopPropagation()">'+evidencePrompt+'</div>' +
+        '</div>';
 }
+
 
 function escHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function toggleGroup(h) { h.classList.toggle('collapsed'); h.nextElementSibling.classList.toggle('collapsed'); }
@@ -434,6 +480,11 @@ function selectPill(el, product, skillId, field, value) {
     el.classList.add('selected');
     updateResponse(product, skillId, field, value);
     renderSkills();
+}
+function updateNotes(product, skillId, value) {
+    if (!userResponses[product]) userResponses[product] = {};
+    if (!userResponses[product][skillId]) userResponses[product][skillId] = {};
+    userResponses[product][skillId].notes = value;
 }
 function updateResponse(product, skillId, field, value) {
     if (!userResponses[product]) userResponses[product] = {};
@@ -459,6 +510,16 @@ async function submitProduct() {
         lastSaved: firebase.firestore.FieldValue.serverTimestamp(),
         submitted: submissionStatus
     }, { merge: true });
+    var snapshot = {
+        product: currentProduct,
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        submittedAtLocal: new Date().toISOString(),
+        userName: currentUser.email.split('@')[0],
+        userEmail: currentUser.email,
+        score: { pct: score.pct, grade: score.grade, answered: score.answered, total: score.total },
+        responses: userResponses[currentProduct] || {}
+    };
+    await db.collection('submissions').doc(currentUser.uid).collection('history').add(snapshot);
     await sendProductEmail();
     renderProductTabs();
     showToast(currentProduct + ' submitted!');
@@ -637,7 +698,75 @@ function toggleAllProducts(el){var boxes=document.querySelectorAll('.prodCheckbo
 async function saveProductAssignment(uid){var boxes=document.querySelectorAll('.prodCheckbox');var selected=[];for(var i=0;i<boxes.length;i++){if(boxes[i].checked)selected.push(boxes[i].value);}await db.collection('users').doc(uid).update({products:selected});closeModal();loadTeamList();showToast('Products assigned!');}
 async function grantAdmin(){var email=document.getElementById('adminEmailInput').value.trim();if(!email)return;var snap=await db.collection('users').where('email','==',email).get();if(snap.empty){alert('User not found. They need to log in first.');return;}snap.forEach(async function(doc){await db.collection('users').doc(doc.id).update({role:'admin'});});document.getElementById('adminEmailInput').value='';loadTeamList();showToast('Admin granted!');}
 
-function showToast(msg,isError){var t=document.createElement('div');t.className='toast'+(isError?' error':'');t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3000);}
+async function loadHistory() {
+    var container = document.getElementById('historyList');
+    container.innerHTML = '<p style="color:var(--text-dim)">Loading...</p>';
+    var usersSnap = await db.collection('users').get();
+    var sel = document.getElementById('historyUserFilter');
+    var currentVal = sel.value;
+    sel.innerHTML = '<option value="all">All Users</option>';
+    usersSnap.forEach(function(doc) { var u = doc.data(); sel.innerHTML += '<option value="'+doc.id+'">'+u.email+'</option>'; });
+    sel.value = currentVal;
+    var filterUser = sel.value;
+    var allHistory = [];
+    if (filterUser === 'all') {
+        var allUsers = []; usersSnap.forEach(function(doc) { allUsers.push(doc.id); });
+        for (var ui = 0; ui < allUsers.length; ui++) {
+            var hSnap = await db.collection('submissions').doc(allUsers[ui]).collection('history').orderBy('submittedAt','desc').limit(20).get();
+            hSnap.forEach(function(hDoc) { allHistory.push(hDoc.data()); });
+        }
+        allHistory.sort(function(a,b) { return (b.submittedAtLocal||'').localeCompare(a.submittedAtLocal||''); });
+    } else {
+        var hSnap = await db.collection('submissions').doc(filterUser).collection('history').orderBy('submittedAt','desc').limit(50).get();
+        hSnap.forEach(function(hDoc) { allHistory.push(hDoc.data()); });
+    }
+    container.innerHTML = renderHistoryList(allHistory) || '<p style="color:var(--text-dim)">No submissions found.</p>';
+}
+function renderHistoryList(items) {
+    var html = '';
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var dateStr = item.submittedAtLocal ? new Date(item.submittedAtLocal).toLocaleString('en-GB', {dateStyle:'medium', timeStyle:'short'}) : 'Unknown';
+        var scoreClass = getScoreClass(item.score ? item.score.pct : 0);
+        html += '<div class="history-item" onclick="this.querySelector(\'.history-detail\').classList.toggle(\'hidden\')">';
+        html += '<div class="history-header"><span class="history-user">'+(item.userName||'Unknown')+'</span><span class="history-product">'+(item.product||'')+'</span><span class="score-display '+scoreClass+'">'+(item.score?item.score.pct+'% '+item.score.grade:'')+'</span><span class="history-date">'+dateStr+'</span></div>';
+        html += '<div class="history-detail hidden">';
+        if (item.responses) {
+            var ids = Object.keys(item.responses);
+            for (var si = 0; si < ids.length; si++) {
+                var sr = item.responses[ids[si]];
+                var sName = findSkillName(item.product, ids[si]) || ids[si];
+                html += '<div class="detail-row"><span>'+sName+'</span><span>SL: '+(sr.sl||'-')+' | Int: '+(sr.int||'-')+'</span></div>';
+                if (sr.notes) html += '<div class="detail-notes">Evidence: '+escHtml(sr.notes)+'</div>';
+            }
+        }
+        html += '</div></div>';
+    }
+    return html;
+}
+function findSkillName(product, skillId) {
+    var skills = questionsData[product] || [];
+    for (var i = 0; i < skills.length; i++) {
+        if (skills[i].id === skillId) return skills[i].text;
+        if (skills[i].children) { for (var j = 0; j < skills[i].children.length; j++) { if (skills[i].children[j].id === skillId) return skills[i].children[j].text; } }
+    }
+    return null;
+}
+function showToast(msg,isError){
+
+
+==============================================
+FIRESTORE RULES UPDATE
+==============================================
+
+Go to Firebase Console > Firestore > Rules.
+Add this BEFORE the closing } of the main match block:
+
+    match /submissions/{userId}/history/{docId} {
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && isAdmin();
+    }
+var t=document.createElement('div');t.className='toast'+(isError?' error':'');t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3000);}
 async function deleteProduct(name){if(!confirm('Delete "'+name+'"?'))return;delete questionsData[name];await saveQuestions();adminCurrentProduct=Object.keys(questionsData)[0]||null;renderAdminProductTabs();renderProductTabs();}
 </script>
 </body>
