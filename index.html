@@ -63,7 +63,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .skill-notes input { width: 100%; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 0.8rem; }
 .skill-notes input:focus { border-color: var(--accent); outline: none; }
 .skill-notes input.evidence-needed { border-color: var(--warning); background: rgba(255,152,0,0.05); }
-.skill-notes .evidence-prompt { font-size: 0.7rem; color: var(--warning); margin-top: 3px; font-weight: 600; }.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--border); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; font-style: italic; cursor: help; position: relative; flex-shrink: 0; font-family: Georgia, serif; }
+.skill-notes .evidence-prompt { font-size: 0.7rem; color: var(--warning); margin-top: 3px; font-weight: 600; } .ticket-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; } .ticket-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: rgba(76,175,80,0.15); border: 1px solid var(--success); border-radius: 12px; font-size: 0.7rem; font-weight: 600; color: var(--success); } .ticket-chip a { color: var(--success); text-decoration: none; } .ticket-chip a:hover { text-decoration: underline; } .ticket-chip .remove-chip { cursor: pointer; color: var(--text-dim); font-size: 0.8rem; margin-left: 2px; } .ticket-chip .remove-chip:hover { color: var(--danger); } .evidence-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; color: var(--success); font-weight: 600; margin-left: 8px; }.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--border); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; font-style: italic; cursor: help; position: relative; flex-shrink: 0; font-family: Georgia, serif; }
 .info-icon:hover { background: var(--accent); color: white; }
 .info-icon .tooltip { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; font-size: 0.8rem; font-style: normal; font-weight: 400; color: var(--text); min-width: 220px; max-width: 320px; white-space: normal; box-shadow: 0 4px 16px rgba(0,0,0,0.4); z-index: 50; line-height: 1.4; }
 .info-icon .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--border); }
@@ -447,28 +447,37 @@ function renderSkills() {
 }
 
 function renderSkillCard(skill, responses, standalone) {
-    var r = responses[skill.id] || { sl: '', int: '', notes: '' };
+    var r = responses[skill.id] || { sl: '', int: '', notes: '', tickets: [] };
     var unanswered = !r.sl || !r.int;
     var needsEvidence = r.sl >= 3;
+    var tickets = r.tickets || [];
     var notesVal = r.notes || '';
     var desc = skill.description ? '<span class="info-icon">i<span class="tooltip">'+escHtml(skill.description)+'</span></span>' : '';
-    var notesClass = (needsEvidence && !notesVal) ? 'evidence-needed' : '';
-    var evidencePrompt = (needsEvidence && !notesVal) ? '<div class="evidence-prompt">Evidence recommended for level 3+</div>' : '';
+    var evidencePrompt = (needsEvidence && !tickets.length && !notesVal) ? '<div class="evidence-prompt">Evidence recommended for level 3+ (add ticket ref or notes)</div>' : '';
+    var evidenceBadge = (tickets.length > 0) ? '<span class="evidence-badge">&#10003; '+tickets.length+' ticket'+(tickets.length>1?'s':'')+' linked</span>' : '';
+    var chipsHtml = '';
+    if (tickets.length > 0) {
+        chipsHtml = '<div class="ticket-chips">';
+        for (var ti = 0; ti < tickets.length; ti++) {
+            chipsHtml += '<span class="ticket-chip"><a href="https://perchcapital.atlassian.net/browse/'+escHtml(tickets[ti])+'" target="_blank">'+escHtml(tickets[ti])+'</a><span class="remove-chip" onclick="event.stopPropagation();removeTicket(\''+currentProduct+'\',\''+skill.id+'\','+ti+')">&times;</span></span>';
+        }
+        chipsHtml += '</div>';
+    }
     return '<div class="skill-card '+(standalone?'standalone':'')+' '+(unanswered?'unanswered':'')+'">' +
-        '<div class="skill-name-row"><span class="skill-name">'+skill.text+'</span>'+desc+'</div>' +
+        '<div class="skill-name-row"><span class="skill-name">'+skill.text+'</span>'+desc+evidenceBadge+'</div>' +
         '<div class="skill-ratings">' +
         '<div class="rating-group"><span class="rating-label">Skill Level</span><div class="pill-group">' +
-        '<div class="pill sl-1 '+(r.sl==1?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',1)">1</div>' +
-        '<div class="pill sl-2 '+(r.sl==2?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',2)">2</div>' +
-        '<div class="pill sl-3 '+(r.sl==3?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',3)">3</div>' +
-        '<div class="pill sl-4 '+(r.sl==4?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',4)">4</div>' +
+        '<div class="pill sl-1 '+(r.sl==1?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',1)">1</div>' +
+        '<div class="pill sl-2 '+(r.sl==2?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',2)">2</div>' +
+        '<div class="pill sl-3 '+(r.sl==3?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',3)">3</div>' +
+        '<div class="pill sl-4 '+(r.sl==4?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',4)">4</div>' +
         '</div></div>' +
         '<div class="rating-group"><span class="rating-label">Interest</span><div class="pill-group">' +
-        '<div class="pill int-1 '+(r.int==1?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',1)">1</div>' +
-        '<div class="pill int-2 '+(r.int==2?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',2)">2</div>' +
+        '<div class="pill int-1 '+(r.int==1?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',1)">1</div>' +
+        '<div class="pill int-2 '+(r.int==2?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',2)">2</div>' +
         '</div></div>' +
         '</div>' +
-        '<div class="skill-notes"><input type="text" class="'+notesClass+'" placeholder="JIRA ticket e.g. OCT-1234 or paste URL" value="'+escHtml(notesVal)+'" onchange="updateNotes(\''+currentProduct+'\',\''+skill.id+'\',this.value)" onclick="event.stopPropagation()">'+evidencePrompt+'</div>' +
+        '<div class="skill-notes"><div style="display:flex;gap:6px;align-items:center;"><input type="text" id="notes-'+skill.id+'" placeholder="Add ticket (e.g. OCT-1234) or notes" value="'+escHtml(notesVal)+'" onchange="updateNotes(\''+currentProduct+'\',\''+skill.id+'\',this.value)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addTicket(\''+currentProduct+'\',\''+skill.id+'\');}" onclick="event.stopPropagation()" style="flex:1;"><button class="btn btn-sm btn-success" onclick="event.stopPropagation();addTicket(\''+currentProduct+'\',\''+skill.id+'\')" style="padding:6px 10px;font-size:0.7rem;">+ Add</button></div>'+evidencePrompt+chipsHtml+'</div>' +
         '</div>';
 }
 
@@ -480,6 +489,23 @@ function selectPill(el, product, skillId, field, value) {
     el.classList.add('selected');
     updateResponse(product, skillId, field, value);
     renderSkills();
+}
+    function addTicket(product, skillId) {
+    var input = document.getElementById('notes-' + skillId);
+    var val = input.value.trim();
+    if (!val) return;
+    if (!userResponses[product]) userResponses[product] = {};
+    if (!userResponses[product][skillId]) userResponses[product][skillId] = {};
+    if (!userResponses[product][skillId].tickets) userResponses[product][skillId].tickets = [];
+    userResponses[product][skillId].tickets.push(val);
+    userResponses[product][skillId].notes = '';
+    renderSkills();
+}
+function removeTicket(product, skillId, index) {
+    if (userResponses[product] && userResponses[product][skillId] && userResponses[product][skillId].tickets) {
+        userResponses[product][skillId].tickets.splice(index, 1);
+        renderSkills();
+    }
 }
 function updateNotes(product, skillId, value) {
     if (!userResponses[product]) userResponses[product] = {};
