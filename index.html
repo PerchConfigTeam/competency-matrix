@@ -753,19 +753,6 @@ function findSkillName(product, skillId) {
     return null;
 }
 function showToast(msg,isError){
-
-
-==============================================
-FIRESTORE RULES UPDATE
-==============================================
-
-Go to Firebase Console > Firestore > Rules.
-Add this BEFORE the closing } of the main match block:
-
-    match /submissions/{userId}/history/{docId} {
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow read: if request.auth != null && isAdmin();
-    }
 var t=document.createElement('div');t.className='toast'+(isError?' error':'');t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3000);}
 async function deleteProduct(name){if(!confirm('Delete "'+name+'"?'))return;delete questionsData[name];await saveQuestions();adminCurrentProduct=Object.keys(questionsData)[0]||null;renderAdminProductTabs();renderProductTabs();}
 </script>
