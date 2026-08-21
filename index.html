@@ -468,7 +468,7 @@ function renderSkillCard(skill, responses, standalone) {
         '<div class="pill int-2 '+(r.int==2?'selected':'')+'" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',2)">2</div>' +
         '</div></div>' +
         '</div>' +
-        '<div class="skill-notes"><input type="text" class="'+notesClass+'" placeholder="Evidence / ticket ref / notes" value="'+escHtml(notesVal)+'" onchange="updateNotes(\''+currentProduct+'\',\''+skill.id+'\',this.value)" onclick="event.stopPropagation()">'+evidencePrompt+'</div>' +
+        '<div class="skill-notes"><input type="text" class="'+notesClass+'" placeholder="JIRA ticket e.g. OCT-1234 or paste URL" value="'+escHtml(notesVal)+'" onchange="updateNotes(\''+currentProduct+'\',\''+skill.id+'\',this.value)" onclick="event.stopPropagation()">'+evidencePrompt+'</div>' +
         '</div>';
 }
 
@@ -737,14 +737,18 @@ function renderHistoryList(items) {
                 var sr = item.responses[ids[si]];
                 var sName = findSkillName(item.product, ids[si]) || ids[si];
                 html += '<div class="detail-row"><span>'+sName+'</span><span>SL: '+(sr.sl||'-')+' | Int: '+(sr.int||'-')+'</span></div>';
-                if (sr.notes) html += '<div class="detail-notes">Evidence: '+escHtml(sr.notes)+'</div>';
+                if (sr.notes) html += '<div class="detail-notes">Evidence: '+linkifyTicket(sr.notes)+'</div>';
             }
         }
         html += '</div></div>';
     }
     return html;
 }
-function findSkillName(product, skillId) {
+function linkifyTicket(text) {
+    var safe = escHtml(text);
+    return safe.replace(/([A-Z][A-Z0-9]+-[0-9]+)/g, '<a href="https://perchcapital.atlassian.net/browse/$1" target="_blank" style="color:var(--accent);text-decoration:underline;">$1</a>');
+}
+    function findSkillName(product, skillId) {
     var skills = questionsData[product] || [];
     for (var i = 0; i < skills.length; i++) {
         if (skills[i].id === skillId) return skills[i].text;
