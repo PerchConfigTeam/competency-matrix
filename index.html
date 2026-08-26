@@ -102,6 +102,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .submit-section .submit-info { font-size: 0.85rem; color: var(--text-dim); }
 .submit-section .submit-info strong { color: var(--text); }
 .submitted-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; background: rgba(76,175,80,0.15); color: var(--success); font-size: 0.85rem; font-weight: 600; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { background: #c62828; transform: translateY(-1px); }
 .admin-section { margin-bottom: 32px; }
 .admin-section h3 { margin-bottom: 16px; font-size: 1.1rem; }
 .drag-hint { background: var(--bg); border: 1px dashed var(--border); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 16px; font-size: 0.8rem; color: var(--text-dim); }
@@ -154,6 +156,22 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .history-detail .detail-row:last-child { border-bottom: none; }
 .history-detail .detail-notes { font-size: 0.75rem; color: var(--text-dim); font-style: italic; padding: 2px 0 6px; }
 
+.heatmap-table { border-collapse: collapse; width: 100%; min-width: 600px; font-size: 0.8rem; }
+.heatmap-table th, .heatmap-table td { padding: 8px 10px; border: 1px solid var(--border); text-align: center; white-space: nowrap; }
+.heatmap-table th { background: var(--surface2); color: var(--text-dim); font-weight: 600; font-size: 0.75rem; }
+.heatmap-table th.skill-header { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); max-width: 40px; height: 120px; vertical-align: bottom; }
+.heatmap-table td.name-cell { text-align: left; font-weight: 600; background: var(--surface); white-space: nowrap; position: sticky; left: 0; z-index: 1; }
+.heatmap-cell { border-radius: 4px; min-width: 36px; font-weight: 700; font-size: 0.85rem; }
+.heatmap-0 { background: var(--bg); color: var(--text-dim); }
+.heatmap-1 { background: rgba(229,57,53,0.3); color: var(--sl1); }
+.heatmap-2 { background: rgba(251,140,0,0.3); color: var(--sl2); }
+.heatmap-3 { background: rgba(67,160,71,0.3); color: var(--sl3); }
+.heatmap-4 { background: rgba(255,214,0,0.3); color: var(--sl4); }
+.heatmap-avg { font-weight: 700; }
+.heatmap-legend { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; font-size: 0.8rem; align-items: center; }
+.heatmap-legend-item { display: flex; align-items: center; gap: 6px; }
+.heatmap-legend-swatch { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border); }
+
 @media (max-width: 768px) { .app-header { padding: 12px 16px; } .app-content { padding: 16px; } .skill-card .skill-ratings { gap: 16px; } .skill-card { padding-left: 20px; } .header-right { gap: 8px; } .user-badge { display: none; } .skill-admin-card.is-child { margin-left: 16px; } .info-icon .tooltip { left: 0; transform: none; min-width: 180px; } }
 </style>
 </head>
@@ -166,7 +184,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="your.name@company.com"></div>
 <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password"></div>
 <button class="btn btn-primary btn-block" onclick="handleLogin()">Sign In</button>
+<p style="text-align:center;margin-top:14px;"><a href="#" onclick="handleResetPassword(event)" style="color:var(--accent);font-size:0.85rem;text-decoration:none;">Forgot Password?</a></p>
 <p id="loginError" style="color:var(--danger);margin-top:12px;font-size:0.85rem;"></p>
+<p id="resetSuccess" style="color:var(--success);margin-top:12px;font-size:0.85rem;"></p>
 </div>
 </div>
 
@@ -203,6 +223,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 <div class="tab" onclick="switchAdminTab('results')">View Results</div>
 <div class="tab" onclick="switchAdminTab('users')">Manage Users</div>
 <div class="tab" onclick="switchAdminTab('history')">History</div>
+<div class="tab" onclick="switchAdminTab('heatmap')">Heatmap</div>
 <div class="tab" onclick="switchAdminTab('settings')">Settings</div>
 </div>
 <div id="adminQuestions">
@@ -243,6 +264,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 <hr style="margin:24px 0;border-color:var(--border);">
 <h4 style="margin-bottom:12px;font-size:0.95rem;">Grant Admin Role</h4>
 <div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="email" id="adminEmailInput" placeholder="user@email.com" style="max-width:250px;"><button class="btn btn-sm btn-secondary" onclick="grantAdmin()">Grant Admin</button></div>
+</div>
+</div>
+<div id="adminHeatmap" class="hidden">
+<div class="admin-section">
+<h3>Team Competency Heatmap</h3>
+<p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">Visual overview of skill levels across the entire team. Colour intensity shows competency level.</p>
+<div class="settings-row"><label>Product:</label><select id="heatmapProductSelect" onchange="renderHeatmap()" style="max-width:250px;"></select></div>
+<div id="heatmapContainer" style="overflow-x:auto;margin-top:16px;"></div>
 </div>
 </div>
 <div id="adminSettings" class="hidden">
@@ -331,11 +360,29 @@ auth.onAuthStateChanged(function(user) {
 });
 
 function handleLogin() {
-    var email = document.getElementById('loginEmail').value.trim();
-    var pass = document.getElementById('loginPassword').value;
-    auth.signInWithEmailAndPassword(email, pass).catch(function(e) {
-        document.getElementById('loginError').textContent = e.message;
-    });
+var email = document.getElementById('loginEmail').value.trim();
+var pass = document.getElementById('loginPassword').value;
+document.getElementById('loginError').textContent = '';
+document.getElementById('resetSuccess').textContent = '';
+auth.signInWithEmailAndPassword(email, pass).catch(function(e) {
+document.getElementById('loginError').textContent = e.message;
+});
+}
+
+function handleResetPassword(e) {
+e.preventDefault();
+var email = document.getElementById('loginEmail').value.trim();
+document.getElementById('loginError').textContent = '';
+document.getElementById('resetSuccess').textContent = '';
+if (!email) {
+document.getElementById('loginError').textContent = 'Enter your email address first, then click Forgot Password.';
+return;
+}
+auth.sendPasswordResetEmail(email).then(function() {
+document.getElementById('resetSuccess').textContent = 'Password reset email sent! Check your inbox.';
+}).catch(function(e) {
+document.getElementById('loginError').textContent = e.message;
+});
 }
 function handleLogout() { auth.signOut(); }
 
@@ -443,7 +490,7 @@ function renderSkills() {
     document.getElementById('skillsList').innerHTML = html;
 
     var unanswered = score.total - score.answered;
-    document.getElementById('submitSection').innerHTML = '<div class="submit-section"><div class="submit-info">'+(unanswered>0?'<strong>'+unanswered+' skill(s)</strong> still need a rating':'<strong>All skills rated!</strong> Ready to submit')+(score.answered>0?' &nbsp;|&nbsp; Current score: <strong>'+score.pct+'% ('+score.grade+')</strong>':'')+'</div><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" onclick="saveProductProgress()">Save Draft</button><button class="btn btn-primary" onclick="submitProduct()">'+(isSubmitted?'Resubmit':'Submit')+' '+currentProduct+'</button></div></div>';
+    document.getElementById('submitSection').innerHTML = '<div class="submit-section"><div class="submit-info">'+(unanswered>0?'<strong>'+unanswered+' skill(s)</strong> still need a rating':'<strong>All skills rated!</strong> Ready to submit')+(score.answered>0?' &nbsp;|&nbsp; Current score: <strong>'+score.pct+'% ('+score.grade+')</strong>':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-danger btn-sm" onclick="clearAllRatings()">Clear All</button><button class="btn btn-secondary btn-sm" onclick="saveProductProgress()">Save Draft</button><button class="btn btn-primary" onclick="submitProduct()">'+(isSubmitted?'Resubmit':'Submit')+' '+currentProduct+'</button></div></div>';
 }
 
 function renderSkillCard(skill, responses, standalone) {
@@ -516,6 +563,16 @@ function updateResponse(product, skillId, field, value) {
     if (!userResponses[product]) userResponses[product] = {};
     if (!userResponses[product][skillId]) userResponses[product][skillId] = {};
     userResponses[product][skillId][field] = value ? parseInt(value) : '';
+}
+function clearAllRatings() {
+if (!confirm('Clear ALL skill ratings and interest for ' + currentProduct + '? This cannot be undone.')) return;
+var skills = getRateableSkillsForProduct(currentProduct);
+if (!userResponses[currentProduct]) userResponses[currentProduct] = {};
+for (var i = 0; i < skills.length; i++) {
+userResponses[currentProduct][skills[i].id] = { sl: '', int: '', notes: '', tickets: [] };
+}
+renderSkills();
+showToast('All ratings cleared for ' + currentProduct);
 }
 
 // SAVE & SUBMIT
@@ -781,6 +838,108 @@ function linkifyTicket(text) {
         if (skills[i].children) { for (var j = 0; j < skills[i].children.length; j++) { if (skills[i].children[j].id === skillId) return skills[i].children[j].text; } }
     }
     return null;
+}
+function populateHeatmapDropdown() {
+var sel = document.getElementById('heatmapProductSelect');
+var products = Object.keys(questionsData);
+sel.innerHTML = '';
+for (var i = 0; i < products.length; i++) {
+sel.innerHTML += '<option value="' + products[i] + '">' + products[i] + '</option>';
+}
+}
+
+function renderHeatmap() {
+var container = document.getElementById('heatmapContainer');
+var product = document.getElementById('heatmapProductSelect').value;
+if (!product || !allResults.length) {
+container.innerHTML = '<p style="color:var(--text-dim)">No data available. Ensure team members have submitted assessments.</p>';
+return;
+}
+
+var skills = getRateableSkillsForProduct(product);
+if (!skills.length) {
+container.innerHTML = '<p style="color:var(--text-dim)">No skills configured for this product.</p>';
+return;
+}
+
+// Build team data
+var team = [];
+for (var ri = 0; ri < allResults.length; ri++) {
+var result = allResults[ri];
+var name = result.name || result.email || 'Unknown';
+var responses = (result.responses && result.responses[product]) || {};
+var hasAny = false;
+var row = { name: name, scores: [] };
+for (var si = 0; si < skills.length; si++) {
+var r = responses[skills[si].id];
+var val = (r && r.sl) ? r.sl : 0;
+if (val > 0) hasAny = true;
+row.scores.push(val);
+}
+if (hasAny) team.push(row);
+}
+
+if (!team.length) {
+container.innerHTML = '<p style="color:var(--text-dim)">No submissions yet for ' + product + '.</p>';
+return;
+}
+
+// Sort team alphabetically
+team.sort(function(a, b) { return a.name.localeCompare(b.name); });
+
+// Build table
+var html = '<table class="heatmap-table"><thead><tr><th style="text-align:left;">Team Member</th>';
+for (var si = 0; si < skills.length; si++) {
+html += '<th class="skill-header" title="' + escHtml(skills[si].text) + '">' + escHtml(skills[si].text) + '</th>';
+}
+html += '<th>Avg</th></tr></thead><tbody>';
+
+// Skill averages array
+var skillTotals = new Array(skills.length).fill(0);
+var skillCounts = new Array(skills.length).fill(0);
+
+for (var ti = 0; ti < team.length; ti++) {
+var t = team[ti];
+var rowSum = 0, rowCount = 0;
+html += '<tr><td class="name-cell">' + escHtml(t.name) + '</td>';
+for (var si = 0; si < t.scores.length; si++) {
+var val = t.scores[si];
+var cellClass = 'heatmap-' + val;
+html += '<td class="heatmap-cell ' + cellClass + '">' + (val > 0 ? val : '-') + '</td>';
+if (val > 0) { rowSum += val; rowCount++; skillTotals[si] += val; skillCounts[si]++; }
+}
+var rowAvg = rowCount > 0 ? (rowSum / rowCount).toFixed(1) : '-';
+var avgClass = rowCount > 0 ? 'heatmap-' + Math.round(rowSum / rowCount) : 'heatmap-0';
+html += '<td class="heatmap-cell heatmap-avg ' + avgClass + '">' + rowAvg + '</td>';
+html += '</tr>';
+}
+
+// Team average row
+html += '<tr style="border-top:2px solid var(--accent);"><td class="name-cell" style="color:var(--accent);font-style:italic;">Team Average</td>';
+var totalSum = 0, totalCount = 0;
+for (var si = 0; si < skills.length; si++) {
+var avg = skillCounts[si] > 0 ? (skillTotals[si] / skillCounts[si]).toFixed(1) : '-';
+var avgVal = skillCounts[si] > 0 ? Math.round(skillTotals[si] / skillCounts[si]) : 0;
+var cellClass = 'heatmap-' + avgVal;
+html += '<td class="heatmap-cell heatmap-avg ' + cellClass + '">' + avg + '</td>';
+if (skillCounts[si] > 0) { totalSum += skillTotals[si] / skillCounts[si]; totalCount++; }
+}
+var grandAvg = totalCount > 0 ? (totalSum / totalCount).toFixed(1) : '-';
+var grandClass = totalCount > 0 ? 'heatmap-' + Math.round(totalSum / totalCount) : 'heatmap-0';
+html += '<td class="heatmap-cell heatmap-avg ' + grandClass + '">' + grandAvg + '</td>';
+html += '</tr></tbody></table>';
+
+// Legend
+html += '<div class="heatmap-legend">';
+html += '<span style="color:var(--text-dim);font-weight:600;">Key:</span>';
+html += '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:var(--bg);"></div><span>Not rated</span></div>';
+html += '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(229,57,53,0.3);"></div><span>1 Basic</span></div>';
+html += '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(251,140,0,0.3);"></div><span>2 Intermediate</span></div>';
+html += '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(67,160,71,0.3);"></div><span>3 Advanced</span></div>';
+html += '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(255,214,0,0.3);"></div><span>4 Trainer</span></div>';
+html += '</div>';
+
+container.innerHTML = html;
 }
 function showToast(msg,isError){
 var t=document.createElement('div');t.className='toast'+(isError?' error':'');t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3000);}
