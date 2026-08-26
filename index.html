@@ -413,17 +413,21 @@ function toggleAdmin() {
 }
 
 function switchAdminTab(tab) {
-    document.querySelectorAll('#adminView > .tabs .tab').forEach(function(t) { t.classList.toggle('active', t.textContent.toLowerCase().includes(tab.substring(0,4))); });
-    document.getElementById('adminQuestions').classList.toggle('hidden', tab !== 'questions');
-    document.getElementById('adminResults').classList.toggle('hidden', tab !== 'results');
-    document.getElementById('adminUsers').classList.toggle('hidden', tab !== 'users');
-    document.getElementById('adminHistory').classList.toggle('hidden', tab !== 'history');
-    document.getElementById('adminSettings').classList.toggle('hidden', tab !== 'settings');
-    if (tab === 'results') loadAllResults();
-    if (tab === 'settings') loadSettingsUI();
-    if (tab === 'users') loadTeamList();
-    if (tab === 'history') loadHistory();
-
+document.querySelectorAll('#adminView > .tabs .tab').forEach(function(t,i) {
+var tabNames = ['questions','results','users','history','heatmap','settings'];
+t.classList.toggle('active', tabNames[i] === tab);
+});
+document.getElementById('adminQuestions').classList.toggle('hidden', tab !== 'questions');
+document.getElementById('adminResults').classList.toggle('hidden', tab !== 'results');
+document.getElementById('adminUsers').classList.toggle('hidden', tab !== 'users');
+document.getElementById('adminHistory').classList.toggle('hidden', tab !== 'history');
+document.getElementById('adminHeatmap').classList.toggle('hidden', tab !== 'heatmap');
+document.getElementById('adminSettings').classList.toggle('hidden', tab !== 'settings');
+if (tab === 'results') loadAllResults();
+if (tab === 'settings') loadSettingsUI();
+if (tab === 'users') loadTeamList();
+if (tab === 'history') loadHistory();
+if (tab === 'heatmap') { loadAllResults().then(function() { populateHeatmapDropdown(); renderHeatmap(); }); }
 }
 
 // DATA
