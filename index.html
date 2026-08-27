@@ -10,26 +10,39 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-:root { --bg: #1a1a2e; --surface: #16213e; --surface2: #0f3460; --accent: #e94560; --accent2: #533483; --text: #eaeaea; --text-dim: #a0a0b0; --success: #4caf50; --warning: #ff9800; --danger: #f44336; --border: #2a2a4a; --radius: 8px; --sl1: #e53935; --sl2: #fb8c00; --sl3: #43a047; --sl4: #ffd600; --int1: #78909c; --int2: #7c4dff; }
+:root { --bg: #1a1a2e; --surface: #16213e; --surface2: #0f3460; --accent: #e94560; --accent2: #533483; --text: #eaeaea; --text-dim: #a0a0b0; --success: #4caf50; --warning: #ff9800; --danger: #f44336; --border: #2a2a4a; --radius: 8px; --sl1: #e53935; --sl2: #fb8c00; --sl3: #43a047; --sl4: #ffd600; --int1: #78909c; --int2: #7c4dff; --na: #546e7a; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
 .hidden { display: none !important; }
+
+/* Loading */
+#loadingView { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 3000; gap: 16px; }
+.spinner { width: 44px; height: 44px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#loadingView p { color: var(--text-dim); font-size: 0.9rem; }
+
 .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
 .login-box { background: var(--surface); border-radius: var(--radius); padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
 .login-box h1 { font-size: 1.5rem; margin-bottom: 8px; color: var(--accent); }
 .login-box p { color: var(--text-dim); margin-bottom: 24px; font-size: 0.9rem; }
 .form-group { margin-bottom: 16px; }
 .form-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 4px; }
-input[type="email"], input[type="password"], input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 1rem; outline: none; transition: border-color 0.2s; }
+input[type="email"], input[type="password"], input[type="text"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 1rem; outline: none; transition: border-color 0.2s; }
 textarea { resize: vertical; min-height: 60px; font-family: inherit; }
 input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .btn { padding: 12px 24px; border: none; border-radius: var(--radius); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
 .btn-primary { background: var(--accent); color: white; }
 .btn-primary:hover { background: #d63851; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 .btn-secondary { background: var(--surface2); color: var(--text); }
 .btn-secondary:hover { background: #1a4a7a; }
 .btn-success { background: var(--success); color: white; }
 .btn-success:hover { background: #388e3c; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { background: #c62828; }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
+.btn-ghost:hover { border-color: var(--danger); color: var(--danger); }
 .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+.btn-xs { padding: 5px 10px; font-size: 0.75rem; }
 .btn-block { width: 100%; justify-content: center; }
 .app-header { background: var(--surface); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
 .app-header h2 { font-size: 1.1rem; color: var(--accent); }
@@ -47,13 +60,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .skill-group { margin-bottom: 20px; }
 .skill-group-header { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; padding: 14px 20px; font-weight: 600; font-size: 0.95rem; color: var(--accent); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
 .skill-group-header:hover { border-color: var(--accent); }
+.skill-group-header .group-meta { font-size: 0.75rem; color: var(--text-dim); font-weight: 400; margin-left: 10px; }
 .skill-group-header .toggle-icon { font-size: 0.8rem; transition: transform 0.2s; }
 .skill-group-header.collapsed .toggle-icon { transform: rotate(-90deg); }
 .skill-group-children { border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius); overflow: visible; }
 .skill-group-children.collapsed { display: none; }
 .skill-card { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 20px 14px 36px; }
 .skill-card:last-child { border-bottom: none; }
-.skill-card .skill-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.skill-card .skill-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
 .skill-card .skill-name { font-size: 0.9rem; color: var(--text); }
 .skill-card .skill-ratings { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
 .skill-card.standalone { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px; }
@@ -62,8 +76,16 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .skill-notes { margin-top: 8px; }
 .skill-notes input { width: 100%; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 0.8rem; }
 .skill-notes input:focus { border-color: var(--accent); outline: none; }
-.skill-notes input.evidence-needed { border-color: var(--warning); background: rgba(255,152,0,0.05); }
-.skill-notes .evidence-prompt { font-size: 0.7rem; color: var(--warning); margin-top: 3px; font-weight: 600; } .ticket-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; } .ticket-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: rgba(76,175,80,0.15); border: 1px solid var(--success); border-radius: 12px; font-size: 0.7rem; font-weight: 600; color: var(--success); } .ticket-chip a { color: var(--success); text-decoration: none; } .ticket-chip a:hover { text-decoration: underline; } .ticket-chip .remove-chip { cursor: pointer; color: var(--text-dim); font-size: 0.8rem; margin-left: 2px; } .ticket-chip .remove-chip:hover { color: var(--danger); } .evidence-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; color: var(--success); font-weight: 600; margin-left: 8px; }.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--border); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; font-style: italic; cursor: help; position: relative; flex-shrink: 0; font-family: Georgia, serif; }
+.skill-notes .evidence-prompt { font-size: 0.7rem; color: var(--warning); margin-top: 3px; font-weight: 600; }
+.ticket-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.ticket-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: rgba(76,175,80,0.15); border: 1px solid var(--success); border-radius: 12px; font-size: 0.7rem; font-weight: 600; color: var(--success); }
+.ticket-chip a { color: var(--success); text-decoration: none; }
+.ticket-chip a:hover { text-decoration: underline; }
+.ticket-chip .remove-chip { cursor: pointer; color: var(--text-dim); font-size: 0.8rem; margin-left: 2px; }
+.ticket-chip .remove-chip:hover { color: var(--danger); }
+.evidence-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; color: var(--success); font-weight: 600; }
+.na-badge { display: inline-flex; align-items: center; font-size: 0.7rem; color: var(--text-dim); font-weight: 600; background: var(--bg); padding: 2px 8px; border-radius: 10px; }
+.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--border); color: var(--text-dim); font-size: 0.7rem; font-weight: 700; font-style: italic; cursor: help; position: relative; flex-shrink: 0; font-family: Georgia, serif; }
 .info-icon:hover { background: var(--accent); color: white; }
 .info-icon .tooltip { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; font-size: 0.8rem; font-style: normal; font-weight: 400; color: var(--text); min-width: 220px; max-width: 320px; white-space: normal; box-shadow: 0 4px 16px rgba(0,0,0,0.4); z-index: 50; line-height: 1.4; }
 .info-icon .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--border); }
@@ -71,13 +93,15 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .rating-group { display: flex; align-items: center; gap: 8px; }
 .rating-group .rating-label { font-size: 0.8rem; color: var(--text-dim); min-width: 75px; }
 .pill-group { display: flex; gap: 4px; }
-.pill { width: 40px; height: 34px; border-radius: 6px; border: 2px solid var(--border); background: var(--bg); color: var(--text-dim); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; user-select: none; }
+.pill { min-width: 40px; padding: 0 8px; height: 34px; border-radius: 6px; border: 2px solid var(--border); background: var(--bg); color: var(--text-dim); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; user-select: none; }
 .pill:hover { border-color: var(--text-dim); transform: translateY(-1px); }
 .pill.selected { color: white; border-color: transparent; transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 .pill.sl-1.selected { background: var(--sl1); }
 .pill.sl-2.selected { background: var(--sl2); }
 .pill.sl-3.selected { background: var(--sl3); }
 .pill.sl-4.selected { background: var(--sl4); color: #1a1a2e; }
+.pill.sl-na { font-size: 0.75rem; }
+.pill.sl-na.selected { background: var(--na); }
 .pill.int-1.selected { background: var(--int1); }
 .pill.int-2.selected { background: var(--int2); }
 .rating-key { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 24px; }
@@ -89,7 +113,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .key-pill.kp-2 { background: var(--sl2); }
 .key-pill.kp-3 { background: var(--sl3); }
 .key-pill.kp-4 { background: var(--sl4); color: #1a1a2e; }
-.product-progress { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.key-pill.kp-na { background: var(--na); }
+.product-progress { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .progress-bar-wrap { flex: 1; min-width: 150px; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
 .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease, background 0.3s ease; }
 .progress-text { font-size: 0.85rem; color: var(--text-dim); white-space: nowrap; }
@@ -98,12 +123,20 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .score-mid { background: rgba(255,152,0,0.2); color: var(--warning); }
 .score-high { background: rgba(76,175,80,0.2); color: var(--success); }
 .score-perfect { background: rgba(255,214,0,0.2); color: var(--sl4); }
+.team-compare { font-size: 0.75rem; color: var(--text-dim); background: var(--bg); padding: 4px 10px; border-radius: 12px; }
+.team-compare strong { color: var(--text); }
+.toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.toolbar input[type="text"] { flex: 1; min-width: 180px; max-width: 340px; padding: 9px 12px; font-size: 0.85rem; }
+.deadline-banner { background: rgba(255,152,0,0.12); border: 1px solid var(--warning); color: var(--warning); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 16px; font-size: 0.85rem; font-weight: 600; }
+.deadline-banner.locked { background: rgba(244,67,54,0.12); border-color: var(--danger); color: var(--danger); }
 .submit-section { margin-top: 24px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
 .submit-section .submit-info { font-size: 0.85rem; color: var(--text-dim); }
 .submit-section .submit-info strong { color: var(--text); }
+.save-status { font-size: 0.75rem; color: var(--text-dim); }
+.save-status.saving { color: var(--warning); }
+.save-status.saved { color: var(--success); }
 .submitted-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; background: rgba(76,175,80,0.15); color: var(--success); font-size: 0.85rem; font-weight: 600; }
-.btn-danger { background: var(--danger); color: white; }
-.btn-danger:hover { background: #c62828; transform: translateY(-1px); }
+.danger-zone { margin-top: 32px; padding-top: 16px; border-top: 1px dashed var(--border); display: flex; justify-content: flex-end; }
 .admin-section { margin-bottom: 32px; }
 .admin-section h3 { margin-bottom: 16px; font-size: 1.1rem; }
 .drag-hint { background: var(--bg); border: 1px dashed var(--border); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 16px; font-size: 0.8rem; color: var(--text-dim); }
@@ -115,7 +148,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .skill-admin-card .drag-handle { cursor: grab; color: var(--text-dim); font-size: 1.1rem; padding: 0 2px; user-select: none; }
 .skill-admin-card .drag-handle:active { cursor: grabbing; }
 .skill-admin-card .skill-text { flex: 1; font-size: 0.9rem; }
-.skill-admin-card .skill-desc-preview { font-size: 0.75rem; color: var(--text-dim); font-weight: 400; margin-left: 8px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.skill-admin-card .skill-desc-preview { font-size: 0.75rem; color: var(--text-dim); font-weight: 400; margin-left: 8px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: bottom; }
 .skill-admin-card .skill-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: var(--accent); color: white; margin-left: 8px; }
 .skill-admin-card .skill-actions { display: flex; gap: 4px; align-items: center; }
 .skill-admin-card .btn-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; color: var(--text-dim); font-size: 0.9rem; transition: all 0.2s; }
@@ -127,15 +160,15 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
 .result-card h4 { margin-bottom: 12px; color: var(--accent); }
 .result-score-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 12px; }
-.result-score-item { padding: 8px 12px; background: var(--bg); border-radius: 4px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
+.result-score-item { padding: 8px 12px; background: var(--bg); border-radius: 4px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .gap-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; margin: 2px; }
 .gap-critical { background: rgba(244,67,54,0.2); color: var(--danger); }
 .gap-warning { background: rgba(255,152,0,0.2); color: var(--warning); }
 .settings-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
 .settings-row label { font-size: 0.9rem; min-width: 150px; }
-.settings-row input, .settings-row select { max-width: 200px; }
+.settings-row input, .settings-row select { max-width: 220px; }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-.modal { background: var(--surface); border-radius: var(--radius); padding: 32px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+.modal { background: var(--surface); border-radius: var(--radius); padding: 32px; width: 100%; max-width: 560px; max-height: 85vh; overflow-y: auto; }
 .modal h3 { margin-bottom: 16px; }
 .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
 .toast { position: fixed; bottom: 24px; right: 24px; background: var(--success); color: white; padding: 12px 24px; border-radius: var(--radius); font-size: 0.9rem; font-weight: 600; z-index: 2000; animation: slideIn 0.3s ease; }
@@ -152,14 +185,21 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .history-item .history-date { font-size: 0.75rem; color: var(--text-dim); }
 .history-item .history-product { font-size: 0.8rem; color: var(--accent); }
 .history-detail { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.8rem; }
-.history-detail .detail-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.history-detail .detail-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border); gap: 10px; }
 .history-detail .detail-row:last-child { border-bottom: none; }
 .history-detail .detail-notes { font-size: 0.75rem; color: var(--text-dim); font-style: italic; padding: 2px 0 6px; }
-
+.delta-up { color: var(--success); font-weight: 700; }
+.delta-down { color: var(--danger); font-weight: 700; }
+.delta-new { color: var(--accent); font-weight: 700; }
+.change-summary { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.change-pill { font-size: 0.7rem; padding: 3px 9px; border-radius: 10px; font-weight: 600; }
+.change-pill.up { background: rgba(76,175,80,0.18); color: var(--success); }
+.change-pill.down { background: rgba(244,67,54,0.18); color: var(--danger); }
+.change-pill.same { background: var(--bg); color: var(--text-dim); }
 .heatmap-table { border-collapse: collapse; width: 100%; min-width: 600px; font-size: 0.8rem; }
 .heatmap-table th, .heatmap-table td { padding: 8px 10px; border: 1px solid var(--border); text-align: center; white-space: nowrap; }
 .heatmap-table th { background: var(--surface2); color: var(--text-dim); font-weight: 600; font-size: 0.75rem; }
-.heatmap-table th.skill-header { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); max-width: 40px; height: 120px; vertical-align: bottom; }
+.heatmap-table th.skill-header { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); max-width: 40px; height: 150px; vertical-align: bottom; }
 .heatmap-table td.name-cell { text-align: left; font-weight: 600; background: var(--surface); white-space: nowrap; position: sticky; left: 0; z-index: 1; }
 .heatmap-cell { border-radius: 4px; min-width: 36px; font-weight: 700; font-size: 0.85rem; }
 .heatmap-0 { background: var(--bg); color: var(--text-dim); }
@@ -173,11 +213,26 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 .heatmap-legend-swatch { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border); }
 
 @media (max-width: 768px) { .app-header { padding: 12px 16px; } .app-content { padding: 16px; } .skill-card .skill-ratings { gap: 16px; } .skill-card { padding-left: 20px; } .header-right { gap: 8px; } .user-badge { display: none; } .skill-admin-card.is-child { margin-left: 16px; } .info-icon .tooltip { left: 0; transform: none; min-width: 180px; } }
+
+@media print {
+  body { background: #fff; color: #000; }
+  .app-header, .tabs, .toolbar, .submit-section, .danger-zone, .modal-overlay, .toast, #adminView, .rating-key .keys { display: none !important; }
+  .app-content { padding: 0; max-width: 100%; }
+  .skill-card, .skill-group-header, .product-progress, .rating-key { background: #fff !important; color: #000 !important; border-color: #999 !important; break-inside: avoid; }
+  .skill-group-children.collapsed { display: block !important; }
+  .skill-name, .progress-text, .rating-label { color: #000 !important; }
+  .pill { border-color: #999 !important; color: #666 !important; }
+  .pill.selected { background: #333 !important; color: #fff !important; }
+  .print-header { display: block !important; margin-bottom: 16px; }
+}
+.print-header { display: none; }
 </style>
 </head>
 <body>
 
-<div id="loginView" class="login-container">
+<div id="loadingView"><div class="spinner"></div><p>Loading your matrix...</p></div>
+
+<div id="loginView" class="login-container hidden">
 <div class="login-box">
 <h1>Competency Matrix</h1>
 <p>Config Team Self-Assessment</p>
@@ -201,6 +256,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 </header>
 <div class="app-content">
 <div id="assessmentView">
+<div class="print-header"><h2 id="printTitle"></h2></div>
 <div class="rating-key">
 <h4>Rating Key</h4>
 <div class="key-pills">
@@ -208,13 +264,22 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 <span class="key-pill kp-2">2 Intermediate</span>
 <span class="key-pill kp-3">3 Advanced</span>
 <span class="key-pill kp-4">4 Trainer</span>
+<span class="key-pill kp-na">N/A Not applicable</span>
 </div>
 <div class="keys" style="margin-top:10px;"><span><strong>Interest:</strong> 1 = No interest / Not relevant &nbsp;|&nbsp; 2 = Interested</span></div>
 </div>
+<div id="deadlineBanner"></div>
 <div class="tabs" id="productTabs"></div>
 <div id="productProgress"></div>
+<div class="toolbar">
+<input type="text" id="skillSearch" placeholder="Search skills..." oninput="renderSkills()">
+<button class="btn btn-sm btn-secondary" onclick="setAllGroups(false)">Expand All</button>
+<button class="btn btn-sm btn-secondary" onclick="setAllGroups(true)">Collapse All</button>
+<button class="btn btn-sm btn-secondary" onclick="printAssessment()">Print / PDF</button>
+</div>
 <div id="skillsList"></div>
 <div id="submitSection"></div>
+<div class="danger-zone"><button class="btn btn-xs btn-ghost" onclick="clearAllRatings()">Clear all ratings for this product</button></div>
 </div>
 
 <div id="adminView" class="hidden">
@@ -233,6 +298,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 <div style="display:flex;gap:8px;flex-wrap:wrap;">
 <button class="btn btn-sm btn-secondary" onclick="showAddProductModal()">+ Product</button>
 <button class="btn btn-sm btn-secondary" onclick="showProductOptions()">Manage Products</button>
+<button class="btn btn-sm btn-secondary" onclick="showBulkImportModal()">Bulk Import</button>
 <button class="btn btn-sm btn-primary" onclick="showAddSkillModal()">+ Skill</button>
 </div>
 </div>
@@ -243,7 +309,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 </div>
 <div id="adminResults" class="hidden">
 <div class="admin-section">
-<h3>Team Results & Gap Analysis</h3>
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+<h3>Team Results &amp; Gap Analysis</h3>
+<button class="btn btn-sm btn-secondary" onclick="exportResultsCSV()">Export CSV</button>
+</div>
 <div class="settings-row"><label>Minimum Skill Threshold:</label><input type="number" id="thresholdInput" min="1" max="4" value="3" style="max-width:80px;" onchange="renderResults()"></div>
 <div id="resultsContainer"></div>
 </div>
@@ -251,7 +320,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 <div id="adminHistory" class="hidden">
 <div class="admin-section">
 <h3>Submission History (Audit Trail)</h3>
-<p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">All completed assessments, date-stamped. Staff cannot see this.</p>
+<p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">All completed assessments, date-stamped, with changes vs the previous submission. Staff cannot see this.</p>
 <div class="settings-row"><label>Filter by user:</label><select id="historyUserFilter" onchange="loadHistory()" style="max-width:250px;"><option value="all">All Users</option></select></div>
 <div id="historyList"></div>
 </div>
@@ -268,7 +337,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 </div>
 <div id="adminHeatmap" class="hidden">
 <div class="admin-section">
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
 <h3>Team Competency Heatmap</h3>
+<button class="btn btn-sm btn-secondary" onclick="exportHeatmapCSV()">Export CSV</button>
+</div>
 <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;">Visual overview of skill levels across the entire team. Colour intensity shows competency level.</p>
 <div class="settings-row"><label>Product:</label><select id="heatmapProductSelect" onchange="renderHeatmap()" style="max-width:250px;"></select></div>
 <div id="heatmapContainer" style="overflow-x:auto;margin-top:16px;"></div>
@@ -279,7 +351,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 <h3>Settings</h3>
 <div class="form-group"><label>Notification Email (receives gap reports)</label><input type="email" id="notifEmail" placeholder="your@email.com"></div>
 <div class="form-group"><label>Skill Level Threshold (flags scores below this)</label><input type="number" id="settingsThreshold" min="1" max="4" value="3"></div>
+<div class="form-group"><label>Submission Deadline (optional - locks submissions after this date)</label><input type="date" id="settingsDeadline"></div>
 <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+<hr style="margin:28px 0;border-color:var(--border);">
+<h4 style="margin-bottom:8px;font-size:0.95rem;">Team Averages</h4>
+<p style="color:var(--text-dim);font-size:0.8rem;margin-bottom:12px;">Publish anonymised team averages so staff can see how they compare.</p>
+<button class="btn btn-sm btn-secondary" onclick="publishTeamAverages()">Publish Team Averages</button>
 </div>
 </div>
 </div>
@@ -300,6 +377,7 @@ var firebaseConfig = {
 var EMAILJS_PUBLIC_KEY = "ptOv5d4JHIriHLzD_";
 var EMAILJS_SERVICE_ID = "service_lokf8zw";
 var EMAILJS_TEMPLATE_ID = "template_gy3dfd3";
+var JIRA_BASE = "https://perchcapital.atlassian.net/browse/";
 
 firebase.initializeApp(firebaseConfig);
 var auth = firebase.auth();
@@ -308,32 +386,51 @@ var secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
 var secondaryAuth = secondaryApp.auth();
 
 var currentUser = null, isAdmin = false, currentProduct = null, adminCurrentProduct = null;
-var questionsData = {}, userResponses = {}, submissionStatus = {}, settings = { threshold: 3, notifEmail: '' };
+var questionsData = {}, userResponses = {}, submissionStatus = {};
+var settings = { threshold: 3, notifEmail: '', deadline: '' };
+var teamAverages = {};
+var userAllowedProducts = null;
 var dragData = null;
+var collapsedGroups = {};
+var isDirty = false, lastSavedAt = null, autoSaveTimer = null, saveInFlight = false;
+var allResults = [];
 
-function calculateProductScore(product) {
-    var skills = getRateableSkillsForProduct(product);
-    if (!skills.length) return { pct: 0, answered: 0, total: 0, grade: 'N/A', sum: 0, max: 0 };
-    var responses = userResponses[product] || {};
-    var sum = 0, answered = 0;
-    for (var i = 0; i < skills.length; i++) {
-        var r = responses[skills[i].id];
-        if (r && r.sl) { sum += r.sl; answered++; }
-    }
-    var max = skills.length * 4;
-    var pct = max > 0 ? Math.round((sum / max) * 100) : 0;
-    var grade = 'Foundational';
-    if (pct >= 90) grade = 'Expert';
-    else if (pct >= 70) grade = 'Proficient';
-    else if (pct >= 50) grade = 'Developing';
-    return { pct: pct, answered: answered, total: skills.length, grade: grade, sum: sum, max: max };
+function escHtml(str) {
+    return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
-
-function getScoreClass(pct) {
-    if (pct >= 90) return 'score-perfect';
-    if (pct >= 70) return 'score-high';
-    if (pct >= 50) return 'score-mid';
-    return 'score-low';
+function showToast(msg, isError) {
+    var t = document.createElement('div');
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function () { t.remove(); }, 3000);
+}
+function linkifyTicket(text) {
+    return escHtml(text).replace(/([A-Z][A-Z0-9]+-[0-9]+)/g, '<a href="' + JIRA_BASE + '$1" target="_blank" style="color:var(--accent);text-decoration:underline;">$1</a>');
+}
+function relativeTime(ts) {
+    if (!ts) return '';
+    var s = Math.round((Date.now() - ts) / 1000);
+    if (s < 5) return 'just now';
+    if (s < 60) return s + 's ago';
+    if (s < 3600) return Math.round(s / 60) + ' min ago';
+    return Math.round(s / 3600) + 'h ago';
+}
+function csvCell(v) {
+    var s = String(v == null ? '' : v);
+    if (s.indexOf(',') > -1 || s.indexOf('"') > -1 || s.indexOf('\n') > -1) {
+        return '"' + s.split('"').join('""') + '"';
+    }
+    return s;
+}
+function downloadCSV(rows, filename) {
+    var csv = rows.map(function (r) { return r.map(csvCell).join(','); }).join('\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 function getRateableSkillsForProduct(product) {
@@ -346,50 +443,82 @@ function getRateableSkillsForProduct(product) {
     }
     return rateable;
 }
+function scoreFrom(skills, responses) {
+    var sum = 0, scored = 0, answered = 0, na = 0;
+    for (var i = 0; i < skills.length; i++) {
+        var r = responses[skills[i].id];
+        if (!r || !r.sl) continue;
+        answered++;
+        if (r.sl === 'na') { na++; continue; }
+        sum += Number(r.sl); scored++;
+    }
+    var max = scored * 4;
+    var pct = max > 0 ? Math.round((sum / max) * 100) : 0;
+    var grade = 'Foundational';
+    if (scored === 0) grade = 'N/A';
+    else if (pct >= 90) grade = 'Expert';
+    else if (pct >= 70) grade = 'Proficient';
+    else if (pct >= 50) grade = 'Developing';
+    return { pct: pct, answered: answered, scored: scored, na: na, total: skills.length, grade: grade, sum: sum, max: max };
+}
+function calculateProductScore(product) {
+    return scoreFrom(getRateableSkillsForProduct(product), userResponses[product] || {});
+}
+function getScoreClass(pct) {
+    if (pct >= 90) return 'score-perfect';
+    if (pct >= 70) return 'score-high';
+    if (pct >= 50) return 'score-mid';
+    return 'score-low';
+}
+function isLocked() {
+    if (isAdmin) return false;
+    if (!settings.deadline) return false;
+    return new Date() > new Date(settings.deadline + 'T23:59:59');
+}
 
-// AUTH
-auth.onAuthStateChanged(function(user) {
+auth.onAuthStateChanged(function (user) {
     if (user) {
         currentUser = user;
-        Promise.all([loadUserRole(), loadQuestions(), loadUserResponses(), loadSettings()]).then(function() { showApp(); });
+        Promise.all([loadUserRole(), loadQuestions(), loadUserResponses(), loadSettings(), loadTeamAverages()])
+            .then(function () { showApp(); })
+            .catch(function (e) { console.error(e); showApp(); });
     } else {
         currentUser = null; isAdmin = false;
+        stopAutoSave();
+        document.getElementById('loadingView').classList.add('hidden');
         document.getElementById('loginView').classList.remove('hidden');
         document.getElementById('appView').classList.add('hidden');
     }
 });
-
 function handleLogin() {
-var email = document.getElementById('loginEmail').value.trim();
-var pass = document.getElementById('loginPassword').value;
-document.getElementById('loginError').textContent = '';
-document.getElementById('resetSuccess').textContent = '';
-auth.signInWithEmailAndPassword(email, pass).catch(function(e) {
-document.getElementById('loginError').textContent = e.message;
-});
+    var email = document.getElementById('loginEmail').value.trim();
+    var pass = document.getElementById('loginPassword').value;
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('resetSuccess').textContent = '';
+    document.getElementById('loadingView').classList.remove('hidden');
+    auth.signInWithEmailAndPassword(email, pass).catch(function (e) {
+        document.getElementById('loadingView').classList.add('hidden');
+        document.getElementById('loginError').textContent = e.message;
+    });
 }
-
 function handleResetPassword(e) {
-e.preventDefault();
-var email = document.getElementById('loginEmail').value.trim();
-document.getElementById('loginError').textContent = '';
-document.getElementById('resetSuccess').textContent = '';
-if (!email) {
-document.getElementById('loginError').textContent = 'Enter your email address first, then click Forgot Password.';
-return;
+    e.preventDefault();
+    var email = document.getElementById('loginEmail').value.trim();
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('resetSuccess').textContent = '';
+    if (!email) { document.getElementById('loginError').textContent = 'Enter your email address first, then click Forgot Password.'; return; }
+    auth.sendPasswordResetEmail(email).then(function () {
+        document.getElementById('resetSuccess').textContent = 'Password reset email sent! Check your inbox.';
+    }).catch(function (e) { document.getElementById('loginError').textContent = e.message; });
 }
-auth.sendPasswordResetEmail(email).then(function() {
-document.getElementById('resetSuccess').textContent = 'Password reset email sent! Check your inbox.';
-}).catch(function(e) {
-document.getElementById('loginError').textContent = e.message;
-});
-}
-function handleLogout() { auth.signOut(); }
+function handleLogout() { stopAutoSave(); auth.signOut(); }
 
 async function loadUserRole() {
     var doc = await db.collection('users').doc(currentUser.uid).get();
-    if (doc.exists) { isAdmin = doc.data().role === 'admin'; userAllowedProducts = doc.data().products || null; }
-    else {
+    if (doc.exists) {
+        isAdmin = doc.data().role === 'admin';
+        userAllowedProducts = doc.data().products || null;
+    } else {
         await db.collection('users').doc(currentUser.uid).set({
             email: currentUser.email, name: currentUser.email.split('@')[0],
             role: 'member', createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -397,221 +526,406 @@ async function loadUserRole() {
         isAdmin = false; userAllowedProducts = null;
     }
 }
-
 function showApp() {
+    document.getElementById('loadingView').classList.add('hidden');
     document.getElementById('loginView').classList.add('hidden');
     document.getElementById('appView').classList.remove('hidden');
     document.getElementById('userBadge').textContent = currentUser.email.split('@')[0];
     document.getElementById('adminToggle').classList.toggle('hidden', !isAdmin);
+    renderDeadlineBanner();
     renderProductTabs();
+    startAutoSave();
 }
-
 function toggleAdmin() {
     var a = document.getElementById('assessmentView'), b = document.getElementById('adminView'), btn = document.getElementById('adminToggle');
-    if (b.classList.contains('hidden')) { a.classList.add('hidden'); b.classList.remove('hidden'); btn.textContent = 'Back to Form'; renderAdminProductTabs(); loadAllResults(); }
-    else { b.classList.add('hidden'); a.classList.remove('hidden'); btn.textContent = 'Admin'; }
+    if (b.classList.contains('hidden')) {
+        a.classList.add('hidden'); b.classList.remove('hidden'); btn.textContent = 'Back to Form';
+        renderAdminProductTabs(); loadAllResults();
+    } else { b.classList.add('hidden'); a.classList.remove('hidden'); btn.textContent = 'Admin'; }
 }
-
 function switchAdminTab(tab) {
-document.querySelectorAll('#adminView > .tabs .tab').forEach(function(t,i) {
-var tabNames = ['questions','results','users','history','heatmap','settings'];
-t.classList.toggle('active', tabNames[i] === tab);
-});
-document.getElementById('adminQuestions').classList.toggle('hidden', tab !== 'questions');
-document.getElementById('adminResults').classList.toggle('hidden', tab !== 'results');
-document.getElementById('adminUsers').classList.toggle('hidden', tab !== 'users');
-document.getElementById('adminHistory').classList.toggle('hidden', tab !== 'history');
-document.getElementById('adminHeatmap').classList.toggle('hidden', tab !== 'heatmap');
-document.getElementById('adminSettings').classList.toggle('hidden', tab !== 'settings');
-if (tab === 'results') loadAllResults();
-if (tab === 'settings') loadSettingsUI();
-if (tab === 'users') loadTeamList();
-if (tab === 'history') loadHistory();
-if (tab === 'heatmap') { loadAllResults().then(function() { populateHeatmapDropdown(); renderHeatmap(); }); }
+    var names = ['questions', 'results', 'users', 'history', 'heatmap', 'settings'];
+    document.querySelectorAll('#adminView > .tabs .tab').forEach(function (t, i) { t.classList.toggle('active', names[i] === tab); });
+    document.getElementById('adminQuestions').classList.toggle('hidden', tab !== 'questions');
+    document.getElementById('adminResults').classList.toggle('hidden', tab !== 'results');
+    document.getElementById('adminUsers').classList.toggle('hidden', tab !== 'users');
+    document.getElementById('adminHistory').classList.toggle('hidden', tab !== 'history');
+    document.getElementById('adminHeatmap').classList.toggle('hidden', tab !== 'heatmap');
+    document.getElementById('adminSettings').classList.toggle('hidden', tab !== 'settings');
+    if (tab === 'results') loadAllResults();
+    if (tab === 'settings') loadSettingsUI();
+    if (tab === 'users') loadTeamList();
+    if (tab === 'history') loadHistory();
+    if (tab === 'heatmap') { loadAllResults().then(function () { populateHeatmapDropdown(); renderHeatmap(); }); }
 }
 
-// DATA
 async function loadQuestions() {
     var snap = await db.collection('config').doc('questions').get();
     if (snap.exists) {
         questionsData = snap.data().products || {};
-        for (var p of Object.keys(questionsData)) {
-            questionsData[p] = questionsData[p].map(function(s) {
+        Object.keys(questionsData).forEach(function (p) {
+            questionsData[p] = questionsData[p].map(function (s) {
                 if (!s.children) s.children = [];
                 if (!s.description) s.description = '';
-                s.children = s.children.map(function(c) { if (!c.description) c.description = ''; return c; });
+                s.children = s.children.map(function (c) { if (!c.description) c.description = ''; return c; });
                 return s;
             });
-        }
+        });
     } else { questionsData = {}; }
 }
 async function saveQuestions() { await db.collection('config').doc('questions').set({ products: questionsData }); }
 async function loadUserResponses() {
     var doc = await db.collection('responses').doc(currentUser.uid).get();
-    if (doc.exists) { var data = doc.data(); userResponses = data.responses || {}; submissionStatus = data.submitted || {}; }
+    if (doc.exists) { var d = doc.data(); userResponses = d.responses || {}; submissionStatus = d.submitted || {}; }
+}
+async function loadSettings() {
+    var doc = await db.collection('config').doc('settings').get();
+    if (doc.exists) settings = Object.assign({ threshold: 3, notifEmail: '', deadline: '' }, doc.data());
+}
+async function loadTeamAverages() {
+    try {
+        var doc = await db.collection('config').doc('aggregates').get();
+        if (doc.exists) teamAverages = doc.data().productAverages || {};
+    } catch (e) { teamAverages = {}; }
 }
 
-// ASSESSMENT
-var userAllowedProducts = null;
-function renderProductTabs() {
-    var allProducts = Object.keys(questionsData);
-    var products = allProducts;
-    if (!isAdmin && userAllowedProducts && userAllowedProducts.length > 0) {
-        products = allProducts.filter(function(p) { return userAllowedProducts.indexOf(p) > -1; });
+function markDirty() { isDirty = true; updateSaveStatus(); }
+function startAutoSave() {
+    stopAutoSave();
+    autoSaveTimer = setInterval(function () { if (isDirty && !saveInFlight) saveProductProgress(true); }, 30000);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+}
+function stopAutoSave() {
+    if (autoSaveTimer) clearInterval(autoSaveTimer);
+    autoSaveTimer = null;
+    window.removeEventListener('beforeunload', beforeUnloadHandler);
+}
+function beforeUnloadHandler(e) {
+    if (isDirty) { e.preventDefault(); e.returnValue = ''; return ''; }
+}
+function updateSaveStatus() {
+    var el = document.getElementById('saveStatus');
+    if (!el) return;
+    if (saveInFlight) { el.className = 'save-status saving'; el.textContent = 'Saving...'; return; }
+    if (isDirty) { el.className = 'save-status saving'; el.textContent = 'Unsaved changes (auto-saves every 30s)'; return; }
+    el.className = 'save-status saved';
+    el.textContent = lastSavedAt ? 'Saved ' + relativeTime(lastSavedAt) : 'All changes saved';
+}
+setInterval(function () { if (!isDirty && !saveInFlight) updateSaveStatus(); }, 15000);
+
+function renderDeadlineBanner() {
+    var el = document.getElementById('deadlineBanner');
+    if (!settings.deadline) { el.innerHTML = ''; return; }
+    var d = new Date(settings.deadline + 'T23:59:59');
+    var pretty = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    if (new Date() > d) {
+        el.innerHTML = '<div class="deadline-banner locked">Submissions closed. The deadline was ' + pretty + '.' + (isAdmin ? ' (Admins can still submit.)' : ' Contact your manager if you still need to submit.') + '</div>';
+    } else {
+        var days = Math.ceil((d - new Date()) / 86400000);
+        el.innerHTML = '<div class="deadline-banner">Deadline: ' + pretty + ' (' + days + ' day' + (days === 1 ? '' : 's') + ' left)</div>';
     }
-    if (!products.length) { document.getElementById('productTabs').innerHTML = '<p style="color:var(--text-dim)">No products configured yet.</p>'; document.getElementById('skillsList').innerHTML = ''; document.getElementById('productProgress').innerHTML = ''; document.getElementById('submitSection').innerHTML = ''; return; }
+}
+function visibleProducts() {
+    var all = Object.keys(questionsData);
+    if (!isAdmin && userAllowedProducts && userAllowedProducts.length > 0) {
+        return all.filter(function (p) { return userAllowedProducts.indexOf(p) > -1; });
+    }
+    return all;
+}
+function renderProductTabs() {
+    var products = visibleProducts();
+    if (!products.length) {
+        document.getElementById('productTabs').innerHTML = '<p style="color:var(--text-dim)">No products configured yet.</p>';
+        document.getElementById('skillsList').innerHTML = '';
+        document.getElementById('productProgress').innerHTML = '';
+        document.getElementById('submitSection').innerHTML = '';
+        return;
+    }
     if (!currentProduct || products.indexOf(currentProduct) === -1) currentProduct = products[0];
-    document.getElementById('productTabs').innerHTML = products.map(function(p) {
-        var score = calculateProductScore(p);
-        var statusClass = 'empty';
-        if (submissionStatus[p]) statusClass = 'complete';
-        else if (score.answered > 0) statusClass = 'incomplete';
-        return '<div class="tab '+(p===currentProduct?'active':'')+'" onclick="selectProduct(\''+p+'\')">' + p + '<span class="tab-status '+statusClass+'"></span></div>';
-    }).join('');
+    var html = '';
+    for (var i = 0; i < products.length; i++) {
+        var p = products[i];
+        var sc = calculateProductScore(p);
+        var cls = 'empty';
+        if (submissionStatus[p]) cls = 'complete';
+        else if (sc.answered > 0) cls = 'incomplete';
+        html += '<div class="tab ' + (p === currentProduct ? 'active' : '') + '" data-product="' + escHtml(p) + '">' + escHtml(p) + '<span class="tab-status ' + cls + '"></span></div>';
+    }
+    document.getElementById('productTabs').innerHTML = html;
     renderSkills();
 }
-function selectProduct(p) { currentProduct = p; renderProductTabs(); }
+document.getElementById('productTabs').addEventListener('click', function (e) {
+    var tab = e.target.closest('.tab');
+    if (!tab) return;
+    currentProduct = tab.getAttribute('data-product');
+    document.getElementById('skillSearch').value = '';
+    renderProductTabs();
+});
+function setAllGroups(collapsed) {
+    var skills = questionsData[currentProduct] || [];
+    if (!collapsedGroups[currentProduct]) collapsedGroups[currentProduct] = {};
+    for (var i = 0; i < skills.length; i++) collapsedGroups[currentProduct][skills[i].id] = collapsed;
+    renderSkills();
+}
+function printAssessment() {
+    document.getElementById('printTitle').textContent = currentProduct + ' - ' + currentUser.email.split('@')[0] + ' - ' + new Date().toLocaleDateString('en-GB');
+    window.print();
+}
 
 function renderSkills() {
     var skills = questionsData[currentProduct] || [];
-    if (!skills.length) { document.getElementById('skillsList').innerHTML = '<p style="color:var(--text-dim)">No skills yet.</p>'; document.getElementById('productProgress').innerHTML = ''; document.getElementById('submitSection').innerHTML = ''; return; }
+    var listEl = document.getElementById('skillsList');
+    if (!skills.length) {
+        listEl.innerHTML = '<p style="color:var(--text-dim)">No skills yet.</p>';
+        document.getElementById('productProgress').innerHTML = '';
+        document.getElementById('submitSection').innerHTML = '';
+        return;
+    }
     var responses = userResponses[currentProduct] || {};
     var score = calculateProductScore(currentProduct);
     var isSubmitted = submissionStatus[currentProduct] === true;
     var completionPct = score.total > 0 ? Math.round((score.answered / score.total) * 100) : 0;
+    var search = (document.getElementById('skillSearch').value || '').trim().toLowerCase();
 
-    document.getElementById('productProgress').innerHTML = '<div class="product-progress"><div class="progress-text">'+score.answered+'/'+score.total+' skills rated</div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:'+completionPct+'%;background:'+(completionPct===100?'var(--success)':'var(--accent)')+'"></div></div>'+(score.answered>0?'<span class="score-display '+getScoreClass(score.pct)+'">'+score.pct+'% - '+score.grade+'</span>':'')+(isSubmitted?'<span class="submitted-badge">&#10003; Submitted</span>':'')+'</div>';
+    var teamAvg = teamAverages[currentProduct];
+    var compare = '';
+    if (typeof teamAvg === 'number' && score.scored > 0) {
+        var diff = score.pct - teamAvg;
+        var arrow = diff > 0 ? '&#9650; ' + diff + '% above' : (diff < 0 ? '&#9660; ' + Math.abs(diff) + '% below' : 'level with');
+        compare = '<span class="team-compare">Team avg <strong>' + teamAvg + '%</strong> &middot; you are ' + arrow + '</span>';
+    }
+    document.getElementById('productProgress').innerHTML =
+        '<div class="product-progress">' +
+        '<div class="progress-text">' + score.answered + '/' + score.total + ' rated' + (score.na ? ' (' + score.na + ' N/A)' : '') + '</div>' +
+        '<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:' + completionPct + '%;background:' + (completionPct === 100 ? 'var(--success)' : 'var(--accent)') + '"></div></div>' +
+        (score.scored > 0 ? '<span class="score-display ' + getScoreClass(score.pct) + '">' + score.pct + '% - ' + score.grade + '</span>' : '') +
+        compare +
+        (isSubmitted ? '<span class="submitted-badge">&#10003; Submitted</span>' : '') +
+        '</div>';
 
-    var html = '';
+    if (!collapsedGroups[currentProduct]) collapsedGroups[currentProduct] = {};
+    var html = '', shown = 0;
     for (var i = 0; i < skills.length; i++) {
         var skill = skills[i];
         if (skill.children && skill.children.length > 0) {
-            html += '<div class="skill-group"><div class="skill-group-header" onclick="toggleGroup(this)"><span>'+skill.text+'</span><span class="toggle-icon">&#9660;</span></div><div class="skill-group-children">';
-            for (var j = 0; j < skill.children.length; j++) html += renderSkillCard(skill.children[j], responses, false);
+            var parentMatch = search && skill.text.toLowerCase().indexOf(search) > -1;
+            var kids = [];
+            for (var kk = 0; kk < skill.children.length; kk++) {
+                var c = skill.children[kk];
+                if (!search || parentMatch || c.text.toLowerCase().indexOf(search) > -1) kids.push(c);
+            }
+            if (!kids.length) continue;
+            shown += kids.length;
+            var collapsed = search ? false : !!collapsedGroups[currentProduct][skill.id];
+            var done = 0;
+            for (var k = 0; k < skill.children.length; k++) { var rr = responses[skill.children[k].id]; if (rr && rr.sl && rr.int) done++; }
+            html += '<div class="skill-group">' +
+                '<div class="skill-group-header ' + (collapsed ? 'collapsed' : '') + '" data-group-id="' + escHtml(skill.id) + '">' +
+                '<span>' + escHtml(skill.text) + '<span class="group-meta">' + done + '/' + skill.children.length + ' complete</span></span>' +
+                '<span class="toggle-icon">&#9660;</span></div>' +
+                '<div class="skill-group-children ' + (collapsed ? 'collapsed' : '') + '">';
+            for (var j = 0; j < kids.length; j++) html += renderSkillCard(kids[j], responses, false);
             html += '</div></div>';
-        } else { html += renderSkillCard(skill, responses, true); }
+        } else {
+            if (search && skill.text.toLowerCase().indexOf(search) === -1) continue;
+            shown++;
+            html += renderSkillCard(skill, responses, true);
+        }
     }
-    document.getElementById('skillsList').innerHTML = html;
+    if (!shown) html = '<p style="color:var(--text-dim)">No skills match that search.</p>';
+    listEl.innerHTML = html;
 
+    var locked = isLocked();
     var unanswered = score.total - score.answered;
-    document.getElementById('submitSection').innerHTML = '<div class="submit-section"><div class="submit-info">'+(unanswered>0?'<strong>'+unanswered+' skill(s)</strong> still need a rating':'<strong>All skills rated!</strong> Ready to submit')+(score.answered>0?' &nbsp;|&nbsp; Current score: <strong>'+score.pct+'% ('+score.grade+')</strong>':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-danger btn-sm" onclick="clearAllRatings()">Clear All</button><button class="btn btn-secondary btn-sm" onclick="saveProductProgress()">Save Draft</button><button class="btn btn-primary" onclick="submitProduct()">'+(isSubmitted?'Resubmit':'Submit')+' '+currentProduct+'</button></div></div>';
+    document.getElementById('submitSection').innerHTML =
+        '<div class="submit-section"><div class="submit-info">' +
+        (unanswered > 0 ? '<strong>' + unanswered + ' skill(s)</strong> still need a rating' : '<strong>All skills rated!</strong> Ready to submit') +
+        (score.scored > 0 ? ' &nbsp;|&nbsp; Current score: <strong>' + score.pct + '% (' + score.grade + ')</strong>' : '') +
+        '<div id="saveStatus" class="save-status" style="margin-top:6px;"></div>' +
+        '</div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
+        '<button class="btn btn-secondary btn-sm" onclick="saveProductProgress()">Save Draft</button>' +
+        '<button class="btn btn-primary" id="submitBtn" onclick="submitProduct()"' + (locked ? ' disabled' : '') + '>' + (isSubmitted ? 'Resubmit' : 'Submit') + ' ' + escHtml(currentProduct) + '</button>' +
+        '</div></div>';
+    updateSaveStatus();
 }
 
 function renderSkillCard(skill, responses, standalone) {
     var r = responses[skill.id] || { sl: '', int: '', notes: '', tickets: [] };
+    var isNA = r.sl === 'na';
     var unanswered = !r.sl || !r.int;
-    var needsEvidence = r.sl >= 3;
+    var needsEvidence = !isNA && Number(r.sl) >= 3;
     var tickets = r.tickets || [];
     var notesVal = r.notes || '';
-    var desc = skill.description ? '<span class="info-icon">i<span class="tooltip">'+escHtml(skill.description)+'</span></span>' : '';
-    var evidencePrompt = (needsEvidence && !tickets.length && !notesVal) ? '<div class="evidence-prompt">Evidence recommended for level 3+ (add ticket ref or notes)</div>' : '';
-    var evidenceBadge = (tickets.length > 0) ? '<span class="evidence-badge">&#10003; '+tickets.length+' ticket'+(tickets.length>1?'s':'')+' linked</span>' : '';
-    var chipsHtml = '';
-    if (tickets.length > 0) {
-        chipsHtml = '<div class="ticket-chips">';
+    var desc = skill.description ? '<span class="info-icon">i<span class="tooltip">' + escHtml(skill.description) + '</span></span>' : '';
+    var evidencePrompt = (needsEvidence && !tickets.length && !notesVal) ? '<div class="evidence-prompt">Evidence recommended for level 3+ (add a ticket or note)</div>' : '';
+    var evidenceBadge = tickets.length ? '<span class="evidence-badge">&#10003; ' + tickets.length + ' ticket' + (tickets.length > 1 ? 's' : '') + '</span>' : '';
+    var naBadge = isNA ? '<span class="na-badge">Not applicable</span>' : '';
+    var chips = '';
+    if (tickets.length) {
+        chips = '<div class="ticket-chips">';
         for (var ti = 0; ti < tickets.length; ti++) {
-            chipsHtml += '<span class="ticket-chip"><a href="https://perchcapital.atlassian.net/browse/'+escHtml(tickets[ti])+'" target="_blank">'+escHtml(tickets[ti])+'</a><span class="remove-chip" onclick="event.stopPropagation();removeTicket(\''+currentProduct+'\',\''+skill.id+'\','+ti+')">&times;</span></span>';
+            chips += '<span class="ticket-chip"><a href="' + JIRA_BASE + encodeURIComponent(tickets[ti]) + '" target="_blank">' + escHtml(tickets[ti]) + '</a><span class="remove-chip" data-action="remove-ticket" data-index="' + ti + '">&times;</span></span>';
         }
-        chipsHtml += '</div>';
+        chips += '</div>';
     }
-    return '<div class="skill-card '+(standalone?'standalone':'')+' '+(unanswered?'unanswered':'')+'">' +
-        '<div class="skill-name-row"><span class="skill-name">'+skill.text+'</span>'+desc+evidenceBadge+'</div>' +
+    var slPills = '';
+    var levels = [1, 2, 3, 4];
+    for (var L = 0; L < levels.length; L++) {
+        slPills += '<div class="pill sl-' + levels[L] + (String(r.sl) === String(levels[L]) ? ' selected' : '') + '" data-field="sl" data-value="' + levels[L] + '">' + levels[L] + '</div>';
+    }
+    slPills += '<div class="pill sl-na' + (isNA ? ' selected' : '') + '" data-field="sl" data-value="na">N/A</div>';
+    return '<div class="skill-card ' + (standalone ? 'standalone' : '') + ' ' + (unanswered ? 'unanswered' : '') + '" data-skill-id="' + escHtml(skill.id) + '">' +
+        '<div class="skill-name-row"><span class="skill-name">' + escHtml(skill.text) + '</span>' + desc + evidenceBadge + naBadge + '</div>' +
         '<div class="skill-ratings">' +
-        '<div class="rating-group"><span class="rating-label">Skill Level</span><div class="pill-group">' +
-        '<div class="pill sl-1 '+(r.sl==1?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',1)">1</div>' +
-        '<div class="pill sl-2 '+(r.sl==2?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',2)">2</div>' +
-        '<div class="pill sl-3 '+(r.sl==3?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',3)">3</div>' +
-        '<div class="pill sl-4 '+(r.sl==4?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'sl\',4)">4</div>' +
-        '</div></div>' +
+        '<div class="rating-group"><span class="rating-label">Skill Level</span><div class="pill-group">' + slPills + '</div></div>' +
         '<div class="rating-group"><span class="rating-label">Interest</span><div class="pill-group">' +
-        '<div class="pill int-1 '+(r.int==1?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',1)">1</div>' +
-        '<div class="pill int-2 '+(r.int==2?'selected':'')+'\" onclick="selectPill(this,\''+currentProduct+'\',\''+skill.id+'\',\'int\',2)">2</div>' +
-        '</div></div>' +
-        '</div>' +
-        '<div class="skill-notes"><div style="display:flex;gap:6px;align-items:center;"><input type="text" id="notes-'+skill.id+'" placeholder="Add ticket (e.g. OCT-1234) or notes" value="'+escHtml(notesVal)+'" onchange="updateNotes(\''+currentProduct+'\',\''+skill.id+'\',this.value)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addTicket(\''+currentProduct+'\',\''+skill.id+'\');}" onclick="event.stopPropagation()" style="flex:1;"><button class="btn btn-sm btn-success" onclick="event.stopPropagation();addTicket(\''+currentProduct+'\',\''+skill.id+'\')" style="padding:6px 10px;font-size:0.7rem;">+ Add</button></div>'+evidencePrompt+chipsHtml+'</div>' +
+        '<div class="pill int-1' + (String(r.int) === '1' ? ' selected' : '') + '" data-field="int" data-value="1">1</div>' +
+        '<div class="pill int-2' + (String(r.int) === '2' ? ' selected' : '') + '" data-field="int" data-value="2">2</div>' +
+        '</div></div></div>' +
+        '<div class="skill-notes"><div style="display:flex;gap:6px;align-items:center;">' +
+        '<input type="text" class="notes-input" placeholder="Add ticket (e.g. OCT-1234) or a note" value="' + escHtml(notesVal) + '" style="flex:1;">' +
+        '<button class="btn btn-sm btn-success" data-action="add-ticket" style="padding:6px 12px;font-size:0.72rem;">+ Add</button>' +
+        '</div>' + evidencePrompt + chips + '</div>' +
         '</div>';
 }
 
-
-function escHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function toggleGroup(h) { h.classList.toggle('collapsed'); h.nextElementSibling.classList.toggle('collapsed'); }
-function selectPill(el, product, skillId, field, value) {
-    el.parentElement.querySelectorAll('.pill').forEach(function(p) { p.classList.remove('selected'); });
-    el.classList.add('selected');
-    updateResponse(product, skillId, field, value);
-    renderSkills();
-}
-    function addTicket(product, skillId) {
-    var input = document.getElementById('notes-' + skillId);
-    var val = input.value.trim();
-    if (!val) return;
-    if (!userResponses[product]) userResponses[product] = {};
-    if (!userResponses[product][skillId]) userResponses[product][skillId] = {};
-    if (!userResponses[product][skillId].tickets) userResponses[product][skillId].tickets = [];
-    userResponses[product][skillId].tickets.push(val);
-    userResponses[product][skillId].notes = '';
-    renderSkills();
-}
-function removeTicket(product, skillId, index) {
-    if (userResponses[product] && userResponses[product][skillId] && userResponses[product][skillId].tickets) {
-        userResponses[product][skillId].tickets.splice(index, 1);
-        renderSkills();
+var skillsListEl = document.getElementById('skillsList');
+skillsListEl.addEventListener('click', function (e) {
+    var header = e.target.closest('.skill-group-header');
+    if (header) {
+        var gid = header.getAttribute('data-group-id');
+        if (!collapsedGroups[currentProduct]) collapsedGroups[currentProduct] = {};
+        collapsedGroups[currentProduct][gid] = !collapsedGroups[currentProduct][gid];
+        header.classList.toggle('collapsed');
+        header.nextElementSibling.classList.toggle('collapsed');
+        return;
     }
-}
-function updateNotes(product, skillId, value) {
+    var card = e.target.closest('.skill-card');
+    if (!card) return;
+    var skillId = card.getAttribute('data-skill-id');
+    var pill = e.target.closest('.pill');
+    if (pill) {
+        updateResponse(currentProduct, skillId, pill.getAttribute('data-field'), pill.getAttribute('data-value'));
+        renderSkills();
+        return;
+    }
+    var action = e.target.getAttribute('data-action');
+    if (action === 'add-ticket') { addTicket(skillId, card.querySelector('.notes-input')); return; }
+    if (action === 'remove-ticket') { removeTicket(skillId, parseInt(e.target.getAttribute('data-index'), 10)); return; }
+});
+skillsListEl.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    if (!e.target.classList.contains('notes-input')) return;
+    e.preventDefault();
+    var card = e.target.closest('.skill-card');
+    addTicket(card.getAttribute('data-skill-id'), e.target);
+});
+skillsListEl.addEventListener('change', function (e) {
+    if (!e.target.classList.contains('notes-input')) return;
+    var card = e.target.closest('.skill-card');
+    ensureResponse(currentProduct, card.getAttribute('data-skill-id')).notes = e.target.value;
+    markDirty();
+});
+
+function ensureResponse(product, skillId) {
     if (!userResponses[product]) userResponses[product] = {};
-    if (!userResponses[product][skillId]) userResponses[product][skillId] = {};
-    userResponses[product][skillId].notes = value;
+    if (!userResponses[product][skillId]) userResponses[product][skillId] = { sl: '', int: '', notes: '', tickets: [] };
+    return userResponses[product][skillId];
 }
 function updateResponse(product, skillId, field, value) {
-    if (!userResponses[product]) userResponses[product] = {};
-    if (!userResponses[product][skillId]) userResponses[product][skillId] = {};
-    userResponses[product][skillId][field] = value ? parseInt(value) : '';
+    var r = ensureResponse(product, skillId);
+    if (field === 'sl' && value === 'na') r.sl = 'na';
+    else r[field] = value ? parseInt(value, 10) : '';
+    markDirty();
+}
+function addTicket(skillId, input) {
+    var val = (input.value || '').trim();
+    if (!val) return;
+    var r = ensureResponse(currentProduct, skillId);
+    if (!r.tickets) r.tickets = [];
+    r.tickets.push(val);
+    r.notes = '';
+    markDirty();
+    renderSkills();
+}
+function removeTicket(skillId, index) {
+    var r = ensureResponse(currentProduct, skillId);
+    if (r.tickets) { r.tickets.splice(index, 1); markDirty(); renderSkills(); }
 }
 function clearAllRatings() {
-if (!confirm('Clear ALL skill ratings and interest for ' + currentProduct + '? This cannot be undone.')) return;
-var skills = getRateableSkillsForProduct(currentProduct);
-if (!userResponses[currentProduct]) userResponses[currentProduct] = {};
-for (var i = 0; i < skills.length; i++) {
-userResponses[currentProduct][skills[i].id] = { sl: '', int: '', notes: '', tickets: [] };
-}
-renderSkills();
-showToast('All ratings cleared for ' + currentProduct);
-}
-
-// SAVE & SUBMIT
-async function saveProductProgress() {
-    await db.collection('responses').doc(currentUser.uid).set({ responses: userResponses, email: currentUser.email, name: currentUser.email.split('@')[0], lastSaved: firebase.firestore.FieldValue.serverTimestamp(), submitted: submissionStatus }, { merge: true });
-    showToast('Draft saved!');
+    if (!confirm('Clear ALL ratings, notes and tickets for ' + currentProduct + '? This cannot be undone.')) return;
+    var skills = getRateableSkillsForProduct(currentProduct);
+    if (!userResponses[currentProduct]) userResponses[currentProduct] = {};
+    for (var i = 0; i < skills.length; i++) userResponses[currentProduct][skills[i].id] = { sl: '', int: '', notes: '', tickets: [] };
+    markDirty();
+    renderSkills();
+    showToast('All ratings cleared for ' + currentProduct);
 }
 
+async function saveProductProgress(silent) {
+    if (saveInFlight) return;
+    saveInFlight = true; updateSaveStatus();
+    try {
+        await db.collection('responses').doc(currentUser.uid).set({
+            responses: userResponses, email: currentUser.email, name: currentUser.email.split('@')[0],
+            lastSaved: firebase.firestore.FieldValue.serverTimestamp(), submitted: submissionStatus
+        }, { merge: true });
+        isDirty = false; lastSavedAt = Date.now();
+        if (!silent) showToast('Draft saved!');
+    } catch (e) {
+        showToast('Save failed: ' + e.message, true);
+    } finally { saveInFlight = false; updateSaveStatus(); }
+}
+function missingEvidence(product) {
+    var skills = getRateableSkillsForProduct(product);
+    var responses = userResponses[product] || {};
+    var out = [];
+    for (var i = 0; i < skills.length; i++) {
+        var r = responses[skills[i].id];
+        if (!r || r.sl === 'na' || !r.sl) continue;
+        if (Number(r.sl) >= 3 && !(r.tickets && r.tickets.length) && !(r.notes && r.notes.trim())) out.push('- ' + skills[i].text);
+    }
+    return out;
+}
 async function submitProduct() {
+    if (isLocked()) { alert('Submissions are closed. The deadline has passed.'); return; }
     var score = calculateProductScore(currentProduct);
     if (score.answered === 0) { alert('Please rate at least one skill before submitting.'); return; }
     if (score.answered < score.total) {
-        if (!confirm('You have '+(score.total - score.answered)+' unanswered skill(s) in '+currentProduct+'. Submit anyway?')) return;
+        if (!confirm('You have ' + (score.total - score.answered) + ' unanswered skill(s) in ' + currentProduct + '. Submit anyway?')) return;
     }
+    var missing = missingEvidence(currentProduct);
+    if (missing.length) {
+        var preview = missing.slice(0, 8).join('\n');
+        if (missing.length > 8) preview += '\n...and ' + (missing.length - 8) + ' more';
+        if (!confirm(missing.length + ' skill(s) rated 3 or above have no evidence attached:\n\n' + preview + '\n\nSubmit anyway?')) return;
+    }
+    var btn = document.getElementById('submitBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
     submissionStatus[currentProduct] = true;
-    await db.collection('responses').doc(currentUser.uid).set({
-        responses: userResponses, email: currentUser.email, name: currentUser.email.split('@')[0],
-        lastSaved: firebase.firestore.FieldValue.serverTimestamp(),
-        submitted: submissionStatus
-    }, { merge: true });
-    var snapshot = {
-        product: currentProduct,
-        submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        submittedAtLocal: new Date().toISOString(),
-        userName: currentUser.email.split('@')[0],
-        userEmail: currentUser.email,
-        score: { pct: score.pct, grade: score.grade, answered: score.answered, total: score.total },
-        responses: userResponses[currentProduct] || {}
-    };
-    await db.collection('submissions').doc(currentUser.uid).collection('history').add(snapshot);
-    await sendProductEmail();
-    renderProductTabs();
-    showToast(currentProduct + ' submitted!');
+    try {
+        await db.collection('responses').doc(currentUser.uid).set({
+            responses: userResponses, email: currentUser.email, name: currentUser.email.split('@')[0],
+            lastSaved: firebase.firestore.FieldValue.serverTimestamp(), submitted: submissionStatus
+        }, { merge: true });
+        await db.collection('submissions').doc(currentUser.uid).collection('history').add({
+            product: currentProduct,
+            submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            submittedAtLocal: new Date().toISOString(),
+            userName: currentUser.email.split('@')[0],
+            userEmail: currentUser.email,
+            score: { pct: score.pct, grade: score.grade, answered: score.answered, scored: score.scored, na: score.na, total: score.total },
+            responses: userResponses[currentProduct] || {}
+        });
+        isDirty = false; lastSavedAt = Date.now();
+        await sendProductEmail();
+        renderProductTabs();
+        showToast(currentProduct + ' submitted!');
+    } catch (e) {
+        showToast('Submit failed: ' + e.message, true);
+        if (btn) { btn.disabled = false; btn.textContent = 'Submit ' + currentProduct; }
+    }
 }
-
 async function sendProductEmail() {
     if (!settings.notifEmail) return;
     var threshold = settings.threshold || 3;
@@ -619,27 +933,32 @@ async function sendProductEmail() {
     var score = calculateProductScore(currentProduct);
     var skills = getRateableSkillsForProduct(currentProduct);
     var responses = userResponses[currentProduct] || {};
-
     var lines = [];
     lines.push('PRODUCT: ' + currentProduct);
     lines.push('OVERALL SCORE: ' + score.pct + '% (' + score.grade + ')');
-    lines.push('Skills Rated: ' + score.answered + '/' + score.total);
-    lines.push('Submitted: ' + new Date().toLocaleString('en-GB', {dateStyle:'full', timeStyle:'short'}));
+    lines.push('Skills Rated: ' + score.answered + '/' + score.total + (score.na ? ' (' + score.na + ' marked N/A)' : ''));
+    lines.push('Submitted: ' + new Date().toLocaleString('en-GB', { dateStyle: 'full', timeStyle: 'short' }));
     lines.push('');
     lines.push('--- SKILL BREAKDOWN ---');
     for (var i = 0; i < skills.length; i++) {
         var r = responses[skills[i].id];
-        var sl = r && r.sl ? r.sl : '-';
-        var flag = (r && r.sl && r.sl < threshold) ? ' *** IMPROVEMENT NEEDED ***' : '';
-        lines.push(skills[i].text + ': Level ' + sl + '/4' + flag);
+        var sl = r && r.sl ? (r.sl === 'na' ? 'N/A' : r.sl + '/4') : '-';
+        var flag = (r && r.sl && r.sl !== 'na' && Number(r.sl) < threshold) ? '  *** IMPROVEMENT NEEDED ***' : '';
+        var ev = '';
+        if (r && r.tickets && r.tickets.length) ev = '  [Evidence: ' + r.tickets.join(', ') + ']';
+        else if (r && r.notes) ev = '  [Note: ' + r.notes + ']';
+        lines.push(skills[i].text + ': ' + sl + flag + ev);
     }
     lines.push('');
-    var gaps = skills.filter(function(s) { var r = responses[s.id]; return r && r.sl && r.sl < threshold; });
-    if (gaps.length > 0) {
+    var gaps = [];
+    for (var q = 0; q < skills.length; q++) {
+        var rq = responses[skills[q].id];
+        if (rq && rq.sl && rq.sl !== 'na' && Number(rq.sl) < threshold) gaps.push(skills[q]);
+    }
+    if (gaps.length) {
         lines.push('--- IMPROVEMENT AREAS (' + gaps.length + ' skills below level ' + threshold + ') ---');
-        for (var g = 0; g < gaps.length; g++) { var rg = responses[gaps[g].id]; lines.push('  - ' + gaps[g].text + ': Level ' + rg.sl + '/' + threshold); }
-    } else { lines.push('No improvement areas identified - all skills at or above threshold!'); }
-
+        for (var g = 0; g < gaps.length; g++) lines.push('  - ' + gaps[g].text + ': Level ' + responses[gaps[g].id].sl + '/' + threshold);
+    } else { lines.push('No improvement areas identified - all rated skills at or above threshold.'); }
     try {
         emailjs.init(EMAILJS_PUBLIC_KEY);
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -648,306 +967,742 @@ async function sendProductEmail() {
             subject: '[' + currentProduct + '] Assessment: ' + userName + ' - ' + score.pct + '% (' + score.grade + ')',
             message: userName + ' submitted their ' + currentProduct + ' assessment.\n\n' + lines.join('\n')
         });
-    } catch(e) { console.error('Email failed:', e); }
+    } catch (e) { console.error('Email failed:', e); }
 }
 
-// ADMIN DRAG
-function handleDragStart(e,type,parentIdx,childIdx){var skills=questionsData[adminCurrentProduct];var skillObj=type==='parent'?Object.assign({},skills[parentIdx],{children:(skills[parentIdx].children||[]).slice()}):Object.assign({},skills[parentIdx].children[childIdx]);dragData={type:type,parentIdx:parentIdx,childIdx:childIdx,skillObj:skillObj};e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','');}
-function handleDragEnd(e){e.currentTarget.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(function(el){el.classList.remove('drag-over');});document.querySelectorAll('.drop-zone.active').forEach(function(el){el.classList.remove('active');});dragData=null;}
-function handleDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
-function handleDragEnter(e){e.preventDefault();e.currentTarget.classList.add('drag-over');}
-function handleDragLeave(e){e.currentTarget.classList.remove('drag-over');}
-async function handleDropOnParent(e,targetParentIdx){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(!dragData)return;var skills=questionsData[adminCurrentProduct];if(dragData.type==='parent'&&dragData.parentIdx===targetParentIdx)return;var movedSkill;if(dragData.type==='parent'){var removed=skills.splice(dragData.parentIdx,1)[0];movedSkill={id:removed.id,text:removed.text,description:removed.description||''};if(removed.children&&removed.children.length>0){var ins=Math.min(dragData.parentIdx,skills.length);for(var i=removed.children.length-1;i>=0;i--)skills.splice(ins,0,Object.assign({},removed.children[i],{children:[]}));}}else{movedSkill=skills[dragData.parentIdx].children.splice(dragData.childIdx,1)[0];}var target=skills[targetParentIdx>=skills.length?skills.length-1:targetParentIdx];if(!target)return;if(!target.children)target.children=[];target.children.push({id:movedSkill.id,text:movedSkill.text,description:movedSkill.description||''});await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Nested!');}
-async function handleDropOnZone(e,targetIdx){e.preventDefault();e.currentTarget.classList.remove('active');if(!dragData)return;var skills=questionsData[adminCurrentProduct];var movedSkill;if(dragData.type==='parent'){movedSkill=skills.splice(dragData.parentIdx,1)[0];}else{var child=skills[dragData.parentIdx].children.splice(dragData.childIdx,1)[0];movedSkill=Object.assign({},child,{children:[]});}skills.splice(Math.min(targetIdx,skills.length),0,movedSkill);await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Reordered!');}
-function handleZoneDragEnter(e){e.preventDefault();e.currentTarget.classList.add('active');}
-function handleZoneDragLeave(e){e.currentTarget.classList.remove('active');}
-async function promoteToParent(pi,ci){var skills=questionsData[adminCurrentProduct];var child=skills[pi].children.splice(ci,1)[0];skills.splice(pi+1,0,Object.assign({},child,{children:[]}));await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Promoted!');}
-async function moveParent(i,dir){var s=questionsData[adminCurrentProduct];var n=i+dir;if(n<0||n>=s.length)return;var tmp=s[i];s[i]=s[n];s[n]=tmp;await saveQuestions();renderAdminSkills();}
-async function moveChild(pi,ci,dir){var c=questionsData[adminCurrentProduct][pi].children;var n=ci+dir;if(n<0||n>=c.length)return;var tmp=c[ci];c[ci]=c[n];c[n]=tmp;await saveQuestions();renderAdminSkills();}
-
-// ADMIN RENDER
-function renderAdminProductTabs(){var products=Object.keys(questionsData);if(!adminCurrentProduct&&products.length)adminCurrentProduct=products[0];document.getElementById('adminProductTabs').innerHTML=products.map(function(p){return '<div class="tab '+(p===adminCurrentProduct?'active':'')+'" onclick="selectAdminProduct(\''+p+'\')">' + p + '</div>';}).join('');renderAdminSkills();}
-function selectAdminProduct(p){adminCurrentProduct=p;renderAdminProductTabs();}
-
-function renderAdminSkills(){
-    var skills=questionsData[adminCurrentProduct]||[];if(!skills.length){document.getElementById('adminSkillsList').innerHTML='<p style="color:var(--text-dim)">No skills yet.</p>';return;}
-    var html='<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event,0)"></div>';
-    for(var i=0;i<skills.length;i++){
-        var skill=skills[i];var cc=skill.children?skill.children.length:0;
-        var dp=skill.description?'<span class="skill-desc-preview">'+escHtml(skill.description.substring(0,30))+(skill.description.length>30?'...':'')+'</span>':'';
-        html+='<div class="skill-admin-card is-parent" draggable="true" ondragstart="handleDragStart(event,\'parent\','+i+',null)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropOnParent(event,'+i+')"><span class="drag-handle">&#9776;</span><span class="skill-text">'+skill.text+(cc>0?' <span class="skill-badge">'+cc+' sub</span>':'')+dp+'</span><div class="skill-actions"><button class="btn-icon" onclick="event.stopPropagation();moveParent('+i+',-1)" '+(i===0?'disabled':'')+' title="Up">&uarr;</button><button class="btn-icon" onclick="event.stopPropagation();moveParent('+i+',1)" '+(i===skills.length-1?'disabled':'')+' title="Down">&darr;</button><button class="btn-icon" onclick="event.stopPropagation();showAddSubSkillModal('+i+')" title="Add sub-skill" style="color:var(--success);border-color:var(--success);">+</button><button class="btn-icon" onclick="event.stopPropagation();showDuplicateModal(\'parent\','+i+',null)" title="Duplicate">&#10697;</button><button class="btn-icon" onclick="event.stopPropagation();editSkill('+i+')" title="Edit">&#9998;</button><button class="btn-icon" onclick="event.stopPropagation();deleteSkill('+i+')" title="Delete">&times;</button></div></div>';
-        if(skill.children){for(var ci=0;ci<skill.children.length;ci++){
-            var child=skill.children[ci];var cdp=child.description?'<span class="skill-desc-preview">'+escHtml(child.description.substring(0,30))+(child.description.length>30?'...':'')+'</span>':'';
-            html+='<div class="skill-admin-card is-child" draggable="true" ondragstart="handleDragStart(event,\'child\','+i+','+ci+')" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropOnParent(event,'+i+')"><span class="drag-handle">&#9776;</span><span class="skill-text">'+child.text+cdp+'</span><div class="skill-actions"><button class="btn-icon" onclick="event.stopPropagation();moveChild('+i+','+ci+',-1)" '+(ci===0?'disabled':'')+' title="Up">&uarr;</button><button class="btn-icon" onclick="event.stopPropagation();moveChild('+i+','+ci+',1)" '+(ci===skill.children.length-1?'disabled':'')+' title="Down">&darr;</button><button class="btn-promote" onclick="event.stopPropagation();promoteToParent('+i+','+ci+')">&#8592; Top</button><button class="btn-icon" onclick="event.stopPropagation();showDuplicateModal(\'child\','+i+','+ci+')" title="Duplicate">&#10697;</button><button class="btn-icon" onclick="event.stopPropagation();editSubSkill('+i+','+ci+')" title="Edit">&#9998;</button><button class="btn-icon" onclick="event.stopPropagation();deleteSubSkill('+i+','+ci+')" title="Delete">&times;</button></div></div>';
-        }}
-        html+='<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event,'+(i+1)+')"></div>';
-    }
-    document.getElementById('adminSkillsList').innerHTML=html;
+function handleDragStart(e, type, parentIdx, childIdx) {
+    var skills = questionsData[adminCurrentProduct];
+    var skillObj = type === 'parent'
+        ? Object.assign({}, skills[parentIdx], { children: (skills[parentIdx].children || []).slice() })
+        : Object.assign({}, skills[parentIdx].children[childIdx]);
+    dragData = { type: type, parentIdx: parentIdx, childIdx: childIdx, skillObj: skillObj };
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', '');
 }
-
-// ADMIN CRUD
-function showAddProductModal(){document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Add Product</h3><div class="form-group"><label>Product Name</label><input type="text" id="newProductName" placeholder="e.g. Financial Cloud"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addProduct()">Add</button></div>';}
-async function addProduct(){var name=document.getElementById('newProductName').value.trim();if(!name)return;if(questionsData[name]){alert('Already exists');return;}questionsData[name]=[];await saveQuestions();adminCurrentProduct=name;renderAdminProductTabs();renderProductTabs();closeModal();showToast('Product added!');}
-function showAddSkillModal(){if(!adminCurrentProduct){alert('Select a product first');return;}document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Add Skill to '+adminCurrentProduct+'</h3><div class="form-group"><label>Skill Name</label><input type="text" id="newSkillText" placeholder="e.g. Workflow"></div><div class="form-group"><label>Description (optional)</label><textarea id="newSkillDesc" placeholder="What does this skill involve?"></textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addSkill()">Add</button></div>';}
-async function addSkill(){var text=document.getElementById('newSkillText').value.trim();if(!text)return;var desc=document.getElementById('newSkillDesc').value.trim();questionsData[adminCurrentProduct].push({id:'skill_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),text:text,description:desc,children:[]});await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Skill added!');}
-function editSkill(index){var skill=questionsData[adminCurrentProduct][index];document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Edit Skill</h3><div class="form-group"><label>Skill Name</label><input type="text" id="editSkillText" value="'+escHtml(skill.text)+'"></div><div class="form-group"><label>Description</label><textarea id="editSkillDesc">'+escHtml(skill.description||'')+'</textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditSkill('+index+')">Save</button></div>';}
-async function saveEditSkill(index){var text=document.getElementById('editSkillText').value.trim();if(!text)return;questionsData[adminCurrentProduct][index].text=text;questionsData[adminCurrentProduct][index].description=document.getElementById('editSkillDesc').value.trim();await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Updated!');}
-function editSubSkill(pi,ci){var child=questionsData[adminCurrentProduct][pi].children[ci];document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Edit Sub-Skill</h3><div class="form-group"><label>Sub-Skill Name</label><input type="text" id="editSubSkillText" value="'+escHtml(child.text)+'"></div><div class="form-group"><label>Description</label><textarea id="editSubSkillDesc">'+escHtml(child.description||'')+'</textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditSubSkill('+pi+','+ci+')">Save</button></div>';}
-async function saveEditSubSkill(pi,ci){var text=document.getElementById('editSubSkillText').value.trim();if(!text)return;questionsData[adminCurrentProduct][pi].children[ci].text=text;questionsData[adminCurrentProduct][pi].children[ci].description=document.getElementById('editSubSkillDesc').value.trim();await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Updated!');}
-async function deleteSkill(index){var s=questionsData[adminCurrentProduct][index];var cc=s.children?s.children.length:0;if(!confirm(cc>0?'Delete "'+s.text+'" and '+cc+' sub-skill(s)?':'Delete "'+s.text+'"?'))return;questionsData[adminCurrentProduct].splice(index,1);await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Deleted');}
-async function deleteSubSkill(pi,ci){if(!confirm('Delete this sub-skill?'))return;questionsData[adminCurrentProduct][pi].children.splice(ci,1);await saveQuestions();renderAdminSkills();renderProductTabs();showToast('Deleted');}
-function closeModal(){document.getElementById('modal').classList.add('hidden');}
-
-function showDuplicateModal(type,parentIdx,childIdx){var skills=questionsData[adminCurrentProduct];var skill=type==='parent'?skills[parentIdx]:skills[parentIdx].children[childIdx];var options='<option value="top">-- Top Level (standalone) --</option>';for(var i=0;i<skills.length;i++){options+='<option value="'+i+'">'+escHtml(skills[i].text)+'</option>';}document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Duplicate: "'+escHtml(skill.text)+'"</h3><div class="form-group"><label>Place copy under:</label><select id="dupTarget">'+options+'</select></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="executeDuplicate(\''+type+'\','+parentIdx+','+(childIdx===null?'null':childIdx)+')">Duplicate</button></div>';}
-async function executeDuplicate(type,parentIdx,childIdx){var skills=questionsData[adminCurrentProduct];var original=type==='parent'?skills[parentIdx]:skills[parentIdx].children[childIdx];var copy={id:'dup_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),text:original.text+' (copy)',description:original.description||''};var target=document.getElementById('dupTarget').value;if(target==='top'){copy.children=[];skills.push(copy);}else{var idx=parseInt(target);if(!skills[idx].children)skills[idx].children=[];skills[idx].children.push(copy);}await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Duplicated!');}
-
-function showAddSubSkillModal(parentIdx){var skill=questionsData[adminCurrentProduct][parentIdx];document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Add Sub-Skill to "'+escHtml(skill.text)+'"</h3><div class="form-group"><label>Sub-Skill Name</label><input type="text" id="newSubSkillText" placeholder="e.g. Status and Reason"></div><div class="form-group"><label>Description (optional)</label><textarea id="newSubSkillDesc" placeholder="What does this sub-skill involve?"></textarea></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-success" onclick="addSubSkill('+parentIdx+')">Add</button></div>';}
-async function addSubSkill(parentIdx){var text=document.getElementById('newSubSkillText').value.trim();if(!text)return;var desc=document.getElementById('newSubSkillDesc').value.trim();questionsData[adminCurrentProduct][parentIdx].children.push({id:'sub_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),text:text,description:desc});await saveQuestions();renderAdminSkills();renderProductTabs();closeModal();showToast('Sub-skill added!');}
-
-function showProductOptions(){var products=Object.keys(questionsData);var options='';for(var i=0;i<products.length;i++){options+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg);border-radius:var(--radius);margin-bottom:6px;"><span>'+products[i]+'</span><div style="display:flex;gap:6px;"><button class="btn-icon" onclick="renameProduct(\''+products[i]+'\')">&#9998;</button><button class="btn-icon" onclick="removeProduct(\''+products[i]+'\')"; style="color:var(--danger);">&times;</button></div></div>';}document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Manage Products</h3>'+options+'<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>';}
-function renameProduct(oldName){var newName=prompt('Rename product:',oldName);if(!newName||newName===oldName)return;if(questionsData[newName]){alert('Name already exists');return;}questionsData[newName]=questionsData[oldName];delete questionsData[oldName];if(adminCurrentProduct===oldName)adminCurrentProduct=newName;if(currentProduct===oldName)currentProduct=newName;saveQuestions();renderAdminProductTabs();renderProductTabs();closeModal();showToast('Renamed!');}
-function removeProduct(name){if(!confirm('Delete "'+name+'" and ALL its skills?'))return;delete questionsData[name];adminCurrentProduct=Object.keys(questionsData)[0]||null;currentProduct=null;saveQuestions();renderAdminProductTabs();renderProductTabs();closeModal();showToast('Product deleted');}
-
-// USER MANAGEMENT
-function showAddUserModal(){
-    document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('modalContent').innerHTML='<h3>Add Team Member</h3><div class="form-group"><label>Email</label><input type="email" id="newUserEmail" placeholder="name@company.com"></div><div class="form-group"><label>Temporary Password (min 6 chars)</label><input type="text" id="newUserPassword" value="TempPass123!"></div><div class="form-group"><label>Role</label><select id="newUserRole"><option value="member">Member</option><option value="admin">Admin</option></select></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-success" onclick="createUser()">Create User</button></div>';
+function handleDragEnd(e) {
+    e.currentTarget.classList.remove('dragging');
+    document.querySelectorAll('.drag-over').forEach(function (el) { el.classList.remove('drag-over'); el._dragCount = 0; });
+    document.querySelectorAll('.drop-zone.active').forEach(function (el) { el.classList.remove('active'); });
+    dragData = null;
 }
-async function createUser(){
-    var email=document.getElementById('newUserEmail').value.trim();
-    var password=document.getElementById('newUserPassword').value;
-    var role=document.getElementById('newUserRole').value;
-    if(!email||password.length<6){alert('Email required and password must be 6+ characters.');return;}
-    try{
-        var userCred=await secondaryAuth.createUserWithEmailAndPassword(email,password);
-        await db.collection('users').doc(userCred.user.uid).set({email:email,name:email.split('@')[0],role:role,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-        await secondaryAuth.signOut();
-        closeModal();loadTeamList();showToast('User created: '+email);
-    }catch(e){alert('Error: '+e.message);}
+function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+function handleDragEnter(e) {
+    e.preventDefault();
+    var c = e.currentTarget;
+    c._dragCount = (c._dragCount || 0) + 1;
+    c.classList.add('drag-over');
 }
-async function deleteUser(uid,email){
-    if(!confirm('Remove '+email+'? This deletes their profile data. Their login must be removed separately in Firebase Console > Authentication.'))return;
-    await db.collection('users').doc(uid).delete();
-    loadTeamList();showToast('User removed');
+function handleDragLeave(e) {
+    var c = e.currentTarget;
+    c._dragCount = (c._dragCount || 1) - 1;
+    if (c._dragCount <= 0) { c._dragCount = 0; c.classList.remove('drag-over'); }
 }
-async function changeRole(uid,email,newRole){
-    await db.collection('users').doc(uid).update({role:newRole});
-    loadTeamList();showToast(email+' is now '+newRole);
-}
-
-// RESULTS
-var allResults=[];
-async function loadAllResults(){var snap=await db.collection('responses').get();allResults=[];snap.forEach(function(doc){allResults.push(Object.assign({uid:doc.id},doc.data()));});renderResults();}
-function renderResults(){
-    var threshold=parseInt(document.getElementById('thresholdInput')?document.getElementById('thresholdInput').value:3)||settings.threshold||3;
-    var container=document.getElementById('resultsContainer');
-    if(!allResults.length){container.innerHTML='<p style="color:var(--text-dim)">No submissions yet.</p>';return;}
-    var html='';
-    for(var ri=0;ri<allResults.length;ri++){
-        var result=allResults[ri];
-        var name=result.name||result.email||'Unknown';
-        var subStatus=result.submitted||{};
-        var productScores=[],allGaps=[];
-        for(var product in questionsData){
-            var rateable=getRateableSkillsForProduct(product);
-            var responses=(result.responses&&result.responses[product])||{};
-            var sum=0,answered=0;
-            for(var si=0;si<rateable.length;si++){var r=responses[rateable[si].id];if(r&&r.sl){sum+=r.sl;answered++;}if(r&&r.sl&&r.sl<threshold)allGaps.push({product:product,skill:rateable[si].text,level:r.sl});}
-            var max=rateable.length*4;var pct=max>0?Math.round((sum/max)*100):0;
-            var grade='Foundational';if(pct>=90)grade='Expert';else if(pct>=70)grade='Proficient';else if(pct>=50)grade='Developing';
-            var submitted=subStatus[product]?true:false;
-            if(answered>0)productScores.push({product:product,pct:pct,grade:grade,answered:answered,total:rateable.length,submitted:submitted});
+async function handleDropOnParent(e, targetParentIdx) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    e.currentTarget._dragCount = 0;
+    if (!dragData) return;
+    var skills = questionsData[adminCurrentProduct];
+    if (dragData.type === 'parent' && dragData.parentIdx === targetParentIdx) return;
+    var movedSkill;
+    if (dragData.type === 'parent') {
+        var removed = skills.splice(dragData.parentIdx, 1)[0];
+        movedSkill = { id: removed.id, text: removed.text, description: removed.description || '' };
+        if (removed.children && removed.children.length) {
+            var ins = Math.min(dragData.parentIdx, skills.length);
+            for (var i = removed.children.length - 1; i >= 0; i--) skills.splice(ins, 0, Object.assign({}, removed.children[i], { children: [] }));
         }
-        var scoresHtml='';for(var ps=0;ps<productScores.length;ps++){scoresHtml+='<div class="result-score-item"><span>'+productScores[ps].product+(productScores[ps].submitted?' &#10003;':'')+'</span><span class="score-display '+getScoreClass(productScores[ps].pct)+'">'+productScores[ps].pct+'% '+productScores[ps].grade+'</span></div>';}
-        var gapHtml='';if(allGaps.length>0){for(var gi=0;gi<allGaps.length;gi++){gapHtml+='<span class="gap-badge '+(allGaps[gi].level===1?'gap-critical':'gap-warning')+'">'+allGaps[gi].product+': '+allGaps[gi].skill+' ('+allGaps[gi].level+')</span> ';}}else{gapHtml='<span style="color:var(--success);font-size:0.85rem;">All at or above threshold</span>';}
-        html+='<div class="result-card"><h4>'+name+'</h4><div class="result-score-grid">'+scoresHtml+'</div><div style="margin-top:12px;"><strong style="font-size:0.8rem;color:var(--text-dim);">Gaps (below level '+threshold+'):</strong><div style="margin-top:6px;">'+gapHtml+'</div></div></div>';
+    } else {
+        movedSkill = skills[dragData.parentIdx].children.splice(dragData.childIdx, 1)[0];
     }
-    container.innerHTML=html;
+    var target = skills[targetParentIdx >= skills.length ? skills.length - 1 : targetParentIdx];
+    if (!target) return;
+    if (!target.children) target.children = [];
+    target.children.push({ id: movedSkill.id, text: movedSkill.text, description: movedSkill.description || '' });
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); showToast('Nested!');
+}
+async function handleDropOnZone(e, targetIdx) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('active');
+    if (!dragData) return;
+    var skills = questionsData[adminCurrentProduct];
+    var movedSkill;
+    if (dragData.type === 'parent') { movedSkill = skills.splice(dragData.parentIdx, 1)[0]; }
+    else {
+        var child = skills[dragData.parentIdx].children.splice(dragData.childIdx, 1)[0];
+        movedSkill = Object.assign({}, child, { children: [] });
+    }
+    skills.splice(Math.min(targetIdx, skills.length), 0, movedSkill);
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); showToast('Reordered!');
+}
+function handleZoneDragEnter(e) { e.preventDefault(); e.currentTarget.classList.add('active'); }
+function handleZoneDragLeave(e) { e.currentTarget.classList.remove('active'); }
+async function promoteToParent(pi, ci) {
+    var skills = questionsData[adminCurrentProduct];
+    var child = skills[pi].children.splice(ci, 1)[0];
+    skills.splice(pi + 1, 0, Object.assign({}, child, { children: [] }));
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); showToast('Promoted!');
+}
+async function moveParent(i, dir) {
+    var s = questionsData[adminCurrentProduct];
+    var n = i + dir;
+    if (n < 0 || n >= s.length) return;
+    var tmp = s[i]; s[i] = s[n]; s[n] = tmp;
+    await saveQuestions(); renderAdminSkills();
+}
+async function moveChild(pi, ci, dir) {
+    var c = questionsData[adminCurrentProduct][pi].children;
+    var n = ci + dir;
+    if (n < 0 || n >= c.length) return;
+    var tmp = c[ci]; c[ci] = c[n]; c[n] = tmp;
+    await saveQuestions(); renderAdminSkills();
 }
 
-// SETTINGS
-async function loadSettings(){var doc=await db.collection('config').doc('settings').get();if(doc.exists)settings=doc.data();}
-function loadSettingsUI(){document.getElementById('notifEmail').value=settings.notifEmail||'';document.getElementById('settingsThreshold').value=settings.threshold||3;}
-async function saveSettings(){settings.notifEmail=document.getElementById('notifEmail').value.trim();settings.threshold=parseInt(document.getElementById('settingsThreshold').value)||3;await db.collection('config').doc('settings').set(settings);showToast('Settings saved!');}
-async function loadTeamList(){
-    var snap=await db.collection('users').get();
-    var html='';
-    snap.forEach(function(doc){
-        var u=doc.data();
-        var uid=doc.id;
-        var roleToggle=u.role==='admin'?'<button class="btn-icon" onclick="changeRole(\''+uid+'\',\''+u.email+'\',\'member\')" title="Demote to member" style="color:var(--warning);">&#9660;</button>':'<button class="btn-icon" onclick="changeRole(\''+uid+'\',\''+u.email+'\',\'admin\')" title="Promote to admin" style="color:var(--success);">&#9650;</button>';
-        html+='<div class="user-card"><span class="user-info">'+u.email+'<span class="user-role">'+u.role+'</span>'+(u.products?' <span style="font-size:0.7rem;color:var(--text-dim);">('+u.products.length+' products)</span>':'')+'</span><div class="user-actions"><button class="btn-icon" onclick="showAssignProductsModal(\''+uid+'\',\''+u.email+'\')" title="Assign products" style="color:var(--accent);">&#9881;</button>'+roleToggle+'<button class="btn-icon" onclick="deleteUser(\''+uid+'\',\''+u.email+'\')" title="Remove" style="color:var(--danger);">&times;</button></div></div>';
+function renderAdminProductTabs() {
+    var products = Object.keys(questionsData);
+    if (!adminCurrentProduct && products.length) adminCurrentProduct = products[0];
+    var html = '';
+    for (var i = 0; i < products.length; i++) {
+        html += '<div class="tab ' + (products[i] === adminCurrentProduct ? 'active' : '') + '" data-admin-product="' + escHtml(products[i]) + '">' + escHtml(products[i]) + '</div>';
+    }
+    document.getElementById('adminProductTabs').innerHTML = html;
+    renderAdminSkills();
+}
+document.getElementById('adminProductTabs').addEventListener('click', function (e) {
+    var tab = e.target.closest('.tab');
+    if (!tab) return;
+    adminCurrentProduct = tab.getAttribute('data-admin-product');
+    renderAdminProductTabs();
+});
+
+function renderAdminSkills() {
+    var skills = questionsData[adminCurrentProduct] || [];
+    var el = document.getElementById('adminSkillsList');
+    if (!skills.length) { el.innerHTML = '<p style="color:var(--text-dim)">No skills yet.</p>'; return; }
+    var html = '<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event,0)"></div>';
+    for (var i = 0; i < skills.length; i++) {
+        var skill = skills[i];
+        var cc = skill.children ? skill.children.length : 0;
+        var dp = skill.description ? '<span class="skill-desc-preview">' + escHtml(skill.description.substring(0, 30)) + (skill.description.length > 30 ? '...' : '') + '</span>' : '';
+        html += '<div class="skill-admin-card is-parent" draggable="true" ondragstart="handleDragStart(event,\'parent\',' + i + ',null)" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropOnParent(event,' + i + ')">' +
+            '<span class="drag-handle">&#9776;</span>' +
+            '<span class="skill-text">' + escHtml(skill.text) + (cc > 0 ? ' <span class="skill-badge">' + cc + ' sub</span>' : '') + dp + '</span>' +
+            '<div class="skill-actions">' +
+            '<button class="btn-icon" onclick="event.stopPropagation();moveParent(' + i + ',-1)" ' + (i === 0 ? 'disabled' : '') + ' title="Up">&uarr;</button>' +
+            '<button class="btn-icon" onclick="event.stopPropagation();moveParent(' + i + ',1)" ' + (i === skills.length - 1 ? 'disabled' : '') + ' title="Down">&darr;</button>' +
+            '<button class="btn-icon" onclick="event.stopPropagation();showAddSubSkillModal(' + i + ')" title="Add sub-skill" style="color:var(--success);border-color:var(--success);">+</button>' +
+            '<button class="btn-icon" onclick="event.stopPropagation();showDuplicateModal(\'parent\',' + i + ',null)" title="Duplicate">&#10697;</button>' +
+            '<button class="btn-icon" onclick="event.stopPropagation();editSkill(' + i + ')" title="Edit">&#9998;</button>' +
+            '<button class="btn-icon" onclick="event.stopPropagation();deleteSkill(' + i + ')" title="Delete">&times;</button>' +
+            '</div></div>';
+        if (skill.children) {
+            for (var ci = 0; ci < skill.children.length; ci++) {
+                var child = skill.children[ci];
+                var cdp = child.description ? '<span class="skill-desc-preview">' + escHtml(child.description.substring(0, 30)) + (child.description.length > 30 ? '...' : '') + '</span>' : '';
+                html += '<div class="skill-admin-card is-child" draggable="true" ondragstart="handleDragStart(event,\'child\',' + i + ',' + ci + ')" ondragend="handleDragEnd(event)" ondragover="handleDragOver(event)" ondrop="event.preventDefault()">' +
+                    '<span class="drag-handle">&#9776;</span>' +
+                    '<span class="skill-text">' + escHtml(child.text) + cdp + '</span>' +
+                    '<div class="skill-actions">' +
+                    '<button class="btn-icon" onclick="event.stopPropagation();moveChild(' + i + ',' + ci + ',-1)" ' + (ci === 0 ? 'disabled' : '') + ' title="Up">&uarr;</button>' +
+                    '<button class="btn-icon" onclick="event.stopPropagation();moveChild(' + i + ',' + ci + ',1)" ' + (ci === skill.children.length - 1 ? 'disabled' : '') + ' title="Down">&darr;</button>' +
+                    '<button class="btn-promote" onclick="event.stopPropagation();promoteToParent(' + i + ',' + ci + ')">&#8592; Top</button>' +
+                    '<button class="btn-icon" onclick="event.stopPropagation();showDuplicateModal(\'child\',' + i + ',' + ci + ')" title="Duplicate">&#10697;</button>' +
+                    '<button class="btn-icon" onclick="event.stopPropagation();editSubSkill(' + i + ',' + ci + ')" title="Edit">&#9998;</button>' +
+                    '<button class="btn-icon" onclick="event.stopPropagation();deleteSubSkill(' + i + ',' + ci + ')" title="Delete">&times;</button>' +
+                    '</div></div>';
+            }
+        }
+        html += '<div class="drop-zone" ondragover="handleDragOver(event)" ondragenter="handleZoneDragEnter(event)" ondragleave="handleZoneDragLeave(event)" ondrop="handleDropOnZone(event,' + (i + 1) + ')"></div>';
+    }
+    el.innerHTML = html;
+}
+
+function openModal(html) {
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('modalContent').innerHTML = html;
+}
+function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+function newId(prefix) { return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5); }
+
+function showAddProductModal() {
+    openModal('<h3>Add Product</h3><div class="form-group"><label>Product Name</label><input type="text" id="newProductName" placeholder="e.g. Financial Cloud"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addProduct()">Add</button></div>');
+}
+async function addProduct() {
+    var name = document.getElementById('newProductName').value.trim();
+    if (!name) return;
+    if (questionsData[name]) { alert('Already exists'); return; }
+    questionsData[name] = [];
+    await saveQuestions();
+    adminCurrentProduct = name;
+    renderAdminProductTabs(); renderProductTabs(); closeModal(); showToast('Product added!');
+}
+function showAddSkillModal() {
+    if (!adminCurrentProduct) { alert('Select a product first'); return; }
+    openModal('<h3>Add Skill to ' + escHtml(adminCurrentProduct) + '</h3>' +
+        '<div class="form-group"><label>Skill Name</label><input type="text" id="newSkillText" placeholder="e.g. Workflow"></div>' +
+        '<div class="form-group"><label>Description (optional)</label><textarea id="newSkillDesc" placeholder="What does this skill involve?"></textarea></div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addSkill()">Add</button></div>');
+}
+async function addSkill() {
+    var text = document.getElementById('newSkillText').value.trim();
+    if (!text) return;
+    questionsData[adminCurrentProduct].push({ id: newId('skill'), text: text, description: document.getElementById('newSkillDesc').value.trim(), children: [] });
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); closeModal(); showToast('Skill added!');
+}
+function editSkill(index) {
+    var skill = questionsData[adminCurrentProduct][index];
+    openModal('<h3>Edit Skill</h3>' +
+        '<div class="form-group"><label>Skill Name</label><input type="text" id="editSkillText" value="' + escHtml(skill.text) + '"></div>' +
+        '<div class="form-group"><label>Description</label><textarea id="editSkillDesc">' + escHtml(skill.description || '') + '</textarea></div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditSkill(' + index + ')">Save</button></div>');
+}
+async function saveEditSkill(index) {
+    var text = document.getElementById('editSkillText').value.trim();
+    if (!text) return;
+    questionsData[adminCurrentProduct][index].text = text;
+    questionsData[adminCurrentProduct][index].description = document.getElementById('editSkillDesc').value.trim();
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); closeModal(); showToast('Updated!');
+}
+function editSubSkill(pi, ci) {
+    var child = questionsData[adminCurrentProduct][pi].children[ci];
+    openModal('<h3>Edit Sub-Skill</h3>' +
+        '<div class="form-group"><label>Sub-Skill Name</label><input type="text" id="editSubSkillText" value="' + escHtml(child.text) + '"></div>' +
+        '<div class="form-group"><label>Description</label><textarea id="editSubSkillDesc">' + escHtml(child.description || '') + '</textarea></div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveEditSubSkill(' + pi + ',' + ci + ')">Save</button></div>');
+}
+async function saveEditSubSkill(pi, ci) {
+    var text = document.getElementById('editSubSkillText').value.trim();
+    if (!text) return;
+    questionsData[adminCurrentProduct][pi].children[ci].text = text;
+    questionsData[adminCurrentProduct][pi].children[ci].description = document.getElementById('editSubSkillDesc').value.trim();
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); closeModal(); showToast('Updated!');
+}
+async function deleteSkill(index) {
+    var s = questionsData[adminCurrentProduct][index];
+    var cc = s.children ? s.children.length : 0;
+    if (!confirm(cc > 0 ? 'Delete "' + s.text + '" and ' + cc + ' sub-skill(s)?' : 'Delete "' + s.text + '"?')) return;
+    questionsData[adminCurrentProduct].splice(index, 1);
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); showToast('Deleted');
+}
+async function deleteSubSkill(pi, ci) {
+    if (!confirm('Delete this sub-skill?')) return;
+    questionsData[adminCurrentProduct][pi].children.splice(ci, 1);
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); showToast('Deleted');
+}
+function showAddSubSkillModal(parentIdx) {
+    var skill = questionsData[adminCurrentProduct][parentIdx];
+    openModal('<h3>Add Sub-Skill to "' + escHtml(skill.text) + '"</h3>' +
+        '<div class="form-group"><label>Sub-Skill Name</label><input type="text" id="newSubSkillText" placeholder="e.g. Status and Reason"></div>' +
+        '<div class="form-group"><label>Description (optional)</label><textarea id="newSubSkillDesc"></textarea></div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-success" onclick="addSubSkill(' + parentIdx + ')">Add</button></div>');
+}
+async function addSubSkill(parentIdx) {
+    var text = document.getElementById('newSubSkillText').value.trim();
+    if (!text) return;
+    if (!questionsData[adminCurrentProduct][parentIdx].children) questionsData[adminCurrentProduct][parentIdx].children = [];
+    questionsData[adminCurrentProduct][parentIdx].children.push({ id: newId('sub'), text: text, description: document.getElementById('newSubSkillDesc').value.trim() });
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); closeModal(); showToast('Sub-skill added!');
+}
+function showDuplicateModal(type, parentIdx, childIdx) {
+    var skills = questionsData[adminCurrentProduct];
+    var skill = type === 'parent' ? skills[parentIdx] : skills[parentIdx].children[childIdx];
+    var options = '<option value="top">-- Top Level (standalone) --</option>';
+    for (var i = 0; i < skills.length; i++) options += '<option value="' + i + '">' + escHtml(skills[i].text) + '</option>';
+    openModal('<h3>Duplicate: "' + escHtml(skill.text) + '"</h3>' +
+        '<div class="form-group"><label>Place copy under:</label><select id="dupTarget">' + options + '</select></div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+        '<button class="btn btn-primary" onclick="executeDuplicate(\'' + type + '\',' + parentIdx + ',' + (childIdx === null ? 'null' : childIdx) + ')">Duplicate</button></div>');
+}
+async function executeDuplicate(type, parentIdx, childIdx) {
+    var skills = questionsData[adminCurrentProduct];
+    var original = type === 'parent' ? skills[parentIdx] : skills[parentIdx].children[childIdx];
+    var copy = { id: newId('dup'), text: original.text + ' (copy)', description: original.description || '' };
+    var target = document.getElementById('dupTarget').value;
+    if (target === 'top') { copy.children = []; skills.push(copy); }
+    else { var idx = parseInt(target, 10); if (!skills[idx].children) skills[idx].children = []; skills[idx].children.push(copy); }
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); closeModal(); showToast('Duplicated!');
+}
+function showProductOptions() {
+    var products = Object.keys(questionsData);
+    var options = '';
+    for (var i = 0; i < products.length; i++) {
+        options += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg);border-radius:var(--radius);margin-bottom:6px;"><span>' + escHtml(products[i]) + '</span><div style="display:flex;gap:6px;"><button class="btn-icon" data-rename="' + escHtml(products[i]) + '">&#9998;</button><button class="btn-icon" data-remove="' + escHtml(products[i]) + '" style="color:var(--danger);">&times;</button></div></div>';
+    }
+    openModal('<h3>Manage Products</h3>' + options + '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>');
+}
+document.getElementById('modalContent').addEventListener('click', function (e) {
+    var rn = e.target.getAttribute('data-rename');
+    if (rn) { renameProduct(rn); return; }
+    var rm = e.target.getAttribute('data-remove');
+    if (rm) { removeProduct(rm); return; }
+});
+async function renameProduct(oldName) {
+    var newName = prompt('Rename product:', oldName);
+    if (!newName || newName === oldName) return;
+    if (questionsData[newName]) { alert('Name already exists'); return; }
+    questionsData[newName] = questionsData[oldName];
+    delete questionsData[oldName];
+    if (adminCurrentProduct === oldName) adminCurrentProduct = newName;
+    if (currentProduct === oldName) currentProduct = newName;
+    await saveQuestions(); renderAdminProductTabs(); renderProductTabs(); closeModal(); showToast('Renamed!');
+}
+async function removeProduct(name) {
+    if (!confirm('Delete "' + name + '" and ALL its skills?')) return;
+    delete questionsData[name];
+    adminCurrentProduct = Object.keys(questionsData)[0] || null;
+    currentProduct = null;
+    await saveQuestions(); renderAdminProductTabs(); renderProductTabs(); closeModal(); showToast('Product deleted');
+}
+
+function showBulkImportModal() {
+    if (!adminCurrentProduct) { alert('Select a product first'); return; }
+    openModal('<h3>Bulk Import Skills into ' + escHtml(adminCurrentProduct) + '</h3>' +
+        '<p style="color:var(--text-dim);font-size:0.82rem;margin-bottom:12px;">One skill per line. Indent with two spaces or use "Parent &gt; Child" to create a sub-skill. Add a description after a pipe: <code>Skill | description here</code></p>' +
+        '<div class="form-group"><textarea id="bulkText" style="min-height:220px;font-family:monospace;font-size:0.82rem;" placeholder="Workflow&#10;  Status and Reason&#10;  Segments | Configuring workflow segments&#10;Filter Templates&#10;Reporting &gt; Legacy Reports"></textarea></div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="runBulkImport()">Import</button></div>');
+}
+async function runBulkImport() {
+    var raw = document.getElementById('bulkText').value;
+    var lines = raw.split(String.fromCharCode(10));
+    var target = questionsData[adminCurrentProduct];
+    var lastParent = null, added = 0;
+    for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        if (!line.trim()) continue;
+        var indented = /^(\s{2,}|\t)/.test(line);
+        var body = line.trim();
+        var desc = '';
+        var pipe = body.indexOf('|');
+        if (pipe > -1) { desc = body.substring(pipe + 1).trim(); body = body.substring(0, pipe).trim(); }
+        var arrow = body.indexOf('>');
+        if (arrow > -1) {
+            var pName = body.substring(0, arrow).trim();
+            var cName = body.substring(arrow + 1).trim();
+            var parent = null;
+            for (var q = 0; q < target.length; q++) if (target[q].text === pName) parent = target[q];
+            if (!parent) { parent = { id: newId('skill'), text: pName, description: '', children: [] }; target.push(parent); }
+            if (!parent.children) parent.children = [];
+            parent.children.push({ id: newId('sub'), text: cName, description: desc });
+            lastParent = parent; added++;
+            continue;
+        }
+        if (indented && lastParent) {
+            if (!lastParent.children) lastParent.children = [];
+            lastParent.children.push({ id: newId('sub'), text: body, description: desc });
+            added++;
+        } else {
+            var np = { id: newId('skill'), text: body, description: desc, children: [] };
+            target.push(np); lastParent = np; added++;
+        }
+    }
+    if (!added) { alert('Nothing to import.'); return; }
+    await saveQuestions(); renderAdminSkills(); renderProductTabs(); closeModal(); showToast(added + ' skill(s) imported!');
+}
+
+function showAddUserModal() {
+    openModal('<h3>Add Team Member</h3>' +
+        '<div class="form-group"><label>Email</label><input type="email" id="newUserEmail" placeholder="name@company.com"></div>' +
+        '<div class="form-group"><label>Temporary Password (min 6 chars)</label><input type="text" id="newUserPassword" value="TempPass123!"></div>' +
+        '<div class="form-group"><label>Role</label><select id="newUserRole"><option value="member">Member</option><option value="admin">Admin</option></select></div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-success" onclick="createUser()">Create User</button></div>');
+}
+async function createUser() {
+    var email = document.getElementById('newUserEmail').value.trim();
+    var password = document.getElementById('newUserPassword').value;
+    var role = document.getElementById('newUserRole').value;
+    if (!email || password.length < 6) { alert('Email required and password must be 6+ characters.'); return; }
+    try {
+        var cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+        await db.collection('users').doc(cred.user.uid).set({ email: email, name: email.split('@')[0], role: role, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        await secondaryAuth.signOut();
+        closeModal(); loadTeamList(); showToast('User created: ' + email);
+    } catch (e) {
+        if (e.code === 'auth/email-already-in-use') {
+            alert('That email already exists in Firebase Authentication. Either delete it in the Firebase Console first, or ask the person to log in once so their profile is created automatically.');
+        } else { alert('Error: ' + e.message); }
+    }
+}
+async function deleteUser(uid, email) {
+    if (!confirm('Remove ' + email + '? This deletes their profile data. Their login must be removed separately in Firebase Console > Authentication.')) return;
+    await db.collection('users').doc(uid).delete();
+    loadTeamList(); showToast('User removed');
+}
+async function changeRole(uid, email, newRole) {
+    await db.collection('users').doc(uid).update({ role: newRole });
+    loadTeamList(); showToast(email + ' is now ' + newRole);
+}
+async function resetUserSubmission(uid, email) {
+    if (!confirm('Reset ' + email + ' submission flags? Their draft answers stay, but every product is marked as not submitted so they can redo the assessment. Audit history is kept.')) return;
+    await db.collection('responses').doc(uid).set({ submitted: {} }, { merge: true });
+    showToast('Submissions reset for ' + email);
+    loadAllResults();
+}
+async function loadTeamList() {
+    var snap = await db.collection('users').get();
+    var html = '';
+    snap.forEach(function (doc) {
+        var u = doc.data();
+        var uid = doc.id;
+        var roleToggle = u.role === 'admin'
+            ? '<button class="btn-icon" data-act="role" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" data-role="member" title="Demote to member" style="color:var(--warning);">&#9660;</button>'
+            : '<button class="btn-icon" data-act="role" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" data-role="admin" title="Promote to admin" style="color:var(--success);">&#9650;</button>';
+        html += '<div class="user-card"><span class="user-info">' + escHtml(u.email) + '<span class="user-role">' + escHtml(u.role) + '</span>' +
+            (u.products ? ' <span style="font-size:0.7rem;color:var(--text-dim);">(' + u.products.length + ' products)</span>' : '') + '</span>' +
+            '<div class="user-actions">' +
+            '<button class="btn-icon" data-act="products" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" title="Assign products" style="color:var(--accent);">&#9881;</button>' +
+            '<button class="btn-icon" data-act="reset" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" title="Reset submissions" style="color:var(--warning);">&#8635;</button>' +
+            roleToggle +
+            '<button class="btn-icon" data-act="delete" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" title="Remove" style="color:var(--danger);">&times;</button>' +
+            '</div></div>';
     });
-    document.getElementById('teamList').innerHTML=html||'<p style="color:var(--text-dim)">No users yet.</p>';
+    document.getElementById('teamList').innerHTML = html || '<p style="color:var(--text-dim)">No users yet.</p>';
 }
-    async function showAssignProductsModal(uid,email){var userDoc=await db.collection('users').doc(uid).get();var userData=userDoc.exists?userDoc.data():{};var userProducts=userData.products||[];var allProducts=Object.keys(questionsData);var checkboxes='';for(var i=0;i<allProducts.length;i++){var checked=userProducts.indexOf(allProducts[i])>-1?'checked':'';checkboxes+='<label style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg);border-radius:var(--radius);margin-bottom:4px;cursor:pointer;"><input type="checkbox" class="prodCheckbox" value="'+allProducts[i]+'" '+checked+' style="width:18px;height:18px;"> '+allProducts[i]+'</label>';}document.getElementById('modal').classList.remove('hidden');document.getElementById('modalContent').innerHTML='<h3>Assign Products to '+email+'</h3><p style="color:var(--text-dim);font-size:0.8rem;margin-bottom:12px;">User will only see checked products in their assessment.</p><div style="margin-bottom:16px;"><label style="display:flex;align-items:center;gap:8px;padding:8px;cursor:pointer;color:var(--accent);font-weight:600;"><input type="checkbox" id="assignAll" onchange="toggleAllProducts(this)" style="width:18px;height:18px;"'+(userProducts.length===allProducts.length?' checked':'')+' > All Products</label><hr style="border-color:var(--border);margin:8px 0;">'+checkboxes+'</div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveProductAssignment(\''+uid+'\')" >Save</button></div>';}
-function toggleAllProducts(el){var boxes=document.querySelectorAll('.prodCheckbox');for(var i=0;i<boxes.length;i++){boxes[i].checked=el.checked;}}
-async function saveProductAssignment(uid){var boxes=document.querySelectorAll('.prodCheckbox');var selected=[];for(var i=0;i<boxes.length;i++){if(boxes[i].checked)selected.push(boxes[i].value);}await db.collection('users').doc(uid).update({products:selected});closeModal();loadTeamList();showToast('Products assigned!');}
-async function grantAdmin(){var email=document.getElementById('adminEmailInput').value.trim();if(!email)return;var snap=await db.collection('users').where('email','==',email).get();if(snap.empty){alert('User not found. They need to log in first.');return;}snap.forEach(async function(doc){await db.collection('users').doc(doc.id).update({role:'admin'});});document.getElementById('adminEmailInput').value='';loadTeamList();showToast('Admin granted!');}
+document.getElementById('teamList').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var act = btn.getAttribute('data-act');
+    var uid = btn.getAttribute('data-uid');
+    var email = btn.getAttribute('data-email');
+    if (act === 'products') showAssignProductsModal(uid, email);
+    else if (act === 'role') changeRole(uid, email, btn.getAttribute('data-role'));
+    else if (act === 'delete') deleteUser(uid, email);
+    else if (act === 'reset') resetUserSubmission(uid, email);
+});
+async function showAssignProductsModal(uid, email) {
+    var userDoc = await db.collection('users').doc(uid).get();
+    var userData = userDoc.exists ? userDoc.data() : {};
+    var userProducts = userData.products || [];
+    var allProducts = Object.keys(questionsData);
+    var checkboxes = '';
+    for (var i = 0; i < allProducts.length; i++) {
+        var checked = userProducts.indexOf(allProducts[i]) > -1 ? 'checked' : '';
+        checkboxes += '<label style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg);border-radius:var(--radius);margin-bottom:4px;cursor:pointer;"><input type="checkbox" class="prodCheckbox" value="' + escHtml(allProducts[i]) + '" ' + checked + ' style="width:18px;height:18px;"> ' + escHtml(allProducts[i]) + '</label>';
+    }
+    openModal('<h3>Assign Products to ' + escHtml(email) + '</h3>' +
+        '<p style="color:var(--text-dim);font-size:0.8rem;margin-bottom:12px;">Leave everything unticked to give access to all products.</p>' +
+        '<div style="margin-bottom:16px;"><label style="display:flex;align-items:center;gap:8px;padding:8px;cursor:pointer;color:var(--accent);font-weight:600;"><input type="checkbox" onchange="toggleAllProducts(this)" style="width:18px;height:18px;"' + (userProducts.length === allProducts.length && allProducts.length ? ' checked' : '') + '> Select all</label><hr style="border-color:var(--border);margin:8px 0;">' + checkboxes + '</div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveProductAssignment(\'' + uid + '\')">Save</button></div>');
+}
+function toggleAllProducts(el) {
+    document.querySelectorAll('.prodCheckbox').forEach(function (b) { b.checked = el.checked; });
+}
+async function saveProductAssignment(uid) {
+    var selected = [];
+    document.querySelectorAll('.prodCheckbox').forEach(function (b) { if (b.checked) selected.push(b.value); });
+    await db.collection('users').doc(uid).update({ products: selected });
+    closeModal(); loadTeamList(); showToast('Products assigned!');
+}
+async function grantAdmin() {
+    var email = document.getElementById('adminEmailInput').value.trim();
+    if (!email) return;
+    var snap = await db.collection('users').where('email', '==', email).get();
+    if (snap.empty) { alert('User not found. They need to log in first.'); return; }
+    var jobs = [];
+    snap.forEach(function (doc) { jobs.push(db.collection('users').doc(doc.id).update({ role: 'admin' })); });
+    await Promise.all(jobs);
+    document.getElementById('adminEmailInput').value = '';
+    loadTeamList(); showToast('Admin granted!');
+}
 
+async function loadAllResults() {
+    var snap = await db.collection('responses').get();
+    allResults = [];
+    snap.forEach(function (doc) { allResults.push(Object.assign({ uid: doc.id }, doc.data())); });
+    renderResults();
+}
+function currentThreshold() {
+    var el = document.getElementById('thresholdInput');
+    return (el ? parseInt(el.value, 10) : 0) || settings.threshold || 3;
+}
+function renderResults() {
+    var threshold = currentThreshold();
+    var container = document.getElementById('resultsContainer');
+    if (!allResults.length) { container.innerHTML = '<p style="color:var(--text-dim)">No submissions yet.</p>'; return; }
+    var html = '';
+    for (var ri = 0; ri < allResults.length; ri++) {
+        var result = allResults[ri];
+        var name = result.name || result.email || 'Unknown';
+        var subStatus = result.submitted || {};
+        var productScores = [], allGaps = [];
+        Object.keys(questionsData).forEach(function (product) {
+            var rateable = getRateableSkillsForProduct(product);
+            var responses = (result.responses && result.responses[product]) || {};
+            var sc = scoreFrom(rateable, responses);
+            for (var si = 0; si < rateable.length; si++) {
+                var r = responses[rateable[si].id];
+                if (r && r.sl && r.sl !== 'na' && Number(r.sl) < threshold) allGaps.push({ product: product, skill: rateable[si].text, level: Number(r.sl) });
+            }
+            if (sc.answered > 0) productScores.push({ product: product, pct: sc.pct, grade: sc.grade, answered: sc.answered, total: sc.total, na: sc.na, submitted: !!subStatus[product] });
+        });
+        if (!productScores.length) continue;
+        var scoresHtml = '';
+        for (var ps = 0; ps < productScores.length; ps++) {
+            var p = productScores[ps];
+            scoresHtml += '<div class="result-score-item"><span>' + escHtml(p.product) + (p.submitted ? ' &#10003;' : '') + '</span><span class="score-display ' + getScoreClass(p.pct) + '">' + p.pct + '% ' + p.grade + '</span></div>';
+        }
+        var gapHtml = '';
+        if (allGaps.length) {
+            for (var gi = 0; gi < allGaps.length; gi++) gapHtml += '<span class="gap-badge ' + (allGaps[gi].level === 1 ? 'gap-critical' : 'gap-warning') + '">' + escHtml(allGaps[gi].product) + ': ' + escHtml(allGaps[gi].skill) + ' (' + allGaps[gi].level + ')</span> ';
+        } else { gapHtml = '<span style="color:var(--success);font-size:0.85rem;">All rated skills at or above threshold</span>'; }
+        html += '<div class="result-card"><h4>' + escHtml(name) + '</h4><div class="result-score-grid">' + scoresHtml + '</div>' +
+            '<div style="margin-top:12px;"><strong style="font-size:0.8rem;color:var(--text-dim);">Gaps (below level ' + threshold + '):</strong><div style="margin-top:6px;">' + gapHtml + '</div></div></div>';
+    }
+    container.innerHTML = html || '<p style="color:var(--text-dim)">No submissions yet.</p>';
+}
+function exportResultsCSV() {
+    if (!allResults.length) { alert('No results to export.'); return; }
+    var threshold = currentThreshold();
+    var rows = [['Team Member', 'Email', 'Product', 'Skill', 'Skill Level', 'Interest', 'Below Threshold', 'Evidence', 'Submitted']];
+    for (var ri = 0; ri < allResults.length; ri++) {
+        var result = allResults[ri];
+        var subStatus = result.submitted || {};
+        Object.keys(questionsData).forEach(function (product) {
+            var rateable = getRateableSkillsForProduct(product);
+            var responses = (result.responses && result.responses[product]) || {};
+            for (var si = 0; si < rateable.length; si++) {
+                var r = responses[rateable[si].id];
+                if (!r || !r.sl) continue;
+                var lvl = r.sl === 'na' ? 'N/A' : r.sl;
+                var below = (r.sl !== 'na' && Number(r.sl) < threshold) ? 'YES' : '';
+                var ev = (r.tickets && r.tickets.length) ? r.tickets.join(' ') : (r.notes || '');
+                rows.push([result.name || '', result.email || '', product, rateable[si].text, lvl, r.int || '', below, ev, subStatus[product] ? 'Yes' : 'No']);
+            }
+        });
+    }
+    downloadCSV(rows, 'competency-results-' + new Date().toISOString().slice(0, 10) + '.csv');
+    showToast('CSV exported!');
+}
+async function publishTeamAverages() {
+    await loadAllResults();
+    var averages = {};
+    Object.keys(questionsData).forEach(function (product) {
+        var rateable = getRateableSkillsForProduct(product);
+        var total = 0, count = 0;
+        for (var ri = 0; ri < allResults.length; ri++) {
+            var responses = (allResults[ri].responses && allResults[ri].responses[product]) || {};
+            var sc = scoreFrom(rateable, responses);
+            if (sc.scored > 0) { total += sc.pct; count++; }
+        }
+        if (count > 0) averages[product] = Math.round(total / count);
+    });
+    await db.collection('config').doc('aggregates').set({ productAverages: averages, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    teamAverages = averages;
+    showToast('Team averages published!');
+}
+
+var historyCache = [];
 async function loadHistory() {
     var container = document.getElementById('historyList');
     container.innerHTML = '<p style="color:var(--text-dim)">Loading...</p>';
     var usersSnap = await db.collection('users').get();
     var sel = document.getElementById('historyUserFilter');
     var currentVal = sel.value;
-    sel.innerHTML = '<option value="all">All Users</option>';
-    usersSnap.forEach(function(doc) { var u = doc.data(); sel.innerHTML += '<option value="'+doc.id+'">'+u.email+'</option>'; });
-    sel.value = currentVal;
+    var opts = '<option value="all">All Users</option>';
+    usersSnap.forEach(function (doc) { opts += '<option value="' + doc.id + '">' + escHtml(doc.data().email) + '</option>'; });
+    sel.innerHTML = opts;
+    sel.value = currentVal || 'all';
     var filterUser = sel.value;
-    var allHistory = [];
-    if (filterUser === 'all') {
-        var allUsers = []; usersSnap.forEach(function(doc) { allUsers.push(doc.id); });
-        for (var ui = 0; ui < allUsers.length; ui++) {
-            var hSnap = await db.collection('submissions').doc(allUsers[ui]).collection('history').orderBy('submittedAt','desc').limit(20).get();
-            hSnap.forEach(function(hDoc) { allHistory.push(hDoc.data()); });
-        }
-        allHistory.sort(function(a,b) { return (b.submittedAtLocal||'').localeCompare(a.submittedAtLocal||''); });
-    } else {
-        var hSnap = await db.collection('submissions').doc(filterUser).collection('history').orderBy('submittedAt','desc').limit(50).get();
-        hSnap.forEach(function(hDoc) { allHistory.push(hDoc.data()); });
+    var items = [];
+    var uids = [];
+    if (filterUser === 'all') { usersSnap.forEach(function (doc) { uids.push(doc.id); }); }
+    else { uids = [filterUser]; }
+    for (var ui = 0; ui < uids.length; ui++) {
+        try {
+            var hSnap = await db.collection('submissions').doc(uids[ui]).collection('history').orderBy('submittedAt', 'desc').limit(30).get();
+            hSnap.forEach(function (hDoc) { items.push(Object.assign({ _uid: uids[ui] }, hDoc.data())); });
+        } catch (e) { console.error('history load', e); }
     }
-    container.innerHTML = renderHistoryList(allHistory) || '<p style="color:var(--text-dim)">No submissions found.</p>';
+    items.sort(function (a, b) { return String(b.submittedAtLocal || '').localeCompare(String(a.submittedAtLocal || '')); });
+    historyCache = items;
+    container.innerHTML = renderHistoryList(items) || '<p style="color:var(--text-dim)">No submissions found.</p>';
+}
+function findPrevious(items, index) {
+    var cur = items[index];
+    for (var i = index + 1; i < items.length; i++) {
+        if (items[i]._uid === cur._uid && items[i].product === cur.product) return items[i];
+    }
+    return null;
 }
 function renderHistoryList(items) {
     var html = '';
     for (var i = 0; i < items.length; i++) {
         var item = items[i];
-        var dateStr = item.submittedAtLocal ? new Date(item.submittedAtLocal).toLocaleString('en-GB', {dateStyle:'medium', timeStyle:'short'}) : 'Unknown';
-        var scoreClass = getScoreClass(item.score ? item.score.pct : 0);
-        html += '<div class="history-item" onclick="this.querySelector(\'.history-detail\').classList.toggle(\'hidden\')">';
-        html += '<div class="history-header"><span class="history-user">'+(item.userName||'Unknown')+'</span><span class="history-product">'+(item.product||'')+'</span><span class="score-display '+scoreClass+'">'+(item.score?item.score.pct+'% '+item.score.grade:'')+'</span><span class="history-date">'+dateStr+'</span></div>';
-        html += '<div class="history-detail hidden">';
-        if (item.responses) {
-            var ids = Object.keys(item.responses);
-            for (var si = 0; si < ids.length; si++) {
-                var sr = item.responses[ids[si]];
-                var sName = findSkillName(item.product, ids[si]) || ids[si];
-                html += '<div class="detail-row"><span>'+sName+'</span><span>SL: '+(sr.sl||'-')+' | Int: '+(sr.int||'-')+'</span></div>';
-                if (sr.notes) html += '<div class="detail-notes">Evidence: '+linkifyTicket(sr.notes)+'</div>';
-            }
-        }
-        html += '</div></div>';
+        var prev = findPrevious(items, i);
+        var dateStr = item.submittedAtLocal ? new Date(item.submittedAtLocal).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }) : 'Unknown';
+        var pct = item.score ? item.score.pct : 0;
+        var scoreClass = getScoreClass(pct);
+        var deltaPill = '';
+        if (prev && prev.score) {
+            var d = pct - prev.score.pct;
+            if (d > 0) deltaPill = '<span class="change-pill up">&#9650; ' + d + '% vs last</span>';
+            else if (d < 0) deltaPill = '<span class="change-pill down">&#9660; ' + Math.abs(d) + '% vs last</span>';
+            else deltaPill = '<span class="change-pill same">No change vs last</span>';
+        } else { deltaPill = '<span class="change-pill same">First submission</span>'; }
+        html += '<div class="history-item" data-hist-index="' + i + '">' +
+            '<div class="history-header">' +
+            '<span class="history-user">' + escHtml(item.userName || 'Unknown') + '</span>' +
+            '<span class="history-product">' + escHtml(item.product || '') + '</span>' +
+            '<span class="score-display ' + scoreClass + '">' + pct + '% ' + escHtml(item.score ? item.score.grade : '') + '</span>' +
+            '<span class="history-date">' + dateStr + '</span></div>' +
+            '<div class="change-summary">' + deltaPill + '</div>' +
+            '<div class="history-detail hidden">' + renderHistoryDetail(item, prev) + '</div>' +
+            '</div>';
     }
     return html;
 }
-function linkifyTicket(text) {
-    var safe = escHtml(text);
-    return safe.replace(/([A-Z][A-Z0-9]+-[0-9]+)/g, '<a href="https://perchcapital.atlassian.net/browse/$1" target="_blank" style="color:var(--accent);text-decoration:underline;">$1</a>');
+function renderHistoryDetail(item, prev) {
+    if (!item.responses) return '<em style="color:var(--text-dim)">No detail recorded.</em>';
+    var out = '';
+    var ids = Object.keys(item.responses);
+    for (var si = 0; si < ids.length; si++) {
+        var sr = item.responses[ids[si]];
+        if (!sr || !sr.sl) continue;
+        var sName = findSkillName(item.product, ids[si]) || ids[si];
+        var lvl = sr.sl === 'na' ? 'N/A' : sr.sl;
+        var delta = '';
+        if (prev && prev.responses && prev.responses[ids[si]]) {
+            var old = prev.responses[ids[si]].sl;
+            if (old && old !== 'na' && sr.sl !== 'na') {
+                var diff = Number(sr.sl) - Number(old);
+                if (diff > 0) delta = ' <span class="delta-up">&#9650;' + diff + '</span>';
+                else if (diff < 0) delta = ' <span class="delta-down">&#9660;' + Math.abs(diff) + '</span>';
+            }
+        } else if (prev) { delta = ' <span class="delta-new">NEW</span>'; }
+        out += '<div class="detail-row"><span>' + escHtml(sName) + '</span><span>Level: ' + lvl + delta + ' &nbsp;|&nbsp; Interest: ' + (sr.int || '-') + '</span></div>';
+        if (sr.tickets && sr.tickets.length) {
+            var links = '';
+            for (var t = 0; t < sr.tickets.length; t++) links += '<a href="' + JIRA_BASE + encodeURIComponent(sr.tickets[t]) + '" target="_blank" style="color:var(--accent);margin-right:8px;">' + escHtml(sr.tickets[t]) + '</a>';
+            out += '<div class="detail-notes">Evidence: ' + links + '</div>';
+        } else if (sr.notes) {
+            out += '<div class="detail-notes">Note: ' + linkifyTicket(sr.notes) + '</div>';
+        }
+    }
+    return out || '<em style="color:var(--text-dim)">No rated skills recorded.</em>';
 }
-    function findSkillName(product, skillId) {
+document.getElementById('historyList').addEventListener('click', function (e) {
+    var item = e.target.closest('.history-item');
+    if (!item) return;
+    if (e.target.tagName === 'A') return;
+    item.querySelector('.history-detail').classList.toggle('hidden');
+});
+function findSkillName(product, skillId) {
     var skills = questionsData[product] || [];
     for (var i = 0; i < skills.length; i++) {
         if (skills[i].id === skillId) return skills[i].text;
-        if (skills[i].children) { for (var j = 0; j < skills[i].children.length; j++) { if (skills[i].children[j].id === skillId) return skills[i].children[j].text; } }
+        if (skills[i].children) {
+            for (var j = 0; j < skills[i].children.length; j++) if (skills[i].children[j].id === skillId) return skills[i].children[j].text;
+        }
     }
     return null;
 }
+
 function populateHeatmapDropdown() {
-var sel = document.getElementById('heatmapProductSelect');
-var products = Object.keys(questionsData);
-sel.innerHTML = '';
-for (var i = 0; i < products.length; i++) {
-sel.innerHTML += '<option value="' + products[i] + '">' + products[i] + '</option>';
+    var sel = document.getElementById('heatmapProductSelect');
+    var products = Object.keys(questionsData);
+    var keep = sel.value;
+    var html = '';
+    for (var i = 0; i < products.length; i++) html += '<option value="' + escHtml(products[i]) + '">' + escHtml(products[i]) + '</option>';
+    sel.innerHTML = html;
+    if (keep && products.indexOf(keep) > -1) sel.value = keep;
 }
+function buildHeatmapData() {
+    var product = document.getElementById('heatmapProductSelect').value;
+    var skills = getRateableSkillsForProduct(product);
+    var team = [];
+    for (var ri = 0; ri < allResults.length; ri++) {
+        var result = allResults[ri];
+        var responses = (result.responses && result.responses[product]) || {};
+        var hasAny = false;
+        var row = { name: result.name || result.email || 'Unknown', scores: [] };
+        for (var si = 0; si < skills.length; si++) {
+            var r = responses[skills[si].id];
+            var val = 0;
+            if (r && r.sl) { val = r.sl === 'na' ? 'na' : Number(r.sl); hasAny = true; }
+            row.scores.push(val);
+        }
+        if (hasAny) team.push(row);
+    }
+    team.sort(function (a, b) { return a.name.localeCompare(b.name); });
+    return { product: product, skills: skills, team: team };
 }
-
 function renderHeatmap() {
-var container = document.getElementById('heatmapContainer');
-var product = document.getElementById('heatmapProductSelect').value;
-if (!product || !allResults.length) {
-container.innerHTML = '<p style="color:var(--text-dim)">No data available. Ensure team members have submitted assessments.</p>';
-return;
+    var container = document.getElementById('heatmapContainer');
+    if (!allResults.length) { container.innerHTML = '<p style="color:var(--text-dim)">No data available yet.</p>'; return; }
+    var d = buildHeatmapData();
+    if (!d.skills.length) { container.innerHTML = '<p style="color:var(--text-dim)">No skills configured for this product.</p>'; return; }
+    if (!d.team.length) { container.innerHTML = '<p style="color:var(--text-dim)">No submissions yet for ' + escHtml(d.product) + '.</p>'; return; }
+    var html = '<table class="heatmap-table"><thead><tr><th style="text-align:left;">Team Member</th>';
+    for (var si = 0; si < d.skills.length; si++) html += '<th class="skill-header" title="' + escHtml(d.skills[si].text) + '">' + escHtml(d.skills[si].text) + '</th>';
+    html += '<th>Avg</th></tr></thead><tbody>';
+    var totals = [], counts = [];
+    for (var z = 0; z < d.skills.length; z++) { totals.push(0); counts.push(0); }
+    for (var ti = 0; ti < d.team.length; ti++) {
+        var t = d.team[ti];
+        var rowSum = 0, rowCount = 0;
+        html += '<tr><td class="name-cell">' + escHtml(t.name) + '</td>';
+        for (var s2 = 0; s2 < t.scores.length; s2++) {
+            var val = t.scores[s2];
+            if (val === 'na') { html += '<td class="heatmap-cell heatmap-0">N/A</td>'; continue; }
+            html += '<td class="heatmap-cell heatmap-' + val + '">' + (val > 0 ? val : '-') + '</td>';
+            if (val > 0) { rowSum += val; rowCount++; totals[s2] += val; counts[s2]++; }
+        }
+        var rowAvg = rowCount > 0 ? (rowSum / rowCount).toFixed(1) : '-';
+        html += '<td class="heatmap-cell heatmap-avg heatmap-' + (rowCount > 0 ? Math.round(rowSum / rowCount) : 0) + '">' + rowAvg + '</td></tr>';
+    }
+    html += '<tr style="border-top:2px solid var(--accent);"><td class="name-cell" style="color:var(--accent);font-style:italic;">Team Average</td>';
+    var gTotal = 0, gCount = 0;
+    for (var s3 = 0; s3 < d.skills.length; s3++) {
+        var avg = counts[s3] > 0 ? (totals[s3] / counts[s3]) : 0;
+        html += '<td class="heatmap-cell heatmap-avg heatmap-' + (counts[s3] > 0 ? Math.round(avg) : 0) + '">' + (counts[s3] > 0 ? avg.toFixed(1) : '-') + '</td>';
+        if (counts[s3] > 0) { gTotal += avg; gCount++; }
+    }
+    var grand = gCount > 0 ? (gTotal / gCount) : 0;
+    html += '<td class="heatmap-cell heatmap-avg heatmap-' + (gCount > 0 ? Math.round(grand) : 0) + '">' + (gCount > 0 ? grand.toFixed(1) : '-') + '</td></tr></tbody></table>';
+    html += '<div class="heatmap-legend"><span style="color:var(--text-dim);font-weight:600;">Key:</span>' +
+        '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:var(--bg);"></div><span>Not rated / N/A</span></div>' +
+        '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(229,57,53,0.3);"></div><span>1 Basic</span></div>' +
+        '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(251,140,0,0.3);"></div><span>2 Intermediate</span></div>' +
+        '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(67,160,71,0.3);"></div><span>3 Advanced</span></div>' +
+        '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(255,214,0,0.3);"></div><span>4 Trainer</span></div></div>';
+    container.innerHTML = html;
+}
+function exportHeatmapCSV() {
+    if (!allResults.length) { alert('No data to export.'); return; }
+    var d = buildHeatmapData();
+    if (!d.team.length) { alert('No submissions for this product.'); return; }
+    var header = ['Team Member'];
+    for (var i = 0; i < d.skills.length; i++) header.push(d.skills[i].text);
+    header.push('Average');
+    var rows = [header];
+    for (var ti = 0; ti < d.team.length; ti++) {
+        var t = d.team[ti];
+        var row = [t.name], sum = 0, count = 0;
+        for (var s = 0; s < t.scores.length; s++) {
+            var v = t.scores[s];
+            row.push(v === 'na' ? 'N/A' : (v > 0 ? v : ''));
+            if (v !== 'na' && v > 0) { sum += v; count++; }
+        }
+        row.push(count > 0 ? (sum / count).toFixed(1) : '');
+        rows.push(row);
+    }
+    downloadCSV(rows, 'heatmap-' + d.product.replace(/\s+/g, '-') + '-' + new Date().toISOString().slice(0, 10) + '.csv');
+    showToast('Heatmap exported!');
 }
 
-var skills = getRateableSkillsForProduct(product);
-if (!skills.length) {
-container.innerHTML = '<p style="color:var(--text-dim)">No skills configured for this product.</p>';
-return;
+function loadSettingsUI() {
+    document.getElementById('notifEmail').value = settings.notifEmail || '';
+    document.getElementById('settingsThreshold').value = settings.threshold || 3;
+    document.getElementById('settingsDeadline').value = settings.deadline || '';
 }
-
-// Build team data
-var team = [];
-for (var ri = 0; ri < allResults.length; ri++) {
-var result = allResults[ri];
-var name = result.name || result.email || 'Unknown';
-var responses = (result.responses && result.responses[product]) || {};
-var hasAny = false;
-var row = { name: name, scores: [] };
-for (var si = 0; si < skills.length; si++) {
-var r = responses[skills[si].id];
-var val = (r && r.sl) ? r.sl : 0;
-if (val > 0) hasAny = true;
-row.scores.push(val);
+async function saveSettings() {
+    settings.notifEmail = document.getElementById('notifEmail').value.trim();
+    settings.threshold = parseInt(document.getElementById('settingsThreshold').value, 10) || 3;
+    settings.deadline = document.getElementById('settingsDeadline').value || '';
+    await db.collection('config').doc('settings').set(settings);
+    renderDeadlineBanner();
+    showToast('Settings saved!');
 }
-if (hasAny) team.push(row);
-}
-
-if (!team.length) {
-container.innerHTML = '<p style="color:var(--text-dim)">No submissions yet for ' + product + '.</p>';
-return;
-}
-
-// Sort team alphabetically
-team.sort(function(a, b) { return a.name.localeCompare(b.name); });
-
-// Build table
-var html = '<table class="heatmap-table"><thead><tr><th style="text-align:left;">Team Member</th>';
-for (var si = 0; si < skills.length; si++) {
-html += '<th class="skill-header" title="' + escHtml(skills[si].text) + '">' + escHtml(skills[si].text) + '</th>';
-}
-html += '<th>Avg</th></tr></thead><tbody>';
-
-// Skill averages array
-var skillTotals = new Array(skills.length).fill(0);
-var skillCounts = new Array(skills.length).fill(0);
-
-for (var ti = 0; ti < team.length; ti++) {
-var t = team[ti];
-var rowSum = 0, rowCount = 0;
-html += '<tr><td class="name-cell">' + escHtml(t.name) + '</td>';
-for (var si = 0; si < t.scores.length; si++) {
-var val = t.scores[si];
-var cellClass = 'heatmap-' + val;
-html += '<td class="heatmap-cell ' + cellClass + '">' + (val > 0 ? val : '-') + '</td>';
-if (val > 0) { rowSum += val; rowCount++; skillTotals[si] += val; skillCounts[si]++; }
-}
-var rowAvg = rowCount > 0 ? (rowSum / rowCount).toFixed(1) : '-';
-var avgClass = rowCount > 0 ? 'heatmap-' + Math.round(rowSum / rowCount) : 'heatmap-0';
-html += '<td class="heatmap-cell heatmap-avg ' + avgClass + '">' + rowAvg + '</td>';
-html += '</tr>';
-}
-
-// Team average row
-html += '<tr style="border-top:2px solid var(--accent);"><td class="name-cell" style="color:var(--accent);font-style:italic;">Team Average</td>';
-var totalSum = 0, totalCount = 0;
-for (var si = 0; si < skills.length; si++) {
-var avg = skillCounts[si] > 0 ? (skillTotals[si] / skillCounts[si]).toFixed(1) : '-';
-var avgVal = skillCounts[si] > 0 ? Math.round(skillTotals[si] / skillCounts[si]) : 0;
-var cellClass = 'heatmap-' + avgVal;
-html += '<td class="heatmap-cell heatmap-avg ' + cellClass + '">' + avg + '</td>';
-if (skillCounts[si] > 0) { totalSum += skillTotals[si] / skillCounts[si]; totalCount++; }
-}
-var grandAvg = totalCount > 0 ? (totalSum / totalCount).toFixed(1) : '-';
-var grandClass = totalCount > 0 ? 'heatmap-' + Math.round(totalSum / totalCount) : 'heatmap-0';
-html += '<td class="heatmap-cell heatmap-avg ' + grandClass + '">' + grandAvg + '</td>';
-html += '</tr></tbody></table>';
-
-// Legend
-html += '<div class="heatmap-legend">';
-html += '<span style="color:var(--text-dim);font-weight:600;">Key:</span>';
-html += '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:var(--bg);"></div><span>Not rated</span></div>';
-html += '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(229,57,53,0.3);"></div><span>1 Basic</span></div>';
-html += '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(251,140,0,0.3);"></div><span>2 Intermediate</span></div>';
-html += '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(67,160,71,0.3);"></div><span>3 Advanced</span></div>';
-html += '<div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(255,214,0,0.3);"></div><span>4 Trainer</span></div>';
-html += '</div>';
-
-container.innerHTML = html;
-}
-function showToast(msg,isError){
-var t=document.createElement('div');t.className='toast'+(isError?' error':'');t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3000);}
-async function deleteProduct(name){if(!confirm('Delete "'+name+'"?'))return;delete questionsData[name];await saveQuestions();adminCurrentProduct=Object.keys(questionsData)[0]||null;renderAdminProductTabs();renderProductTabs();}
 </script>
 </body>
 </html>
