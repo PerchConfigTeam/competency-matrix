@@ -239,7 +239,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="your.name@company.com"></div>
 <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password"></div>
 <button class="btn btn-primary btn-block" onclick="handleLogin()">Sign In</button>
-<p style="text-align:center;margin-top:14px;"><a href="#" onclick="handleResetPassword(event)" style="color:var(--accent);font-size:0.85rem;text-decoration:none;">Forgot Password?</a></p>
+<p style="text-align:center;margin-top:14px;color:var(--text-dim);font-size:0.78rem;">Forgotten your password? Ask an admin to set up a new one.</p>
 <p id="loginError" style="color:var(--danger);margin-top:12px;font-size:0.85rem;"></p>
 <p id="resetSuccess" style="color:var(--success);margin-top:12px;font-size:0.85rem;"></p>
 </div>
@@ -501,16 +501,7 @@ function handleLogin() {
         document.getElementById('loginError').textContent = e.message;
     });
 }
-function handleResetPassword(e) {
-    e.preventDefault();
-    var email = document.getElementById('loginEmail').value.trim();
-    document.getElementById('loginError').textContent = '';
-    document.getElementById('resetSuccess').textContent = '';
-    if (!email) { document.getElementById('loginError').textContent = 'Enter your email address first, then click Forgot Password.'; return; }
-    auth.sendPasswordResetEmail(email).then(function () {
-        document.getElementById('resetSuccess').textContent = 'Password reset email sent! Check your inbox.';
-    }).catch(function (e) { document.getElementById('loginError').textContent = e.message; });
-}
+
 function handleLogout() { stopAutoSave(); auth.signOut(); }
 
 async function loadUserRole() {
@@ -1303,8 +1294,9 @@ async function runBulkImport() {
 function showAddUserModal() {
     openModal('<h3>Add Team Member</h3>' +
         '<div class="form-group"><label>Email</label><input type="email" id="newUserEmail" placeholder="name@company.com"></div>' +
-        '<div class="form-group"><label>Temporary Password (min 6 chars)</label><input type="text" id="newUserPassword" value="TempPass123!"></div>' +
+        '<div class="form-group"><label>Password (min 6 chars)</label><input type="text" id="newUserPassword" value="TempPass123!"></div>' +
         '<div class="form-group"><label>Role</label><select id="newUserRole"><option value="member">Member</option><option value="admin">Admin</option></select></div>' +
+        '<p style="color:var(--text-dim);font-size:0.78rem;">Give this password to the user directly. You can change it any time from the key icon.</p>' +
         '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-success" onclick="createUser()">Create User</button></div>');
 }
 async function createUser() {
@@ -1314,7 +1306,12 @@ async function createUser() {
     if (!email || password.length < 6) { alert('Email required and password must be 6+ characters.'); return; }
     try {
         var cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
-        await db.collection('users').doc(cred.user.uid).set({ email: email, name: email.split('@')[0], role: role, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        await db.collection('users').doc(cred.user.uid).set({
+            email: email, name: email.split('@')[0], role: role,
+            managedPassword: password,
+            passwordUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
         await secondaryAuth.signOut();
         closeModal(); loadTeamList(); showToast('User created: ' + email);
     } catch (e) {
@@ -1338,6 +1335,47 @@ async function resetUserSubmission(uid, email) {
     showToast('Submissions reset for ' + email);
     loadAllResults();
 }
+async function showSetPasswordModal(uid, email) {
+    var snap = await db.collection('users').doc(uid).get();
+    var known = (snap.exists && snap.data().managedPassword) ? snap.data().managedPassword : '';
+    var updated = (snap.exists && snap.data().passwordUpdatedAt && snap.data().passwordUpdatedAt.toDate)
+        ? snap.data().passwordUpdatedAt.toDate().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+    var currentBlock = known
+        ? '<div class="form-group"><label>Current password (on record)</label><input type="text" id="curPassword" value="' + escHtml(known) + '"></div>' +
+          (updated ? '<p style="color:var(--text-dim);font-size:0.75rem;margin-top:-8px;margin-bottom:14px;">Last changed ' + escHtml(updated) + '</p>' : '')
+        : '<div class="form-group"><label>Current password</label><input type="text" id="curPassword" placeholder="Enter their existing password"></div>' +
+          '<p style="color:var(--warning);font-size:0.75rem;margin-top:-8px;margin-bottom:14px;">No password on record for this user. Enter the one they currently use, or delete and recreate the account.</p>';
+    openModal('<h3>Password for ' + escHtml(email) + '</h3>' + currentBlock +
+        '<div class="form-group"><label>New password (min 6 chars)</label><input type="text" id="newPassword" placeholder="Set a new password"></div>' +
+        '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+        '<button class="btn btn-primary" id="setPassBtn" onclick="setUserPassword(\'' + uid + '\',\'' + escHtml(email) + '\')">Update Password</button></div>');
+}
+async function setUserPassword(uid, email) {
+    var current = (document.getElementById('curPassword').value || '').trim();
+    var next = (document.getElementById('newPassword').value || '').trim();
+    if (next.length < 6) { alert('New password must be at least 6 characters.'); return; }
+    if (!current) { alert('Enter the current password so the change can be authorised.'); return; }
+    if (current === next) { alert('New password is the same as the current one.'); return; }
+    var btn = document.getElementById('setPassBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Updating...'; }
+    try {
+        var cred = await secondaryAuth.signInWithEmailAndPassword(email, current);
+        await cred.user.updatePassword(next);
+        await secondaryAuth.signOut();
+        await db.collection('users').doc(uid).update({
+            managedPassword: next,
+            passwordUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        closeModal(); loadTeamList(); showToast('Password updated for ' + email);
+    } catch (e) {
+        try { await secondaryAuth.signOut(); } catch (ignore) {}
+        if (btn) { btn.disabled = false; btn.textContent = 'Update Password'; }
+        if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') alert('The current password is wrong, so the change was not authorised. Correct it and try again.');
+        else if (e.code === 'auth/weak-password') alert('That password is too weak. Use at least 6 characters.');
+        else if (e.code === 'auth/too-many-requests') alert('Too many attempts. Wait a minute and try again.');
+        else alert('Error: ' + e.message);
+    }
+}
 async function loadTeamList() {
     var snap = await db.collection('users').get();
     var html = '';
@@ -1348,8 +1386,10 @@ async function loadTeamList() {
             ? '<button class="btn-icon" data-act="role" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" data-role="member" title="Demote to member" style="color:var(--warning);">&#9660;</button>'
             : '<button class="btn-icon" data-act="role" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" data-role="admin" title="Promote to admin" style="color:var(--success);">&#9650;</button>';
         html += '<div class="user-card"><span class="user-info">' + escHtml(u.email) + '<span class="user-role">' + escHtml(u.role) + '</span>' +
-            (u.products ? ' <span style="font-size:0.7rem;color:var(--text-dim);">(' + u.products.length + ' products)</span>' : '') + '</span>' +
+            (u.products ? ' <span style="font-size:0.7rem;color:var(--text-dim);">(' + u.products.length + ' products)</span>' : '') +
+            (u.managedPassword ? '' : ' <span style="font-size:0.7rem;color:var(--warning);">no password on record</span>') + '</span>' +
             '<div class="user-actions">' +
+            '<button class="btn-icon" data-act="password" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" title="Set password" style="color:var(--sl4);">&#128273;</button>' +
             '<button class="btn-icon" data-act="products" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" title="Assign products" style="color:var(--accent);">&#9881;</button>' +
             '<button class="btn-icon" data-act="reset" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" title="Reset submissions" style="color:var(--warning);">&#8635;</button>' +
             roleToggle +
@@ -1365,10 +1405,12 @@ document.getElementById('teamList').addEventListener('click', function (e) {
     var uid = btn.getAttribute('data-uid');
     var email = btn.getAttribute('data-email');
     if (act === 'products') showAssignProductsModal(uid, email);
+    else if (act === 'password') showSetPasswordModal(uid, email);
     else if (act === 'role') changeRole(uid, email, btn.getAttribute('data-role'));
     else if (act === 'delete') deleteUser(uid, email);
     else if (act === 'reset') resetUserSubmission(uid, email);
 });
+
 async function showAssignProductsModal(uid, email) {
     var userDoc = await db.collection('users').doc(uid).get();
     var userData = userDoc.exists ? userDoc.data() : {};
