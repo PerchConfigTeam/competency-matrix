@@ -1338,44 +1338,48 @@ async function resetUserSubmission(uid, email) {
 async function showSetPasswordModal(uid, email) {
     var snap = await db.collection('users').doc(uid).get();
     var known = (snap.exists && snap.data().managedPassword) ? snap.data().managedPassword : '';
-    var updated = (snap.exists && snap.data().passwordUpdatedAt && snap.data().passwordUpdatedAt.toDate)
+    var stamp = (snap.exists && snap.data().passwordUpdatedAt && snap.data().passwordUpdatedAt.toDate)
         ? snap.data().passwordUpdatedAt.toDate().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }) : '';
-    var currentBlock = known
-        ? '<div class="form-group"><label>Current password (on record)</label><input type="text" id="curPassword" value="' + escHtml(known) + '"></div>' +
-          (updated ? '<p style="color:var(--text-dim);font-size:0.75rem;margin-top:-8px;margin-bottom:14px;">Last changed ' + escHtml(updated) + '</p>' : '')
-        : '<div class="form-group"><label>Current password</label><input type="text" id="curPassword" placeholder="Enter their existing password"></div>' +
-          '<p style="color:var(--warning);font-size:0.75rem;margin-top:-8px;margin-bottom:14px;">No password on record for this user. Enter the one they currently use, or delete and recreate the account.</p>';
-    openModal('<h3>Password for ' + escHtml(email) + '</h3>' + currentBlock +
-        '<div class="form-group"><label>New password (min 6 chars)</label><input type="text" id="newPassword" placeholder="Set a new password"></div>' +
+    var onRecord = known
+        ? '<p style="color:var(--text-dim);font-size:0.78rem;margin-bottom:14px;">Current password on record: <strong style="color:var(--text);">' + escHtml(known) + '</strong>' + (stamp ? ' &middot; set ' + escHtml(stamp) : '') + '</p>'
+        : '<p style="color:var(--text-dim);font-size:0.78rem;margin-bottom:14px;">No password on record. Setting one here overwrites whatever they currently use.</p>';
+    openModal('<h3>Set password for ' + escHtml(email) + '</h3>' + onRecord +
+        '<div class="form-group"><label>New password (min 6 chars)</label><input type="text" id="newPassword" placeholder="Type or generate a password"></div>' +
+        '<button class="btn btn-sm btn-secondary" onclick="generatePassword()">Generate</button>' +
         '<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
-        '<button class="btn btn-primary" id="setPassBtn" onclick="setUserPassword(\'' + uid + '\',\'' + escHtml(email) + '\')">Update Password</button></div>');
+        '<button class="btn btn-primary" id="setPassBtn" onclick="setUserPassword(\'' + uid + '\',\'' + escHtml(email) + '\')">Overwrite Password</button></div>');
+}
+function generatePassword() {
+    var words = ['Config', 'Matrix', 'Perch', 'Cloud', 'Ticket', 'Rota', 'Widget', 'Strategy'];
+    var pw = words[Math.floor(Math.random() * words.length)] + '-' + Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('newPassword').value = pw;
 }
 async function setUserPassword(uid, email) {
-    var current = (document.getElementById('curPassword').value || '').trim();
     var next = (document.getElementById('newPassword').value || '').trim();
-    if (next.length < 6) { alert('New password must be at least 6 characters.'); return; }
-    if (!current) { alert('Enter the current password so the change can be authorised.'); return; }
-    if (current === next) { alert('New password is the same as the current one.'); return; }
+    if (next.length < 6) { alert('Password must be at least 6 characters.'); return; }
     var btn = document.getElementById('setPassBtn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Updating...'; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Overwriting...'; }
     try {
-        var cred = await secondaryAuth.signInWithEmailAndPassword(email, current);
-        await cred.user.updatePassword(next);
-        await secondaryAuth.signOut();
+        var idToken = await currentUser.getIdToken(true);
+        var res = await fetch('/set-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken: idToken, targetUid: uid, newPassword: next })
+        });
+        var out = await res.json();
+        if (!res.ok || !out.ok) throw new Error(out.error || 'Password change failed.');
         await db.collection('users').doc(uid).update({
             managedPassword: next,
-            passwordUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            passwordUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            passwordSetBy: currentUser.email
         });
-        closeModal(); loadTeamList(); showToast('Password updated for ' + email);
+        closeModal(); loadTeamList(); showToast('Password set for ' + email);
     } catch (e) {
-        try { await secondaryAuth.signOut(); } catch (ignore) {}
-        if (btn) { btn.disabled = false; btn.textContent = 'Update Password'; }
-        if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') alert('The current password is wrong, so the change was not authorised. Correct it and try again.');
-        else if (e.code === 'auth/weak-password') alert('That password is too weak. Use at least 6 characters.');
-        else if (e.code === 'auth/too-many-requests') alert('Too many attempts. Wait a minute and try again.');
-        else alert('Error: ' + e.message);
+        if (btn) { btn.disabled = false; btn.textContent = 'Overwrite Password'; }
+        alert(e.message);
     }
 }
+
 async function loadTeamList() {
     var snap = await db.collection('users').get();
     var html = '';
@@ -1387,7 +1391,7 @@ async function loadTeamList() {
             : '<button class="btn-icon" data-act="role" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" data-role="admin" title="Promote to admin" style="color:var(--success);">&#9650;</button>';
         html += '<div class="user-card"><span class="user-info">' + escHtml(u.email) + '<span class="user-role">' + escHtml(u.role) + '</span>' +
             (u.products ? ' <span style="font-size:0.7rem;color:var(--text-dim);">(' + u.products.length + ' products)</span>' : '') +
-            (u.managedPassword ? '' : ' <span style="font-size:0.7rem;color:var(--warning);">no password on record</span>') + '</span>' +
+            (u.managedPassword ? ' <span style="font-size:0.7rem;color:var(--text-dim);">pw: ' + escHtml(u.managedPassword) + '</span>' : ' <span style="font-size:0.7rem;color:var(--warning);">no password set</span>') + '</span>' +
             '<div class="user-actions">' +
             '<button class="btn-icon" data-act="password" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" title="Set password" style="color:var(--sl4);">&#128273;</button>' +
             '<button class="btn-icon" data-act="products" data-uid="' + uid + '" data-email="' + escHtml(u.email) + '" title="Assign products" style="color:var(--accent);">&#9881;</button>' +
